@@ -1,0 +1,15 @@
+{
+  "description": "Bayrell Lang",
+  "files": [
+	"Exceptions/*.js",
+	"LangBay/*.js",
+	"LangES6/*.js",
+	"LangNodeJS/*.js",
+	"LangPHP/*.js",
+	"OpCodes/*.js",
+    "*.js"
+  ],
+  "main": "index.js",
+  "name": "bayrell-lang-es6",
+  "version": "0.4.2"
+}
