@@ -28,18 +28,6 @@ BayrellLang.OpCodes.OpAssign = class extends BayrellLang.OpCodes.BaseOpCode{
 		this.value = null;
 		this.op_name = "";
 	}
-	createNewInstance(){
-		return Runtime.rtl.newInstance( this.getClassName() );
-	}
-	assignObject(obj){
-		if (obj instanceof BayrellLang.OpCodes.OpAssign){
-			this.op = Runtime.rtl._clone(obj.op);
-			this.ident = Runtime.rtl._clone(obj.ident);
-			this.value = Runtime.rtl._clone(obj.value);
-			this.op_name = Runtime.rtl._clone(obj.op_name);
-		}
-		super.assign(obj);
-	}
 	assignValue(variable_name, value){
 		if (variable_name == "op") this.op = Runtime.rtl.correct(value, "string", "op_assign", "");
 		else if (variable_name == "ident") this.ident = Runtime.rtl.correct(value, "BayrellLang.OpCodes.BaseOpCode", null, "");

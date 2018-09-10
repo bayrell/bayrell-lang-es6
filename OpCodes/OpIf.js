@@ -29,19 +29,6 @@ BayrellLang.OpCodes.OpIf = class extends BayrellLang.OpCodes.BaseOpCode{
 		this.if_false = null;
 		this.if_else = null;
 	}
-	createNewInstance(){
-		return Runtime.rtl.newInstance( this.getClassName() );
-	}
-	assignObject(obj){
-		if (obj instanceof BayrellLang.OpCodes.OpIf){
-			this.op = Runtime.rtl._clone(obj.op);
-			this.condition = Runtime.rtl._clone(obj.condition);
-			this.if_true = Runtime.rtl._clone(obj.if_true);
-			this.if_false = Runtime.rtl._clone(obj.if_false);
-			this.if_else = Runtime.rtl._clone(obj.if_else);
-		}
-		super.assign(obj);
-	}
 	assignValue(variable_name, value){
 		if (variable_name == "op") this.op = Runtime.rtl.correct(value, "string", "op_if", "");
 		else if (variable_name == "condition") this.condition = Runtime.rtl.correct(value, "BayrellLang.OpCodes.BaseOpCode", null, "");

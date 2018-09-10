@@ -25,15 +25,6 @@ BayrellLang.OpCodes.OpIdentifier = class extends BayrellLang.OpCodes.OpValueStri
 		super._init();
 		this.op = "op_identifier";
 	}
-	createNewInstance(){
-		return Runtime.rtl.newInstance( this.getClassName() );
-	}
-	assignObject(obj){
-		if (obj instanceof BayrellLang.OpCodes.OpIdentifier){
-			this.op = Runtime.rtl._clone(obj.op);
-		}
-		super.assign(obj);
-	}
 	assignValue(variable_name, value){
 		if (variable_name == "op") this.op = Runtime.rtl.correct(value, "string", "op_identifier", "");
 		else super.assignValue(variable_name, value);

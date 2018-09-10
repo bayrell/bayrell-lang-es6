@@ -27,15 +27,6 @@ BayrellLang.OpCodes.BaseOpCode = class extends Runtime.CoreObject{
 		if (this.__implements__ == undefined){this.__implements__ = [];}
 		this.__implements__.push(Runtime.Interfaces.SerializeInterface);
 	}
-	createNewInstance(){
-		return Runtime.rtl.newInstance( this.getClassName() );
-	}
-	assignObject(obj){
-		if (obj instanceof BayrellLang.OpCodes.BaseOpCode){
-			this.op = Runtime.rtl._clone(obj.op);
-		}
-		super.assign(obj);
-	}
 	assignValue(variable_name, value){
 		if (variable_name == "op") this.op = Runtime.rtl.correct(value, "string", "", "");
 		else super.assignValue(variable_name, value);

@@ -25,15 +25,6 @@ BayrellLang.OpCodes.OpShiftLeft = class extends BayrellLang.OpCodes.OpValue2{
 		super._init();
 		this.op = "op_shift_left";
 	}
-	createNewInstance(){
-		return Runtime.rtl.newInstance( this.getClassName() );
-	}
-	assignObject(obj){
-		if (obj instanceof BayrellLang.OpCodes.OpShiftLeft){
-			this.op = Runtime.rtl._clone(obj.op);
-		}
-		super.assign(obj);
-	}
 	assignValue(variable_name, value){
 		if (variable_name == "op") this.op = Runtime.rtl.correct(value, "string", "op_shift_left", "");
 		else super.assignValue(variable_name, value);

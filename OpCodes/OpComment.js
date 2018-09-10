@@ -25,15 +25,6 @@ BayrellLang.OpCodes.OpComment = class extends BayrellLang.OpCodes.OpValueString{
 		super._init();
 		this.op = "op_comment";
 	}
-	createNewInstance(){
-		return Runtime.rtl.newInstance( this.getClassName() );
-	}
-	assignObject(obj){
-		if (obj instanceof BayrellLang.OpCodes.OpComment){
-			this.op = Runtime.rtl._clone(obj.op);
-		}
-		super.assign(obj);
-	}
 	assignValue(variable_name, value){
 		if (variable_name == "op") this.op = Runtime.rtl.correct(value, "string", "op_comment", "");
 		else super.assignValue(variable_name, value);

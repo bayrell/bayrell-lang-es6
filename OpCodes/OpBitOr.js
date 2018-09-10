@@ -25,15 +25,6 @@ BayrellLang.OpCodes.OpBitOr = class extends BayrellLang.OpCodes.OpValue2{
 		super._init();
 		this.op = "op_bit_or";
 	}
-	createNewInstance(){
-		return Runtime.rtl.newInstance( this.getClassName() );
-	}
-	assignObject(obj){
-		if (obj instanceof BayrellLang.OpCodes.OpBitOr){
-			this.op = Runtime.rtl._clone(obj.op);
-		}
-		super.assign(obj);
-	}
 	assignValue(variable_name, value){
 		if (variable_name == "op") this.op = Runtime.rtl.correct(value, "string", "op_bit_or", "");
 		else super.assignValue(variable_name, value);

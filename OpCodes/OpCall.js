@@ -28,18 +28,6 @@ BayrellLang.OpCodes.OpCall = class extends BayrellLang.OpCodes.BaseOpCode{
 		this.args = null;
 		this.is_await = false;
 	}
-	createNewInstance(){
-		return Runtime.rtl.newInstance( this.getClassName() );
-	}
-	assignObject(obj){
-		if (obj instanceof BayrellLang.OpCodes.OpCall){
-			this.op = Runtime.rtl._clone(obj.op);
-			this.value = Runtime.rtl._clone(obj.value);
-			this.args = Runtime.rtl._clone(obj.args);
-			this.is_await = Runtime.rtl._clone(obj.is_await);
-		}
-		super.assign(obj);
-	}
 	assignValue(variable_name, value){
 		if (variable_name == "op") this.op = Runtime.rtl.correct(value, "string", "op_call", "");
 		else if (variable_name == "value") this.value = Runtime.rtl.correct(value, "BayrellLang.OpCodes.BaseOpCode", null, "");

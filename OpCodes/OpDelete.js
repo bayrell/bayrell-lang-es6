@@ -25,15 +25,6 @@ BayrellLang.OpCodes.OpDelete = class extends BayrellLang.OpCodes.OpValue1{
 		super._init();
 		this.op = "op_delete";
 	}
-	createNewInstance(){
-		return Runtime.rtl.newInstance( this.getClassName() );
-	}
-	assignObject(obj){
-		if (obj instanceof BayrellLang.OpCodes.OpDelete){
-			this.op = Runtime.rtl._clone(obj.op);
-		}
-		super.assign(obj);
-	}
 	assignValue(variable_name, value){
 		if (variable_name == "op") this.op = Runtime.rtl.correct(value, "string", "op_delete", "");
 		else super.assignValue(variable_name, value);

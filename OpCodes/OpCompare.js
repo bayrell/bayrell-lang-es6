@@ -28,18 +28,6 @@ BayrellLang.OpCodes.OpCompare = class extends BayrellLang.OpCodes.BaseOpCode{
 		this.value1 = null;
 		this.value2 = null;
 	}
-	createNewInstance(){
-		return Runtime.rtl.newInstance( this.getClassName() );
-	}
-	assignObject(obj){
-		if (obj instanceof BayrellLang.OpCodes.OpCompare){
-			this.op = Runtime.rtl._clone(obj.op);
-			this.condition = Runtime.rtl._clone(obj.condition);
-			this.value1 = Runtime.rtl._clone(obj.value1);
-			this.value2 = Runtime.rtl._clone(obj.value2);
-		}
-		super.assign(obj);
-	}
 	assignValue(variable_name, value){
 		if (variable_name == "op") this.op = Runtime.rtl.correct(value, "string", "op_compare", "");
 		else if (variable_name == "condition") this.condition = Runtime.rtl.correct(value, "string", "", "");

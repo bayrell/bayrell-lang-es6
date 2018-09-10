@@ -26,16 +26,6 @@ BayrellLang.OpCodes.OpMap = class extends BayrellLang.OpCodes.BaseOpCode{
 		this.op = "op_map";
 		this.values = null;
 	}
-	createNewInstance(){
-		return Runtime.rtl.newInstance( this.getClassName() );
-	}
-	assignObject(obj){
-		if (obj instanceof BayrellLang.OpCodes.OpMap){
-			this.op = Runtime.rtl._clone(obj.op);
-			this.values = Runtime.rtl._clone(obj.values);
-		}
-		super.assign(obj);
-	}
 	assignValue(variable_name, value){
 		if (variable_name == "op") this.op = Runtime.rtl.correct(value, "string", "op_map", "");
 		else if (variable_name == "values") this.values = Runtime.rtl.correct(value, "Runtime.Map", null, "string");

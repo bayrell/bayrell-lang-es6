@@ -25,15 +25,6 @@ BayrellLang.OpCodes.OpPreprocessorSwitch = class extends BayrellLang.OpCodes.OpC
 		super._init();
 		this.op = "op_preprocessor_switch";
 	}
-	createNewInstance(){
-		return Runtime.rtl.newInstance( this.getClassName() );
-	}
-	assignObject(obj){
-		if (obj instanceof BayrellLang.OpCodes.OpPreprocessorSwitch){
-			this.op = Runtime.rtl._clone(obj.op);
-		}
-		super.assign(obj);
-	}
 	assignValue(variable_name, value){
 		if (variable_name == "op") this.op = Runtime.rtl.correct(value, "string", "op_preprocessor_switch", "");
 		else super.assignValue(variable_name, value);

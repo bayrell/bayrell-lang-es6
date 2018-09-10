@@ -29,19 +29,6 @@ BayrellLang.OpCodes.OpFor = class extends BayrellLang.OpCodes.BaseOpCode{
 		this.loop_inc = null;
 		this.childs = null;
 	}
-	createNewInstance(){
-		return Runtime.rtl.newInstance( this.getClassName() );
-	}
-	assignObject(obj){
-		if (obj instanceof BayrellLang.OpCodes.OpFor){
-			this.op = Runtime.rtl._clone(obj.op);
-			this.loop_condition = Runtime.rtl._clone(obj.loop_condition);
-			this.loop_init = Runtime.rtl._clone(obj.loop_init);
-			this.loop_inc = Runtime.rtl._clone(obj.loop_inc);
-			this.childs = Runtime.rtl._clone(obj.childs);
-		}
-		super.assign(obj);
-	}
 	assignValue(variable_name, value){
 		if (variable_name == "op") this.op = Runtime.rtl.correct(value, "string", "op_for", "");
 		else if (variable_name == "loop_condition") this.loop_condition = Runtime.rtl.correct(value, "BayrellLang.OpCodes.BaseOpCode", null, "");

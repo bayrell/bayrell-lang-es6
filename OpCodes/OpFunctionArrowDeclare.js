@@ -26,16 +26,6 @@ BayrellLang.OpCodes.OpFunctionArrowDeclare = class extends BayrellLang.OpCodes.O
 		this.op = "op_arrow_function";
 		this.return_function = null;
 	}
-	createNewInstance(){
-		return Runtime.rtl.newInstance( this.getClassName() );
-	}
-	assignObject(obj){
-		if (obj instanceof BayrellLang.OpCodes.OpFunctionArrowDeclare){
-			this.op = Runtime.rtl._clone(obj.op);
-			this.return_function = Runtime.rtl._clone(obj.return_function);
-		}
-		super.assign(obj);
-	}
 	assignValue(variable_name, value){
 		if (variable_name == "op") this.op = Runtime.rtl.correct(value, "string", "op_arrow_function", "");
 		else if (variable_name == "return_function") this.return_function = Runtime.rtl.correct(value, "BayrellLang.OpCodes.OpFunctionDeclare", null, "");

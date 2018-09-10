@@ -20,8 +20,6 @@ if (typeof BayrellLang == 'undefined') BayrellLang = {};
 BayrellLang.LangConstant = class{
 	getClassName(){return "BayrellLang.LangConstant";}
 	static getParentClassName(){return "";}
-	_init(){
-	}
 }
 BayrellLang.LangConstant.ERROR_END_OF_THE_STRING_EXPECTED = Runtime.RuntimeConstant.ERROR_MODULE_PARSER - 501;
 BayrellLang.LangConstant.ERROR_PARSER_HEX_NUMBER_EXPECTED = Runtime.RuntimeConstant.ERROR_MODULE_PARSER - 502;

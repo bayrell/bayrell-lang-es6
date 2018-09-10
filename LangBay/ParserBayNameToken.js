@@ -21,9 +21,6 @@ if (typeof BayrellLang.LangBay == 'undefined') BayrellLang.LangBay = {};
 BayrellLang.LangBay.ParserBayNameToken = class extends BayrellParser.ParserToken{
 	getClassName(){return "BayrellLang.LangBay.ParserBayNameToken";}
 	static getParentClassName(){return "BayrellParser.ParserToken";}
-	_init(){
-		super._init();
-	}
 	/**
 	 * Return true if char is token char
 	 * @param {char} ch

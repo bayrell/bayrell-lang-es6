@@ -44,7 +44,6 @@ $load.subscribe(["Runtime_loaded", "BayrellParser_loaded"], function(){
 		"/assets/BayrellLang/LangES6/TranslatorES6Factory.js",
 		"/assets/BayrellLang/OpCodes/OpAdd.js",
 		"/assets/BayrellLang/OpCodes/OpAnd.js",
-		"/assets/BayrellLang/OpCodes/OpArray.js",
 		"/assets/BayrellLang/OpCodes/OpAssign.js",
 		"/assets/BayrellLang/OpCodes/OpAssignDeclare.js",
 		"/assets/BayrellLang/OpCodes/OpBitAnd.js",

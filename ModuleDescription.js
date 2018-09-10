@@ -36,7 +36,7 @@ BayrellLang.ModuleDescription = class{
 	 * @return string
 	 */
 	static getModuleVersion(){
-		return "0.4.2";
+		return "0.5.0";
 	}
 	/**
 	 * Init context

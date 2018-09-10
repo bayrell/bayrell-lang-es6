@@ -25,15 +25,6 @@ BayrellLang.OpCodes.OpNamespace = class extends BayrellLang.OpCodes.OpValueStrin
 		super._init();
 		this.op = "op_namespace";
 	}
-	createNewInstance(){
-		return Runtime.rtl.newInstance( this.getClassName() );
-	}
-	assignObject(obj){
-		if (obj instanceof BayrellLang.OpCodes.OpNamespace){
-			this.op = Runtime.rtl._clone(obj.op);
-		}
-		super.assign(obj);
-	}
 	assignValue(variable_name, value){
 		if (variable_name == "op") this.op = Runtime.rtl.correct(value, "string", "op_namespace", "");
 		else super.assignValue(variable_name, value);

@@ -27,17 +27,6 @@ BayrellLang.OpCodes.OpPreprocessorCase = class extends BayrellLang.OpCodes.BaseO
 		this.condition = null;
 		this.value = null;
 	}
-	createNewInstance(){
-		return Runtime.rtl.newInstance( this.getClassName() );
-	}
-	assignObject(obj){
-		if (obj instanceof BayrellLang.OpCodes.OpPreprocessorCase){
-			this.op = Runtime.rtl._clone(obj.op);
-			this.condition = Runtime.rtl._clone(obj.condition);
-			this.value = Runtime.rtl._clone(obj.value);
-		}
-		super.assign(obj);
-	}
 	assignValue(variable_name, value){
 		if (variable_name == "op") this.op = Runtime.rtl.correct(value, "string", "op_preprocessor_case", "");
 		else if (variable_name == "condition") this.condition = Runtime.rtl.correct(value, "BayrellLang.OpCodes.BaseOpCode", null, "");

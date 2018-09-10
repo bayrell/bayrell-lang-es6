@@ -42,7 +42,7 @@ BayrellLang.LangNodeJS.TranslatorNodeJS = class extends BayrellLang.LangES6.Tran
 		this.current_module_name = arr.item(0);
 		this.modules.clear();
 		if (this.current_module_name != "Runtime"){
-			return "var rtl = require('BayrellRuntime').rtl;"+Runtime.rtl.toString(this.s("var Map = require('BayrellRuntime').Map;"))+Runtime.rtl.toString(this.s("var Vector = require('BayrellRuntime').Vector;"));
+			return "var rtl = require('bayrell-runtime-nodejs').rtl;"+Runtime.rtl.toString(this.s("var Map = require('bayrell-runtime-nodejs').Map;"))+Runtime.rtl.toString(this.s("var Vector = require('bayrell-runtime-nodejs').Vector;"));
 		}
 		return "";
 	}
@@ -94,6 +94,7 @@ BayrellLang.LangNodeJS.TranslatorNodeJS = class extends BayrellLang.LangES6.Tran
 			if (module_name == "Runtime"){
 				module_name = "BayrellRuntime";
 			}
+			module_name = Runtime.rtl.convertNodeJSModuleName(module_name);
 			res = "var "+Runtime.rtl.toString(class_name)+" = require('"+Runtime.rtl.toString(module_name)+"')."+Runtime.rtl.toString(module_path)+";";
 		}
 		return res;

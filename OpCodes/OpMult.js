@@ -25,15 +25,6 @@ BayrellLang.OpCodes.OpMult = class extends BayrellLang.OpCodes.OpValue2{
 		super._init();
 		this.op = "op_mult";
 	}
-	createNewInstance(){
-		return Runtime.rtl.newInstance( this.getClassName() );
-	}
-	assignObject(obj){
-		if (obj instanceof BayrellLang.OpCodes.OpMult){
-			this.op = Runtime.rtl._clone(obj.op);
-		}
-		super.assign(obj);
-	}
 	assignValue(variable_name, value){
 		if (variable_name == "op") this.op = Runtime.rtl.correct(value, "string", "op_mult", "");
 		else super.assignValue(variable_name, value);

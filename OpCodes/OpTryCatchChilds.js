@@ -28,18 +28,6 @@ BayrellLang.OpCodes.OpTryCatchChilds = class extends BayrellLang.OpCodes.BaseOpC
 		this.op_ident = null;
 		this.childs = null;
 	}
-	createNewInstance(){
-		return Runtime.rtl.newInstance( this.getClassName() );
-	}
-	assignObject(obj){
-		if (obj instanceof BayrellLang.OpCodes.OpTryCatchChilds){
-			this.op = Runtime.rtl._clone(obj.op);
-			this.op_type = Runtime.rtl._clone(obj.op_type);
-			this.op_ident = Runtime.rtl._clone(obj.op_ident);
-			this.childs = Runtime.rtl._clone(obj.childs);
-		}
-		super.assign(obj);
-	}
 	assignValue(variable_name, value){
 		if (variable_name == "op") this.op = Runtime.rtl.correct(value, "string", "op_try_catch_childs", "");
 		else if (variable_name == "op_type") this.op_type = Runtime.rtl.correct(value, "BayrellLang.OpCodes.BaseOpCode", null, "");

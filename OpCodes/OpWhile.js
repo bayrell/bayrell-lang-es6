@@ -27,16 +27,6 @@ BayrellLang.OpCodes.OpWhile = class extends BayrellLang.OpCodes.BaseOpCode{
 		this.condition = null;
 		this.childs = null;
 	}
-	createNewInstance(){
-		return Runtime.rtl.newInstance( this.getClassName() );
-	}
-	assignObject(obj){
-		if (obj instanceof BayrellLang.OpCodes.OpWhile){
-			this.condition = Runtime.rtl._clone(obj.condition);
-			this.childs = Runtime.rtl._clone(obj.childs);
-		}
-		super.assign(obj);
-	}
 	assignValue(variable_name, value){
 		if (variable_name == "condition") this.condition = Runtime.rtl.correct(value, "BayrellLang.OpCodes.BaseOpCode", null, "");
 		else if (variable_name == "childs") this.childs = Runtime.rtl.correct(value, "Runtime.Vector", null, "BayrellLang.OpCodes.BaseOpCode");

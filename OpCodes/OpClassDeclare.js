@@ -32,22 +32,6 @@ BayrellLang.OpCodes.OpClassDeclare = class extends BayrellLang.OpCodes.BaseOpCod
 		this.class_template = null;
 		this.flags = null;
 	}
-	createNewInstance(){
-		return Runtime.rtl.newInstance( this.getClassName() );
-	}
-	assignObject(obj){
-		if (obj instanceof BayrellLang.OpCodes.OpClassDeclare){
-			this.op = Runtime.rtl._clone(obj.op);
-			this.class_name = Runtime.rtl._clone(obj.class_name);
-			this.class_extends = Runtime.rtl._clone(obj.class_extends);
-			this.class_implements = Runtime.rtl._clone(obj.class_implements);
-			this.class_variables = Runtime.rtl._clone(obj.class_variables);
-			this.childs = Runtime.rtl._clone(obj.childs);
-			this.class_template = Runtime.rtl._clone(obj.class_template);
-			this.flags = Runtime.rtl._clone(obj.flags);
-		}
-		super.assign(obj);
-	}
 	assignValue(variable_name, value){
 		if (variable_name == "op") this.op = Runtime.rtl.correct(value, "string", "op_class", "");
 		else if (variable_name == "class_name") this.class_name = Runtime.rtl.correct(value, "string", "", "");

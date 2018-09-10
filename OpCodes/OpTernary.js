@@ -28,18 +28,6 @@ BayrellLang.OpCodes.OpTernary = class extends BayrellLang.OpCodes.BaseOpCode{
 		this.if_true = null;
 		this.if_false = null;
 	}
-	createNewInstance(){
-		return Runtime.rtl.newInstance( this.getClassName() );
-	}
-	assignObject(obj){
-		if (obj instanceof BayrellLang.OpCodes.OpTernary){
-			this.op = Runtime.rtl._clone(obj.op);
-			this.condition = Runtime.rtl._clone(obj.condition);
-			this.if_true = Runtime.rtl._clone(obj.if_true);
-			this.if_false = Runtime.rtl._clone(obj.if_false);
-		}
-		super.assign(obj);
-	}
 	assignValue(variable_name, value){
 		if (variable_name == "op") this.op = Runtime.rtl.correct(value, "string", "op_ternary", "");
 		else if (variable_name == "condition") this.condition = Runtime.rtl.correct(value, "BayrellLang.OpCodes.BaseOpCode", null, "");
