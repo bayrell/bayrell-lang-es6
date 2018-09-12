@@ -94,6 +94,9 @@ BayrellLang.LangNodeJS.TranslatorNodeJS = class extends BayrellLang.LangES6.Tran
 			if (module_name == "Runtime"){
 				module_name = "BayrellRuntime";
 			}
+			if (module_name == "RuntimeWeb"){
+				module_name = "BayrellRuntimeWeb";
+			}
 			module_name = Runtime.rtl.convertNodeJSModuleName(module_name);
 			res = "var "+Runtime.rtl.toString(class_name)+" = require('"+Runtime.rtl.toString(module_name)+"')."+Runtime.rtl.toString(module_path)+";";
 		}
