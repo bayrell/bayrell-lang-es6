@@ -1083,7 +1083,7 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 				}
 				this.levelDec();
 				res += this.s("}");
-				res += this.s("parser::assign($obj);");
+				res += this.s("parent::assignObject($obj);");
 				this.levelDec();
 				res += this.s("}");
 			}
@@ -1110,7 +1110,7 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 						else {
 							res += this.s("else "+Runtime.rtl.toString(s));
 						}
-						class_variables_serializable_count++
+						class_variables_serializable_count++;
 					}
 				}
 				res += this.s("else parent::assignValue($variable_name, $value);");
@@ -1129,7 +1129,7 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 						else {
 							res += this.s("else "+Runtime.rtl.toString(take_value_s));
 						}
-						class_variables_serializable_count++
+						class_variables_serializable_count++;
 					}
 				}
 				res += this.s("return parent::takeValue($variable_name, $default_value);");

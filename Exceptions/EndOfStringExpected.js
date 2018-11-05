@@ -21,12 +21,12 @@ if (typeof BayrellLang.Exceptions == 'undefined') BayrellLang.Exceptions = {};
 BayrellLang.Exceptions.EndOfStringExpected = class extends BayrellParser.Exceptions.ParserError{
 	getClassName(){return "BayrellLang.Exceptions.EndOfStringExpected";}
 	static getParentClassName(){return "BayrellParser.Exceptions.ParserError";}
-	constructor(context, line, col, prev){
+	constructor(line, col, context, prev){
 		if (prev == undefined) prev=null;
 		if (context == null){
-			context = Runtime.Utils.globalContext();
+			context = Runtime.RuntimeUtils.globalContext();
 		}
-		super(context, context.translate("ERROR_END_OF_THE_STRING_EXPECTED"), BayrellLang.LangConstant.ERROR_END_OF_THE_STRING_EXPECTED, prev);
+		super(context.translate("ERROR_END_OF_THE_STRING_EXPECTED"), BayrellLang.LangConstant.ERROR_END_OF_THE_STRING_EXPECTED, context, prev);
 		this.line = line;
 		this.pos = col;
 		this.buildMessage();

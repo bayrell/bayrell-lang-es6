@@ -21,12 +21,12 @@ if (typeof BayrellLang.Exceptions == 'undefined') BayrellLang.Exceptions = {};
 BayrellLang.Exceptions.TwiceDeclareElseError = class extends BayrellParser.Exceptions.ParserError{
 	getClassName(){return "BayrellLang.Exceptions.TwiceDeclareElseError";}
 	static getParentClassName(){return "BayrellParser.Exceptions.ParserError";}
-	constructor(context, line, col, prev){
+	constructor(line, col, context, prev){
 		if (prev == undefined) prev=null;
 		if (context == null){
-			context = Runtime.Utils.globalContext();
+			context = Runtime.RuntimeUtils.globalContext();
 		}
-		super(context, context.translate("ERROR_TWICE_DECLARE_ERROR"), BayrellLang.LangConstant.ERROR_TWICE_DECLARE_ERROR, prev);
+		super(context.translate("ERROR_TWICE_DECLARE_ERROR"), BayrellLang.LangConstant.ERROR_TWICE_DECLARE_ERROR, context, prev);
 		this.line = line;
 		this.pos = col;
 		this.buildMessage();

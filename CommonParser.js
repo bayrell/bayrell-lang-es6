@@ -193,7 +193,7 @@ BayrellLang.CommonParser = class extends BayrellParser.CoreParser{
 			if (this.lookNextTokenType() == BayrellParser.ParserToken.TOKEN_BASE && this.isHexStringBegin(this.lookNextToken())){
 				var start_line = this.next_token.start_line;
 				var start_col = this.next_token.start_col;
-				throw new BayrellLang.Exceptions.HexNumberExpected(this.context(), start_line, start_col);
+				throw new BayrellLang.Exceptions.HexNumberExpected(start_line, start_col, this.context());
 			}
 			else {
 				throw this.nextTokenExpected(this.translate("ERROR_PARSER_HEX_NUMBER_EXPECTED"));

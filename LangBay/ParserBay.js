@@ -345,9 +345,6 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 		if (this.findNextToken("new")){
 			return this.readNewInstance();
 		}
-		else if (this.findNextToken("await")){
-			return this.readCallAwait();
-		}
 		else if (this.findNextToken("clone")){
 			return this.readClone();
 		}
@@ -682,7 +679,12 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 			var pos = this.findNextTokenVector(v);
 			var op_name = v.item(pos);
 			this.matchNextToken(op_name);
-			op_exp = this.readExpression();
+			if (this.findNextToken("await")){
+				op_exp = this.readCallAwait();
+			}
+			else {
+				op_exp = this.readExpression();
+			}
 			return new BayrellLang.OpCodes.OpAssign(op_ident, op_exp, op_name);
 		}
 		this.popRollbackToken();
@@ -708,7 +710,12 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 			this.popToken();
 			if (this.findNextToken("=")){
 				this.matchNextToken("=");
-				op_exp = this.readExpression();
+				if (this.findNextToken("await")){
+					op_exp = this.readCallAwait();
+				}
+				else {
+					op_exp = this.readExpression();
+				}
 			}
 			return new BayrellLang.OpCodes.OpAssignDeclare(op_type, op_ident_name, op_exp);
 		}
@@ -1060,7 +1067,14 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 			alias_name = this.readIdentifierName();
 		}
 		this.matchNextToken(";");
-		this.modules.set(name, alias_name);
+		if (alias_name != ""){
+			this.modules.set(alias_name, name);
+		}
+		else {
+			var arr = Runtime.rs.explode(".", name);
+			var last_name = arr.pop();
+			this.modules.set(last_name, name);
+		}
 		return new BayrellLang.OpCodes.OpUse(name, alias_name);
 	}
 	/**

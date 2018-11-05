@@ -40,6 +40,7 @@ $load.subscribe(["Runtime_loaded", "BayrellParser_loaded"], function(){
 		"/assets/BayrellLang/LangBay/ParserBayFactory.js",
 		"/assets/BayrellLang/LangBay/ParserBayNameToken.js",
 		"/assets/BayrellLang/LangBay/ParserBayToken.js",
+		"/assets/BayrellLang/LangES6/FunctionStack.js",
 		"/assets/BayrellLang/LangES6/TranslatorES6.js",
 		"/assets/BayrellLang/LangES6/TranslatorES6Factory.js",
 		"/assets/BayrellLang/OpCodes/OpAdd.js",

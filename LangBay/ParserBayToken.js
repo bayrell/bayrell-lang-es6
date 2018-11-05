@@ -99,7 +99,7 @@ BayrellLang.LangBay.ParserBayToken = class extends BayrellParser.ParserToken{
 			this.moveChar(match_char);
 		}
 		else {
-			throw new BayrellLang.Exceptions.EndOfStringExpected(this.context(), start_line, start_col);
+			throw new BayrellLang.Exceptions.EndOfStringExpected(start_line, start_col, this.context());
 		}
 		return res_str;
 	}

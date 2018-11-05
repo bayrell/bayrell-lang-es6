@@ -67,7 +67,7 @@ BayrellLang.LangNodeJS.TranslatorNodeJS = class extends BayrellLang.LangES6.Tran
 		if (arr1.item(0) == arr2.item(0)){
 			var pos = 0;
 			while (pos < sz_arr1 && pos < sz_arr2 && arr1.item(pos) == arr2.item(pos)){
-				pos++
+				pos++;
 			}
 			var js_path = "";
 			if (pos == arr2.count()){

@@ -61,7 +61,7 @@ BayrellLang.CommonTranslator = class extends Runtime.ContextObject{
 	 */
 	levelInc(){
 		if (!this.isOneLine()){
-			this.indent_level++
+			this.indent_level++;
 		}
 	}
 	/**
@@ -69,7 +69,7 @@ BayrellLang.CommonTranslator = class extends Runtime.ContextObject{
 	 */
 	levelDec(){
 		if (!this.isOneLine()){
-			this.indent_level--
+			this.indent_level--;
 		}
 	}
 	/**
