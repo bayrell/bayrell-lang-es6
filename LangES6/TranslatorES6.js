@@ -1290,7 +1290,7 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 			}
 			if (op_code.if_false != null){
 				for (var i = 0; i < op_code.if_false.count(); i++){
-					this.detectAsyncDeclareVariables(op_code.if_true.item(i), variables);
+					this.detectAsyncDeclareVariables(op_code.if_false.item(i), variables);
 				}
 			}
 		}
