@@ -19,18 +19,19 @@
 if (typeof BayrellLang == 'undefined') BayrellLang = {};
 if (typeof BayrellLang.LangES6 == 'undefined') BayrellLang.LangES6 = {};
 BayrellLang.LangES6.TranslatorES6Factory = class extends Runtime.ContextObject{
+	/**
+	 * Returns new Instance
+	 */
+	newInstance(context){
+		return new BayrellLang.LangES6.TranslatorES6(context);
+	}
+	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.LangES6.TranslatorES6Factory";}
 	static getParentClassName(){return "Runtime.ContextObject";}
 	_init(){
 		super._init();
 		if (this.__implements__ == undefined){this.__implements__ = [];}
 		this.__implements__.push(Runtime.Interfaces.FactoryInterface);
-	}
-	/**
-	 * Returns new Instance
-	 */
-	newInstance(context){
-		return new BayrellLang.LangES6.TranslatorES6(context);
 	}
 }
 BayrellLang.LangES6.TranslatorES6Factory.__static_implements__ = [];

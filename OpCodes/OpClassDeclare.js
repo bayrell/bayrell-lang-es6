@@ -19,60 +19,7 @@
 if (typeof BayrellLang == 'undefined') BayrellLang = {};
 if (typeof BayrellLang.OpCodes == 'undefined') BayrellLang.OpCodes = {};
 BayrellLang.OpCodes.OpClassDeclare = class extends BayrellLang.OpCodes.BaseOpCode{
-	getClassName(){return "BayrellLang.OpCodes.OpClassDeclare";}
-	static getParentClassName(){return "BayrellLang.OpCodes.BaseOpCode";}
-	_init(){
-		super._init();
-		this.op = "op_class";
-		this.class_name = "";
-		this.class_extends = "";
-		this.class_implements = null;
-		this.class_variables = null;
-		this.childs = null;
-		this.class_template = null;
-		this.flags = null;
-	}
-	assignValue(variable_name, value){
-		if (variable_name == "op") this.op = Runtime.rtl.correct(value, "string", "op_class", "");
-		else if (variable_name == "class_name") this.class_name = Runtime.rtl.correct(value, "string", "", "");
-		else if (variable_name == "class_extends") this.class_extends = Runtime.rtl.correct(value, "BayrellLang.OpCodes.BaseOpCode", "", "");
-		else if (variable_name == "class_implements") this.class_implements = Runtime.rtl.correct(value, "Runtime.Vector", null, "string");
-		else if (variable_name == "class_variables") this.class_variables = Runtime.rtl.correct(value, "Runtime.Vector", null, "OpAssignDeclare");
-		else if (variable_name == "childs") this.childs = Runtime.rtl.correct(value, "Runtime.Vector", null, "BayrellLang.OpCodes.BaseOpCode");
-		else if (variable_name == "class_template") this.class_template = Runtime.rtl.correct(value, "Runtime.Vector", null, "BayrellLang.OpCodes.BaseOpCode");
-		else if (variable_name == "flags") this.flags = Runtime.rtl.correct(value, "BayrellLang.OpCodes.OpFlags", null, "");
-		else super.assignValue(variable_name, value);
-	}
-	takeValue(variable_name, default_value){
-		if (default_value == undefined) default_value = null;
-		if (variable_name == "op") return this.op;
-		else if (variable_name == "class_name") return this.class_name;
-		else if (variable_name == "class_extends") return this.class_extends;
-		else if (variable_name == "class_implements") return this.class_implements;
-		else if (variable_name == "class_variables") return this.class_variables;
-		else if (variable_name == "childs") return this.childs;
-		else if (variable_name == "class_template") return this.class_template;
-		else if (variable_name == "flags") return this.flags;
-		return super.takeValue(variable_name, default_value);
-	}
-	getVariablesNames(names){
-		super.getVariablesNames(names);
-		names.push("op");
-		names.push("class_name");
-		names.push("class_extends");
-		names.push("class_implements");
-		names.push("class_variables");
-		names.push("childs");
-		names.push("class_template");
-		names.push("flags");
-	}
-	/**
-	 * Returns classname of the object
-	 * @return string
-	 */
-	getClassName(){
-		return "BayrellLang.OpCodes.OpClassDeclare";
-	}
+	/*public serializable Vector<OpAssignDeclare> class_variables = null;*/
 	/**
 	 * Read is Flag
 	 */
@@ -100,5 +47,63 @@ BayrellLang.OpCodes.OpClassDeclare = class extends BayrellLang.OpCodes.BaseOpCod
 	 */
 	destructor(){
 		super.destructor();
+	}
+	/* ======================= Class Init Functions ======================= */
+	getClassName(){return "BayrellLang.OpCodes.OpClassDeclare";}
+	static getParentClassName(){return "BayrellLang.OpCodes.BaseOpCode";}
+	_init(){
+		super._init();
+		this.op = "op_class";
+		this.class_name = "";
+		this.class_extends = "";
+		this.class_implements = null;
+		this.childs = null;
+		this.class_template = null;
+		this.flags = null;
+	}
+	assignObject(obj){
+		if (obj instanceof BayrellLang.OpCodes.OpClassDeclare){
+			this.op = Runtime.rtl._clone(obj.op);
+			this.class_name = Runtime.rtl._clone(obj.class_name);
+			this.class_extends = Runtime.rtl._clone(obj.class_extends);
+			this.class_implements = Runtime.rtl._clone(obj.class_implements);
+			this.childs = Runtime.rtl._clone(obj.childs);
+			this.class_template = Runtime.rtl._clone(obj.class_template);
+			this.flags = Runtime.rtl._clone(obj.flags);
+		}
+		super.assignObject(obj);
+	}
+	assignValue(variable_name, value){
+		if (variable_name == "op") this.op = Runtime.rtl.correct(value, "string", "op_class", "");
+		else if (variable_name == "class_name") this.class_name = Runtime.rtl.correct(value, "string", "", "");
+		else if (variable_name == "class_extends") this.class_extends = Runtime.rtl.correct(value, "BayrellLang.OpCodes.BaseOpCode", "", "");
+		else if (variable_name == "class_implements") this.class_implements = Runtime.rtl.correct(value, "Runtime.Vector", null, "string");
+		else if (variable_name == "childs") this.childs = Runtime.rtl.correct(value, "Runtime.Vector", null, "BayrellLang.OpCodes.BaseOpCode");
+		else if (variable_name == "class_template") this.class_template = Runtime.rtl.correct(value, "Runtime.Vector", null, "BayrellLang.OpCodes.BaseOpCode");
+		else if (variable_name == "flags") this.flags = Runtime.rtl.correct(value, "BayrellLang.OpCodes.OpFlags", null, "");
+		else super.assignValue(variable_name, value);
+	}
+	takeValue(variable_name, default_value){
+		if (default_value == undefined) default_value = null;
+		if (variable_name == "op") return this.op;
+		else if (variable_name == "class_name") return this.class_name;
+		else if (variable_name == "class_extends") return this.class_extends;
+		else if (variable_name == "class_implements") return this.class_implements;
+		else if (variable_name == "childs") return this.childs;
+		else if (variable_name == "class_template") return this.class_template;
+		else if (variable_name == "flags") return this.flags;
+		return super.takeValue(variable_name, default_value);
+	}
+	static getFieldsList(names){
+		names.push("op");
+		names.push("class_name");
+		names.push("class_extends");
+		names.push("class_implements");
+		names.push("childs");
+		names.push("class_template");
+		names.push("flags");
+	}
+	static getFieldInfoByName(field_name){
+		return null;
 	}
 }

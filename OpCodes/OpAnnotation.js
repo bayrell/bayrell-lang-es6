@@ -18,31 +18,41 @@
  */
 if (typeof BayrellLang == 'undefined') BayrellLang = {};
 if (typeof BayrellLang.OpCodes == 'undefined') BayrellLang.OpCodes = {};
-BayrellLang.OpCodes.OpAnd = class extends BayrellLang.OpCodes.OpValue2{
+BayrellLang.OpCodes.OpAnnotation = class extends BayrellLang.OpCodes.BaseOpCode{
 	/* ======================= Class Init Functions ======================= */
-	getClassName(){return "BayrellLang.OpCodes.OpAnd";}
-	static getParentClassName(){return "BayrellLang.OpCodes.OpValue2";}
+	getClassName(){return "BayrellLang.OpCodes.OpAnnotation";}
+	static getParentClassName(){return "BayrellLang.OpCodes.BaseOpCode";}
 	_init(){
 		super._init();
-		this.op = "op_and";
+		this.op = "op_annotation";
+		this.kind = null;
+		this.options = null;
 	}
 	assignObject(obj){
-		if (obj instanceof BayrellLang.OpCodes.OpAnd){
+		if (obj instanceof BayrellLang.OpCodes.OpAnnotation){
 			this.op = Runtime.rtl._clone(obj.op);
+			this.kind = Runtime.rtl._clone(obj.kind);
+			this.options = Runtime.rtl._clone(obj.options);
 		}
 		super.assignObject(obj);
 	}
 	assignValue(variable_name, value){
-		if (variable_name == "op") this.op = Runtime.rtl.correct(value, "string", "op_and", "");
+		if (variable_name == "op") this.op = Runtime.rtl.correct(value, "string", "op_annotation", "");
+		else if (variable_name == "kind") this.kind = Runtime.rtl.correct(value, "BayrellLang.OpCodes.BaseOpCode", null, "");
+		else if (variable_name == "options") this.options = Runtime.rtl.correct(value, "BayrellLang.OpCodes.OpMap", null, "");
 		else super.assignValue(variable_name, value);
 	}
 	takeValue(variable_name, default_value){
 		if (default_value == undefined) default_value = null;
 		if (variable_name == "op") return this.op;
+		else if (variable_name == "kind") return this.kind;
+		else if (variable_name == "options") return this.options;
 		return super.takeValue(variable_name, default_value);
 	}
 	static getFieldsList(names){
 		names.push("op");
+		names.push("kind");
+		names.push("options");
 	}
 	static getFieldInfoByName(field_name){
 		return null;

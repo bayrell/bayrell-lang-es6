@@ -19,36 +19,6 @@
 if (typeof BayrellLang == 'undefined') BayrellLang = {};
 if (typeof BayrellLang.OpCodes == 'undefined') BayrellLang.OpCodes = {};
 BayrellLang.OpCodes.OpUse = class extends BayrellLang.OpCodes.OpValueString{
-	getClassName(){return "BayrellLang.OpCodes.OpUse";}
-	static getParentClassName(){return "BayrellLang.OpCodes.OpValueString";}
-	_init(){
-		super._init();
-		this.op = "op_use";
-		this.alias_name = "";
-	}
-	assignValue(variable_name, value){
-		if (variable_name == "op") this.op = Runtime.rtl.correct(value, "string", "op_use", "");
-		else if (variable_name == "alias_name") this.alias_name = Runtime.rtl.correct(value, "string", "", "");
-		else super.assignValue(variable_name, value);
-	}
-	takeValue(variable_name, default_value){
-		if (default_value == undefined) default_value = null;
-		if (variable_name == "op") return this.op;
-		else if (variable_name == "alias_name") return this.alias_name;
-		return super.takeValue(variable_name, default_value);
-	}
-	getVariablesNames(names){
-		super.getVariablesNames(names);
-		names.push("op");
-		names.push("alias_name");
-	}
-	/**
-	 * Returns classname of the object
-	 * @return string
-	 */
-	getClassName(){
-		return "BayrellLang.OpCodes.OpUse";
-	}
 	/**
 	 * Constructor
 	 */
@@ -63,5 +33,38 @@ BayrellLang.OpCodes.OpUse = class extends BayrellLang.OpCodes.OpValueString{
 	 */
 	destructor(){
 		super.destructor();
+	}
+	/* ======================= Class Init Functions ======================= */
+	getClassName(){return "BayrellLang.OpCodes.OpUse";}
+	static getParentClassName(){return "BayrellLang.OpCodes.OpValueString";}
+	_init(){
+		super._init();
+		this.op = "op_use";
+		this.alias_name = "";
+	}
+	assignObject(obj){
+		if (obj instanceof BayrellLang.OpCodes.OpUse){
+			this.op = Runtime.rtl._clone(obj.op);
+			this.alias_name = Runtime.rtl._clone(obj.alias_name);
+		}
+		super.assignObject(obj);
+	}
+	assignValue(variable_name, value){
+		if (variable_name == "op") this.op = Runtime.rtl.correct(value, "string", "op_use", "");
+		else if (variable_name == "alias_name") this.alias_name = Runtime.rtl.correct(value, "string", "", "");
+		else super.assignValue(variable_name, value);
+	}
+	takeValue(variable_name, default_value){
+		if (default_value == undefined) default_value = null;
+		if (variable_name == "op") return this.op;
+		else if (variable_name == "alias_name") return this.alias_name;
+		return super.takeValue(variable_name, default_value);
+	}
+	static getFieldsList(names){
+		names.push("op");
+		names.push("alias_name");
+	}
+	static getFieldInfoByName(field_name){
+		return null;
 	}
 }

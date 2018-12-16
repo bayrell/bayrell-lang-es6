@@ -18,19 +18,6 @@
  */
 if (typeof BayrellLang == 'undefined') BayrellLang = {};
 BayrellLang.CommonTranslator = class extends Runtime.ContextObject{
-	getClassName(){return "BayrellLang.CommonTranslator";}
-	static getParentClassName(){return "Runtime.ContextObject";}
-	_init(){
-		super._init();
-		this.one_lines = null;
-		this.is_operation = false;
-		this.current_opcode_level = 0;
-		this.max_opcode_level = 100;
-		this.indent_level = 0;
-		this.indent = "\t";
-		this.space = " ";
-		this.crlf = "\n";
-	}
 	/**
 	 * Constructor
 	 */
@@ -112,8 +99,9 @@ BayrellLang.CommonTranslator = class extends Runtime.ContextObject{
 	/**
 	 * Output string
 	 */
-	s(s){
-		if (s == ""){
+	s(s, force){
+		if (force == undefined) force=false;
+		if (s == "" && !force){
 			return "";
 		}
 		if (this.isOneLine()){
@@ -280,6 +268,9 @@ BayrellLang.CommonTranslator = class extends Runtime.ContextObject{
 	OpStringItem(op_code){
 		return "";
 	}
+	OpStructDeclare(op_code){
+		return "";
+	}
 	OpSub(op_code){
 		return "";
 	}
@@ -340,6 +331,9 @@ BayrellLang.CommonTranslator = class extends Runtime.ContextObject{
 		}
 		else if (op_code instanceof BayrellLang.OpCodes.OpInterfaceDeclare){
 			return this.OpInterfaceDeclare(op_code);
+		}
+		else if (op_code instanceof BayrellLang.OpCodes.OpStructDeclare){
+			return this.OpStructDeclare(op_code);
 		}
 		else if (op_code instanceof BayrellLang.OpCodes.OpAdd){
 			return this.OpAdd(op_code);
@@ -532,5 +526,19 @@ BayrellLang.CommonTranslator = class extends Runtime.ContextObject{
 	translate(op_code){
 		this.resetTranslator();
 		return this.translateRun(op_code);
+	}
+	/* ======================= Class Init Functions ======================= */
+	getClassName(){return "BayrellLang.CommonTranslator";}
+	static getParentClassName(){return "Runtime.ContextObject";}
+	_init(){
+		super._init();
+		this.one_lines = null;
+		this.is_operation = false;
+		this.current_opcode_level = 0;
+		this.max_opcode_level = 100;
+		this.indent_level = 0;
+		this.indent = "\t";
+		this.space = " ";
+		this.crlf = "\n";
 	}
 }

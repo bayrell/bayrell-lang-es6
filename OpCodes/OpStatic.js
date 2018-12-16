@@ -19,40 +19,6 @@
 if (typeof BayrellLang == 'undefined') BayrellLang = {};
 if (typeof BayrellLang.OpCodes == 'undefined') BayrellLang.OpCodes = {};
 BayrellLang.OpCodes.OpStatic = class extends BayrellLang.OpCodes.BaseOpCode{
-	getClassName(){return "BayrellLang.OpCodes.OpStatic";}
-	static getParentClassName(){return "BayrellLang.OpCodes.BaseOpCode";}
-	_init(){
-		super._init();
-		this.op = "op_static";
-		this.value = null;
-		this.name = null;
-	}
-	assignValue(variable_name, value){
-		if (variable_name == "op") this.op = Runtime.rtl.correct(value, "string", "op_static", "");
-		else if (variable_name == "value") this.value = Runtime.rtl.correct(value, "BayrellLang.OpCodes.BaseOpCode", null, "");
-		else if (variable_name == "name") this.name = Runtime.rtl.correct(value, "string", null, "");
-		else super.assignValue(variable_name, value);
-	}
-	takeValue(variable_name, default_value){
-		if (default_value == undefined) default_value = null;
-		if (variable_name == "op") return this.op;
-		else if (variable_name == "value") return this.value;
-		else if (variable_name == "name") return this.name;
-		return super.takeValue(variable_name, default_value);
-	}
-	getVariablesNames(names){
-		super.getVariablesNames(names);
-		names.push("op");
-		names.push("value");
-		names.push("name");
-	}
-	/**
-	 * Returns classname of the object
-	 * @return string
-	 */
-	getClassName(){
-		return "BayrellLang.OpCodes.OpStatic";
-	}
 	/**
 	 * Constructor
 	 */
@@ -68,5 +34,43 @@ BayrellLang.OpCodes.OpStatic = class extends BayrellLang.OpCodes.BaseOpCode{
 	 */
 	destructor(){
 		super.destructor();
+	}
+	/* ======================= Class Init Functions ======================= */
+	getClassName(){return "BayrellLang.OpCodes.OpStatic";}
+	static getParentClassName(){return "BayrellLang.OpCodes.BaseOpCode";}
+	_init(){
+		super._init();
+		this.op = "op_static";
+		this.value = null;
+		this.name = null;
+	}
+	assignObject(obj){
+		if (obj instanceof BayrellLang.OpCodes.OpStatic){
+			this.op = Runtime.rtl._clone(obj.op);
+			this.value = Runtime.rtl._clone(obj.value);
+			this.name = Runtime.rtl._clone(obj.name);
+		}
+		super.assignObject(obj);
+	}
+	assignValue(variable_name, value){
+		if (variable_name == "op") this.op = Runtime.rtl.correct(value, "string", "op_static", "");
+		else if (variable_name == "value") this.value = Runtime.rtl.correct(value, "BayrellLang.OpCodes.BaseOpCode", null, "");
+		else if (variable_name == "name") this.name = Runtime.rtl.correct(value, "string", null, "");
+		else super.assignValue(variable_name, value);
+	}
+	takeValue(variable_name, default_value){
+		if (default_value == undefined) default_value = null;
+		if (variable_name == "op") return this.op;
+		else if (variable_name == "value") return this.value;
+		else if (variable_name == "name") return this.name;
+		return super.takeValue(variable_name, default_value);
+	}
+	static getFieldsList(names){
+		names.push("op");
+		names.push("value");
+		names.push("name");
+	}
+	static getFieldInfoByName(field_name){
+		return null;
 	}
 }

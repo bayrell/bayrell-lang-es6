@@ -19,17 +19,6 @@
 if (typeof BayrellLang == 'undefined') BayrellLang = {};
 if (typeof BayrellLang.LangES6 == 'undefined') BayrellLang.LangES6 = {};
 BayrellLang.LangES6.FunctionStack = class extends Runtime.CoreObject{
-	getClassName(){return "BayrellLang.LangES6.FunctionStack";}
-	static getParentClassName(){return "Runtime.CoreObject";}
-	_init(){
-		super._init();
-		this.name = "";
-		this.is_async = false;
-		this.async_ctx = "";
-		this.async_jump = "";
-		this.async_jump_pos = new Runtime.Vector();
-		this.async_stop_pos = new Runtime.Vector();
-	}
 	/**
 	 * Returns jump string from arr
 	 * @param Vector<int> arr
@@ -117,5 +106,17 @@ BayrellLang.LangES6.FunctionStack = class extends Runtime.CoreObject{
 		}
 		var obj = this.async_stop_pos.item(sz - 1);
 		return obj.get("end", "", "string");
+	}
+	/* ======================= Class Init Functions ======================= */
+	getClassName(){return "BayrellLang.LangES6.FunctionStack";}
+	static getParentClassName(){return "Runtime.CoreObject";}
+	_init(){
+		super._init();
+		this.name = "";
+		this.is_async = false;
+		this.async_ctx = "";
+		this.async_jump = "";
+		this.async_jump_pos = new Runtime.Vector();
+		this.async_stop_pos = new Runtime.Vector();
 	}
 }

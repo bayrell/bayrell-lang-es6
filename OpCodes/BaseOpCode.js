@@ -19,27 +19,6 @@
 if (typeof BayrellLang == 'undefined') BayrellLang = {};
 if (typeof BayrellLang.OpCodes == 'undefined') BayrellLang.OpCodes = {};
 BayrellLang.OpCodes.BaseOpCode = class extends Runtime.CoreObject{
-	getClassName(){return "BayrellLang.OpCodes.BaseOpCode";}
-	static getParentClassName(){return "Runtime.CoreObject";}
-	_init(){
-		super._init();
-		this.op = "";
-		if (this.__implements__ == undefined){this.__implements__ = [];}
-		this.__implements__.push(Runtime.Interfaces.SerializeInterface);
-	}
-	assignValue(variable_name, value){
-		if (variable_name == "op") this.op = Runtime.rtl.correct(value, "string", "", "");
-		else super.assignValue(variable_name, value);
-	}
-	takeValue(variable_name, default_value){
-		if (default_value == undefined) default_value = null;
-		if (variable_name == "op") return this.op;
-		return super.takeValue(variable_name, default_value);
-	}
-	getVariablesNames(names){
-		super.getVariablesNames(names);
-		names.push("op");
-	}
 	/**
 	 * Constructor
 	 */
@@ -52,6 +31,36 @@ BayrellLang.OpCodes.BaseOpCode = class extends Runtime.CoreObject{
 	 */
 	getClassName(){
 		return "BayrellLang.OpCodes.BaseOpCode";
+	}
+	/* ======================= Class Init Functions ======================= */
+	getClassName(){return "BayrellLang.OpCodes.BaseOpCode";}
+	static getParentClassName(){return "Runtime.CoreObject";}
+	_init(){
+		super._init();
+		this.op = "";
+		if (this.__implements__ == undefined){this.__implements__ = [];}
+		this.__implements__.push(Runtime.Interfaces.SerializeInterface);
+	}
+	assignObject(obj){
+		if (obj instanceof BayrellLang.OpCodes.BaseOpCode){
+			this.op = Runtime.rtl._clone(obj.op);
+		}
+		super.assignObject(obj);
+	}
+	assignValue(variable_name, value){
+		if (variable_name == "op") this.op = Runtime.rtl.correct(value, "string", "", "");
+		else super.assignValue(variable_name, value);
+	}
+	takeValue(variable_name, default_value){
+		if (default_value == undefined) default_value = null;
+		if (variable_name == "op") return this.op;
+		return super.takeValue(variable_name, default_value);
+	}
+	static getFieldsList(names){
+		names.push("op");
+	}
+	static getFieldInfoByName(field_name){
+		return null;
 	}
 }
 BayrellLang.OpCodes.BaseOpCode.__static_implements__ = [];

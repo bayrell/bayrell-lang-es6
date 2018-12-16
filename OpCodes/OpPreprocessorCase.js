@@ -19,40 +19,6 @@
 if (typeof BayrellLang == 'undefined') BayrellLang = {};
 if (typeof BayrellLang.OpCodes == 'undefined') BayrellLang.OpCodes = {};
 BayrellLang.OpCodes.OpPreprocessorCase = class extends BayrellLang.OpCodes.BaseOpCode{
-	getClassName(){return "BayrellLang.OpCodes.OpPreprocessorCase";}
-	static getParentClassName(){return "BayrellLang.OpCodes.BaseOpCode";}
-	_init(){
-		super._init();
-		this.op = "op_preprocessor_case";
-		this.condition = null;
-		this.value = null;
-	}
-	assignValue(variable_name, value){
-		if (variable_name == "op") this.op = Runtime.rtl.correct(value, "string", "op_preprocessor_case", "");
-		else if (variable_name == "condition") this.condition = Runtime.rtl.correct(value, "BayrellLang.OpCodes.BaseOpCode", null, "");
-		else if (variable_name == "value") this.value = Runtime.rtl.correct(value, "string", null, "");
-		else super.assignValue(variable_name, value);
-	}
-	takeValue(variable_name, default_value){
-		if (default_value == undefined) default_value = null;
-		if (variable_name == "op") return this.op;
-		else if (variable_name == "condition") return this.condition;
-		else if (variable_name == "value") return this.value;
-		return super.takeValue(variable_name, default_value);
-	}
-	getVariablesNames(names){
-		super.getVariablesNames(names);
-		names.push("op");
-		names.push("condition");
-		names.push("value");
-	}
-	/**
-	 * Returns classname of the object
-	 * @return string
-	 */
-	getClassName(){
-		return "BayrellLang.OpCodes.OpPreprocessorCase";
-	}
 	/**
 	 * Constructor
 	 */
@@ -68,5 +34,43 @@ BayrellLang.OpCodes.OpPreprocessorCase = class extends BayrellLang.OpCodes.BaseO
 	 */
 	destructor(){
 		super.destructor();
+	}
+	/* ======================= Class Init Functions ======================= */
+	getClassName(){return "BayrellLang.OpCodes.OpPreprocessorCase";}
+	static getParentClassName(){return "BayrellLang.OpCodes.BaseOpCode";}
+	_init(){
+		super._init();
+		this.op = "op_preprocessor_case";
+		this.condition = null;
+		this.value = null;
+	}
+	assignObject(obj){
+		if (obj instanceof BayrellLang.OpCodes.OpPreprocessorCase){
+			this.op = Runtime.rtl._clone(obj.op);
+			this.condition = Runtime.rtl._clone(obj.condition);
+			this.value = Runtime.rtl._clone(obj.value);
+		}
+		super.assignObject(obj);
+	}
+	assignValue(variable_name, value){
+		if (variable_name == "op") this.op = Runtime.rtl.correct(value, "string", "op_preprocessor_case", "");
+		else if (variable_name == "condition") this.condition = Runtime.rtl.correct(value, "BayrellLang.OpCodes.BaseOpCode", null, "");
+		else if (variable_name == "value") this.value = Runtime.rtl.correct(value, "string", null, "");
+		else super.assignValue(variable_name, value);
+	}
+	takeValue(variable_name, default_value){
+		if (default_value == undefined) default_value = null;
+		if (variable_name == "op") return this.op;
+		else if (variable_name == "condition") return this.condition;
+		else if (variable_name == "value") return this.value;
+		return super.takeValue(variable_name, default_value);
+	}
+	static getFieldsList(names){
+		names.push("op");
+		names.push("condition");
+		names.push("value");
+	}
+	static getFieldInfoByName(field_name){
+		return null;
 	}
 }

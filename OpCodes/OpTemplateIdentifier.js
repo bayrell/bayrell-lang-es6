@@ -19,21 +19,6 @@
 if (typeof BayrellLang == 'undefined') BayrellLang = {};
 if (typeof BayrellLang.OpCodes == 'undefined') BayrellLang.OpCodes = {};
 BayrellLang.OpCodes.OpTemplateIdentifier = class extends BayrellLang.OpCodes.BaseOpCode{
-	getClassName(){return "BayrellLang.OpCodes.OpTemplateIdentifier";}
-	static getParentClassName(){return "BayrellLang.OpCodes.BaseOpCode";}
-	_init(){
-		super._init();
-		this.op = "op_template_identifier";
-		this.t = null;
-		this.childs = null;
-	}
-	/**
-	 * Returns classname of the object
-	 * @return string
-	 */
-	getClassName(){
-		return "BayrellLang.OpCodes.OpTemplateIdentifier";
-	}
 	/**
 	 * Constructor
 	 */
@@ -89,5 +74,14 @@ BayrellLang.OpCodes.OpTemplateIdentifier = class extends BayrellLang.OpCodes.Bas
 		else {
 			super.assignValue(variable_name, value);
 		}
+	}
+	/* ======================= Class Init Functions ======================= */
+	getClassName(){return "BayrellLang.OpCodes.OpTemplateIdentifier";}
+	static getParentClassName(){return "BayrellLang.OpCodes.BaseOpCode";}
+	_init(){
+		super._init();
+		this.op = "op_template_identifier";
+		this.t = null;
+		this.childs = null;
 	}
 }

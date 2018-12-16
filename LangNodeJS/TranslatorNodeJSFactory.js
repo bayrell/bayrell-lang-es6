@@ -19,18 +19,19 @@
 if (typeof BayrellLang == 'undefined') BayrellLang = {};
 if (typeof BayrellLang.LangNodeJS == 'undefined') BayrellLang.LangNodeJS = {};
 BayrellLang.LangNodeJS.TranslatorNodeJSFactory = class extends Runtime.ContextObject{
+	/**
+	 * Returns new Instance
+	 */
+	newInstance(context){
+		return new BayrellLang.LangNodeJS.TranslatorNodeJS(context);
+	}
+	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.LangNodeJS.TranslatorNodeJSFactory";}
 	static getParentClassName(){return "Runtime.ContextObject";}
 	_init(){
 		super._init();
 		if (this.__implements__ == undefined){this.__implements__ = [];}
 		this.__implements__.push(Runtime.Interfaces.FactoryInterface);
-	}
-	/**
-	 * Returns new Instance
-	 */
-	newInstance(context){
-		return new BayrellLang.LangNodeJS.TranslatorNodeJS(context);
 	}
 }
 BayrellLang.LangNodeJS.TranslatorNodeJSFactory.__static_implements__ = [];

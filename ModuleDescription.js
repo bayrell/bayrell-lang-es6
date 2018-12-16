@@ -18,12 +18,6 @@
  */
 if (typeof BayrellLang == 'undefined') BayrellLang = {};
 BayrellLang.ModuleDescription = class{
-	getClassName(){return "BayrellLang.ModuleDescription";}
-	static getParentClassName(){return "";}
-	_init(){
-		if (this.__implements__ == undefined){this.__implements__ = [];}
-		this.__implements__.push(Runtime.Interfaces.ModuleDescriptionInterface);
-	}
 	/**
 	 * Returns module name
 	 * @return string
@@ -36,7 +30,7 @@ BayrellLang.ModuleDescription = class{
 	 * @return string
 	 */
 	static getModuleVersion(){
-		return "0.5.1";
+		return "0.6.0";
 	}
 	/**
 	 * Init context
@@ -63,6 +57,13 @@ BayrellLang.ModuleDescription = class{
 	 */
 	static getRequiredModules(context){
 		return (new Runtime.Map()).set("Runtime", ">=0.2 <1.0").set("BayrellParser", ">=0.1 <1.0");
+	}
+	/* ======================= Class Init Functions ======================= */
+	getClassName(){return "BayrellLang.ModuleDescription";}
+	static getParentClassName(){return "";}
+	_init(){
+		if (this.__implements__ == undefined){this.__implements__ = [];}
+		this.__implements__.push(Runtime.Interfaces.ModuleDescriptionInterface);
 	}
 }
 BayrellLang.ModuleDescription.__static_implements__ = [];

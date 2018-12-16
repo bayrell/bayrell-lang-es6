@@ -18,13 +18,6 @@
  */
 if (typeof BayrellLang == 'undefined') BayrellLang = {};
 BayrellLang.CommonParser = class extends BayrellParser.CoreParser{
-	getClassName(){return "BayrellLang.CommonParser";}
-	static getParentClassName(){return "BayrellParser.CoreParser";}
-	_init(){
-		super._init();
-		this._result = null;
-		this.skip_comments = false;
-	}
 	/**
 	 * Return true if char is alfa symbol
 	 * @param char ch
@@ -212,5 +205,13 @@ BayrellLang.CommonParser = class extends BayrellParser.CoreParser{
 	 */
 	runParser(){
 		this._result = null;
+	}
+	/* ======================= Class Init Functions ======================= */
+	getClassName(){return "BayrellLang.CommonParser";}
+	static getParentClassName(){return "BayrellParser.CoreParser";}
+	_init(){
+		super._init();
+		this._result = null;
+		this.skip_comments = false;
 	}
 }

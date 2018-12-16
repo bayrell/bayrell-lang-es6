@@ -19,6 +19,23 @@
 if (typeof BayrellLang == 'undefined') BayrellLang = {};
 if (typeof BayrellLang.OpCodes == 'undefined') BayrellLang.OpCodes = {};
 BayrellLang.OpCodes.OpCall = class extends BayrellLang.OpCodes.BaseOpCode{
+	/**
+	 * Constructor
+	 */
+	constructor(value, args){
+		if (value == undefined) value=null;
+		if (args == undefined) args=null;
+		super();
+		this.value = value;
+		this.args = args;
+	}
+	/**
+	 * Destructor
+	 */
+	destructor(){
+		super.destructor();
+	}
+	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.OpCodes.OpCall";}
 	static getParentClassName(){return "BayrellLang.OpCodes.BaseOpCode";}
 	_init(){
@@ -27,6 +44,15 @@ BayrellLang.OpCodes.OpCall = class extends BayrellLang.OpCodes.BaseOpCode{
 		this.value = null;
 		this.args = null;
 		this.is_await = false;
+	}
+	assignObject(obj){
+		if (obj instanceof BayrellLang.OpCodes.OpCall){
+			this.op = Runtime.rtl._clone(obj.op);
+			this.value = Runtime.rtl._clone(obj.value);
+			this.args = Runtime.rtl._clone(obj.args);
+			this.is_await = Runtime.rtl._clone(obj.is_await);
+		}
+		super.assignObject(obj);
 	}
 	assignValue(variable_name, value){
 		if (variable_name == "op") this.op = Runtime.rtl.correct(value, "string", "op_call", "");
@@ -43,34 +69,13 @@ BayrellLang.OpCodes.OpCall = class extends BayrellLang.OpCodes.BaseOpCode{
 		else if (variable_name == "is_await") return this.is_await;
 		return super.takeValue(variable_name, default_value);
 	}
-	getVariablesNames(names){
-		super.getVariablesNames(names);
+	static getFieldsList(names){
 		names.push("op");
 		names.push("value");
 		names.push("args");
 		names.push("is_await");
 	}
-	/**
-	 * Returns classname of the object
-	 * @return string
-	 */
-	getClassName(){
-		return "BayrellLang.OpCodes.OpCall";
-	}
-	/**
-	 * Constructor
-	 */
-	constructor(value, args){
-		if (value == undefined) value=null;
-		if (args == undefined) args=null;
-		super();
-		this.value = value;
-		this.args = args;
-	}
-	/**
-	 * Destructor
-	 */
-	destructor(){
-		super.destructor();
+	static getFieldInfoByName(field_name){
+		return null;
 	}
 }

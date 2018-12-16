@@ -18,8 +18,6 @@
  */
 if (typeof BayrellLang == 'undefined') BayrellLang = {};
 BayrellLang.TranslatorBay = class extends BayrellLang.CommonTranslator{
-	getClassName(){return "BayrellLang.TranslatorBay";}
-	static getParentClassName(){return "BayrellLang.CommonTranslator";}
 	/**
 	 * Operator ADD
 	 */
@@ -189,4 +187,7 @@ BayrellLang.TranslatorBay = class extends BayrellLang.CommonTranslator{
 	OpWhile(code_tree){
 		return null;
 	}
+	/* ======================= Class Init Functions ======================= */
+	getClassName(){return "BayrellLang.TranslatorBay";}
+	static getParentClassName(){return "BayrellLang.CommonTranslator";}
 }

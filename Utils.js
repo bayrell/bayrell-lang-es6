@@ -18,8 +18,6 @@
  */
 if (typeof BayrellLang == 'undefined') BayrellLang = {};
 BayrellLang.Utils = class extends Runtime.ContextObject{
-	getClassName(){return "BayrellLang.Utils";}
-	static getParentClassName(){return "Runtime.ContextObject";}
 	/**
 	 * Transcompile one language to other
 	 * @string string parser_factory_name
@@ -106,4 +104,7 @@ BayrellLang.Utils = class extends Runtime.ContextObject{
 		#endswitch
 		*/
 	}
+	/* ======================= Class Init Functions ======================= */
+	getClassName(){return "BayrellLang.Utils";}
+	static getParentClassName(){return "Runtime.ContextObject";}
 }

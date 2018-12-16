@@ -19,20 +19,6 @@
 if (typeof BayrellLang == 'undefined') BayrellLang = {};
 if (typeof BayrellLang.LangES6 == 'undefined') BayrellLang.LangES6 = {};
 BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
-	getClassName(){return "BayrellLang.LangES6.TranslatorES6";}
-	static getParentClassName(){return "BayrellLang.CommonTranslator";}
-	_init(){
-		super._init();
-		this.modules = null;
-		this.current_namespace = "";
-		this.current_class_name = "";
-		this.function_stack = null;
-		this.current_module_name = "";
-		this.is_interface = false;
-		this.is_return = false;
-		this.is_async_opcode = false;
-		this.is_async_await_op_call = false;
-	}
 	/**
 	 * Returns true if function is async
 	 * @return bool
@@ -1240,6 +1226,7 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 			this.modules.set("rtl", "Runtime.rtl");
 			this.modules.set("Map", "Runtime.Map");
 			this.modules.set("Vector", "Runtime.Vector");
+			this.modules.set("IntrospectionInfo", "Runtime.IntrospectionInfo");
 		}
 		return "";
 	}
@@ -1539,8 +1526,11 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 	OpClassDeclareFooter(op_code){
 		var res = "";
 		/* Static variables */
-		for (var i = 0; i < op_code.class_variables.count(); i++){
-			var variable = op_code.class_variables.item(i);
+		for (var i = 0; i < op_code.childs.count(); i++){
+			var variable = op_code.childs.item(i);
+			if (!(variable instanceof BayrellLang.OpCodes.OpAssignDeclare)){
+				continue;
+			}
 			if (variable.flags != null && (variable.isFlag("static") || variable.isFlag("const"))){
 				this.beginOperation();
 				var s = Runtime.rtl.toString(this.current_namespace)+"."+Runtime.rtl.toString(op_code.class_name)+"."+Runtime.rtl.toString(variable.name)+" = "+Runtime.rtl.toString(this.translateRun(variable.value))+";";
@@ -1614,7 +1604,7 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 	 * Class init functions
 	 */
 	OpClassInit(op_code){
-		var class_variables = op_code.class_variables;
+		var childs = op_code.childs;
 		var class_implements = op_code.class_implements;
 		var class_extends = "";
 		if (op_code.class_extends){
@@ -1626,18 +1616,39 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 		var has_cloneable = false;
 		var has_variables = false;
 		var has_implements = class_implements != null && class_implements.count() > 0;
-		for (var i = 0; i < class_variables.count(); i++){
-			var variable = class_variables.item(i);
-			if (variable.isFlag("serializable")){
-				has_serializable = true;
+		var has_methods_annotations = false;
+		var has_fields_annotations = false;
+		for (var i = 0; i < childs.count(); i++){
+			var variable = childs.item(i);
+			if (variable instanceof BayrellLang.OpCodes.OpAssignDeclare){
+				if (variable.isFlag("serializable")){
+					has_serializable = true;
+					has_cloneable = true;
+				}
+				if (variable.isFlag("cloneable")){
+					has_cloneable = true;
+				}
+				if (variable.isFlag("assignable")){
+					has_serializable = true;
+				}
+				if (!variable.isFlag("static") && !variable.isFlag("const")){
+					has_variables = true;
+				}
+				if (variable.hasAnnotations()){
+					has_methods_annotations = true;
+				}
 			}
-			if (variable.isFlag("cloneable")){
-				has_cloneable = true;
-			}
-			if (!variable.isFlag("static") && !variable.isFlag("const")){
-				has_variables = true;
+			if (variable instanceof BayrellLang.OpCodes.OpFunctionDeclare){
+				if (variable.hasAnnotations()){
+					has_fields_annotations = true;
+				}
 			}
 		}
+		if (this.is_struct){
+			has_serializable = true;
+			has_cloneable = true;
+		}
+		res += this.s("/* ======================= Class Init Functions ======================= */");
 		if (!this.is_interface){
 			res += this.s("getClassName(){"+"return "+Runtime.rtl.toString(this.convertString(Runtime.rtl.toString(this.current_namespace)+"."+Runtime.rtl.toString(this.current_class_name)))+";}");
 			res += this.s("static getParentClassName(){"+"return "+Runtime.rtl.toString(this.convertString(class_extends))+";}");
@@ -1649,9 +1660,12 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 				if (class_extends != ""){
 					res += this.s("super._init();");
 				}
-				if (class_variables != null){
-					for (var i = 0; i < class_variables.count(); i++){
-						var variable = class_variables.item(i);
+				if (childs != null){
+					for (var i = 0; i < childs.count(); i++){
+						var variable = childs.item(i);
+						if (!(variable instanceof BayrellLang.OpCodes.OpAssignDeclare)){
+							continue;
+						}
 						if (!variable.isFlag("static") && !variable.isFlag("const")){
 							this.beginOperation();
 							s = "this."+Runtime.rtl.toString(variable.name)+" = "+Runtime.rtl.toString(this.translateRun(variable.value))+";";
@@ -1678,9 +1692,13 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 				this.levelInc();
 				res += this.s("if (obj instanceof "+Runtime.rtl.toString(this.getName(this.current_class_name))+"){");
 				this.levelInc();
-				for (var i = 0; i < class_variables.count(); i++){
-					var variable = class_variables.item(i);
-					if (variable.isFlag("cloneable")){
+				for (var i = 0; i < childs.count(); i++){
+					var variable = childs.item(i);
+					if (!(variable instanceof BayrellLang.OpCodes.OpAssignDeclare)){
+						continue;
+					}
+					var is_struct = this.is_struct && !variable.isFlag("static") && !variable.isFlag("const");
+					if (variable.isFlag("public") && (variable.isFlag("cloneable") || variable.isFlag("serializable") || is_struct)){
 						res += this.s("this."+Runtime.rtl.toString(variable.name)+" = "+Runtime.rtl.toString(this.getName("rtl"))+"._clone("+"obj."+Runtime.rtl.toString(variable.name)+");");
 					}
 				}
@@ -1695,9 +1713,13 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 				res += this.s("assignValue(variable_name, value){");
 				this.levelInc();
 				class_variables_serializable_count = 0;
-				for (var i = 0; i < class_variables.count(); i++){
-					var variable = class_variables.item(i);
-					if (variable.isFlag("serializable")){
+				for (var i = 0; i < childs.count(); i++){
+					var variable = childs.item(i);
+					if (!(variable instanceof BayrellLang.OpCodes.OpAssignDeclare)){
+						continue;
+					}
+					var is_struct = this.is_struct && !variable.isFlag("static") && !variable.isFlag("const");
+					if (variable.isFlag("public") && (variable.isFlag("serializable") || variable.isFlag("assignable") || is_struct)){
 						var type_value = this.getAssignDeclareTypeValue(variable);
 						var type_template = this.getAssignDeclareTypeTemplate(variable);
 						var def_val = "null";
@@ -1716,16 +1738,25 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 						class_variables_serializable_count++;
 					}
 				}
-				res += this.s("else super.assignValue(variable_name, value);");
+				if (class_variables_serializable_count == 0){
+					res += this.s("super.assignValue(variable_name, value);");
+				}
+				else {
+					res += this.s("else super.assignValue(variable_name, value);");
+				}
 				this.levelDec();
 				res += this.s("}");
 				res += this.s("takeValue(variable_name, default_value){");
 				this.levelInc();
 				res += this.s("if (default_value == undefined) default_value = null;");
 				class_variables_serializable_count = 0;
-				for (var i = 0; i < class_variables.count(); i++){
-					var variable = class_variables.item(i);
-					if (variable.isFlag("serializable")){
+				for (var i = 0; i < childs.count(); i++){
+					var variable = childs.item(i);
+					if (!(variable instanceof BayrellLang.OpCodes.OpAssignDeclare)){
+						continue;
+					}
+					var is_struct = this.is_struct && !variable.isFlag("static") && !variable.isFlag("const");
+					if (variable.isFlag("public") && (variable.isFlag("serializable") || variable.isFlag("assignable") || is_struct)){
 						var take_value_s = "if (variable_name == "+Runtime.rtl.toString(this.convertString(variable.name))+") "+"return this."+Runtime.rtl.toString(variable.name)+";";
 						if (class_variables_serializable_count == 0){
 							res += this.s(take_value_s);
@@ -1739,15 +1770,109 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 				res += this.s("return super.takeValue(variable_name, default_value);");
 				this.levelDec();
 				res += this.s("}");
-				res += this.s("getVariablesNames(names){");
+			}
+			if (has_serializable || has_fields_annotations){
+				res += this.s("static getFieldsList(names){");
 				this.levelInc();
-				res += this.s("super.getVariablesNames(names);");
-				for (var i = 0; i < class_variables.count(); i++){
-					var variable = class_variables.item(i);
-					if (variable.isFlag("serializable")){
+				for (var i = 0; i < childs.count(); i++){
+					var variable = childs.item(i);
+					if (!(variable instanceof BayrellLang.OpCodes.OpAssignDeclare)){
+						continue;
+					}
+					var is_struct = this.is_struct && !variable.isFlag("static") && !variable.isFlag("const");
+					if (variable.isFlag("public") && (variable.isFlag("serializable") || variable.isFlag("assignable") || is_struct)){
 						res += this.s("names.push("+Runtime.rtl.toString(this.convertString(variable.name))+");");
 					}
 				}
+				this.levelDec();
+				res += this.s("}");
+				res += this.s("static getFieldInfoByName(field_name){");
+				this.levelInc();
+				for (var i = 0; i < childs.count(); i++){
+					var variable = childs.item(i);
+					if (!(variable instanceof BayrellLang.OpCodes.OpAssignDeclare)){
+						continue;
+					}
+					if (variable.isFlag("public") && variable.hasAnnotations()){
+						res += this.s("if (field_name == "+Runtime.rtl.toString(this.convertString(variable.name))+"){");
+						this.levelInc();
+						res += this.s("return new "+Runtime.rtl.toString(this.getName("IntrospectionInfo"))+"(");
+						this.levelInc();
+						res += this.s("(new "+Runtime.rtl.toString(this.getName("Map"))+"())");
+						res += this.s(".set(\"kind\", \"field\")");
+						res += this.s(".set(\"name\", "+Runtime.rtl.toString(this.convertString(variable.name))+")");
+						res += this.s(".set(\"annotations\", ");
+						this.levelInc();
+						res += this.s("(new "+Runtime.rtl.toString(this.getName("Vector"))+"())");
+						for (var j = 0; j < variable.annotations.count(); j++){
+							var annotation = variable.annotations.item(j);
+							this.pushOneLine(true);
+							var s_kind = this.translateRun(annotation.kind);
+							var s_options = this.translateRun(annotation.options);
+							this.popOneLine();
+							res += this.s(".push(new "+Runtime.rtl.toString(s_kind)+"("+Runtime.rtl.toString(s_options)+"))");
+						}
+						this.levelDec();
+						res += this.s(")");
+						this.levelDec();
+						res += this.s(");");
+						this.levelDec();
+						res += this.s("}");
+					}
+				}
+				res += this.s("return null;");
+				this.levelDec();
+				res += this.s("}");
+			}
+			if (has_methods_annotations){
+				res += this.s("static getMethodsList(names){");
+				this.levelInc();
+				for (var i = 0; i < childs.count(); i++){
+					var variable = childs.item(i);
+					if (!(variable instanceof BayrellLang.OpCodes.OpFunctionDeclare)){
+						continue;
+					}
+					if (variable.isFlag("public") && variable.hasAnnotations()){
+						res += this.s("names.push("+Runtime.rtl.toString(this.convertString(variable.name))+");");
+					}
+				}
+				this.levelDec();
+				res += this.s("}");
+				res += this.s("static getMethodInfoByName(method_name){");
+				this.levelInc();
+				for (var i = 0; i < childs.count(); i++){
+					var variable = childs.item(i);
+					if (!(variable instanceof BayrellLang.OpCodes.OpFunctionDeclare)){
+						continue;
+					}
+					if (variable.isFlag("public") && variable.hasAnnotations()){
+						res += this.s("if (method_name == "+Runtime.rtl.toString(this.convertString(variable.name))+"){");
+						this.levelInc();
+						res += this.s("return new "+Runtime.rtl.toString(this.getName("IntrospectionInfo"))+"(");
+						this.levelInc();
+						res += this.s("(new "+Runtime.rtl.toString(this.getName("Map"))+"())");
+						res += this.s(".set(\"kind\", \"method\")");
+						res += this.s(".set(\"name\", "+Runtime.rtl.toString(this.convertString(variable.name))+")");
+						res += this.s(".set(\"annotations\", ");
+						this.levelInc();
+						res += this.s("(new "+Runtime.rtl.toString(this.getName("Vector"))+"())");
+						for (var j = 0; j < variable.annotations.count(); j++){
+							var annotation = variable.annotations.item(j);
+							this.pushOneLine(true);
+							var s_kind = this.translateRun(annotation.kind);
+							var s_options = this.translateRun(annotation.options);
+							this.popOneLine();
+							res += this.s(".push(new "+Runtime.rtl.toString(s_kind)+"("+Runtime.rtl.toString(s_options)+"))");
+						}
+						this.levelDec();
+						res += this.s(")");
+						this.levelDec();
+						res += this.s(");");
+						this.levelDec();
+						res += this.s("}");
+					}
+				}
+				res += this.s("return null;");
 				this.levelDec();
 				res += this.s("}");
 			}
@@ -1797,9 +1922,10 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 			return "";
 		}
 		res += this.OpClassDeclareHeader(op_code);
-		res += this.OpClassInit(op_code);
 		/* Body */
 		res += this.OpClassBody(op_code);
+		/* Class Init */
+		res += this.OpClassInit(op_code);
 		/* Footer class */
 		this.levelDec();
 		res += this.s("}");
@@ -1814,6 +1940,16 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 		this.is_interface = true;
 		var res = this.OpClassDeclare(op_code);
 		this.is_interface = false;
+		return res;
+	}
+	/**
+	 * Struct declare
+	 */
+	OpStructDeclare(op_code){
+		this.is_struct = true;
+		this.struct_read_only = op_code.is_readonly;
+		var res = this.OpClassDeclare(op_code);
+		this.is_struct = false;
 		return res;
 	}
 	/** =========================== Preprocessor ========================== */
@@ -1858,5 +1994,22 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 		var s = "\"use strict;\""+Runtime.rtl.toString(this.crlf);
 		s += this.translateRun(op_code);
 		return s;
+	}
+	/* ======================= Class Init Functions ======================= */
+	getClassName(){return "BayrellLang.LangES6.TranslatorES6";}
+	static getParentClassName(){return "BayrellLang.CommonTranslator";}
+	_init(){
+		super._init();
+		this.modules = null;
+		this.current_namespace = "";
+		this.current_class_name = "";
+		this.function_stack = null;
+		this.current_module_name = "";
+		this.is_interface = false;
+		this.is_struct = false;
+		this.is_return = false;
+		this.is_async_opcode = false;
+		this.is_async_await_op_call = false;
+		this.struct_read_only = false;
 	}
 }

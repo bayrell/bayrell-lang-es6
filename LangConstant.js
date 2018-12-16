@@ -18,6 +18,7 @@
  */
 if (typeof BayrellLang == 'undefined') BayrellLang = {};
 BayrellLang.LangConstant = class{
+	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.LangConstant";}
 	static getParentClassName(){return "";}
 }

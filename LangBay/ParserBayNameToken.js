@@ -19,8 +19,6 @@
 if (typeof BayrellLang == 'undefined') BayrellLang = {};
 if (typeof BayrellLang.LangBay == 'undefined') BayrellLang.LangBay = {};
 BayrellLang.LangBay.ParserBayNameToken = class extends BayrellParser.ParserToken{
-	getClassName(){return "BayrellLang.LangBay.ParserBayNameToken";}
-	static getParentClassName(){return "BayrellParser.ParserToken";}
 	/**
 	 * Return true if char is token char
 	 * @param {char} ch
@@ -29,6 +27,9 @@ BayrellLang.LangBay.ParserBayNameToken = class extends BayrellParser.ParserToken
 	isTokenChar(ch){
 		return Runtime.rs.strpos("qazwsxedcrfvtgbyhnujmikolp0123456789_.", Runtime.rs.strtolower(ch)) !== -1;
 	}
+	/* ======================= Class Init Functions ======================= */
+	getClassName(){return "BayrellLang.LangBay.ParserBayNameToken";}
+	static getParentClassName(){return "BayrellParser.ParserToken";}
 }
 BayrellLang.LangBay.ParserBayNameToken.TOKEN_NONE = "none";
 BayrellLang.LangBay.ParserBayNameToken.TOKEN_BASE = "base";

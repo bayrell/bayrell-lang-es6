@@ -19,12 +19,20 @@
 if (typeof BayrellLang == 'undefined') BayrellLang = {};
 if (typeof BayrellLang.OpCodes == 'undefined') BayrellLang.OpCodes = {};
 BayrellLang.OpCodes.OpFunctionArrowDeclare = class extends BayrellLang.OpCodes.OpFunctionDeclare{
+	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.OpCodes.OpFunctionArrowDeclare";}
 	static getParentClassName(){return "BayrellLang.OpCodes.OpFunctionDeclare";}
 	_init(){
 		super._init();
 		this.op = "op_arrow_function";
 		this.return_function = null;
+	}
+	assignObject(obj){
+		if (obj instanceof BayrellLang.OpCodes.OpFunctionArrowDeclare){
+			this.op = Runtime.rtl._clone(obj.op);
+			this.return_function = Runtime.rtl._clone(obj.return_function);
+		}
+		super.assignObject(obj);
 	}
 	assignValue(variable_name, value){
 		if (variable_name == "op") this.op = Runtime.rtl.correct(value, "string", "op_arrow_function", "");
@@ -37,16 +45,11 @@ BayrellLang.OpCodes.OpFunctionArrowDeclare = class extends BayrellLang.OpCodes.O
 		else if (variable_name == "return_function") return this.return_function;
 		return super.takeValue(variable_name, default_value);
 	}
-	getVariablesNames(names){
-		super.getVariablesNames(names);
+	static getFieldsList(names){
 		names.push("op");
 		names.push("return_function");
 	}
-	/**
-	 * Returns classname of the object
-	 * @return string
-	 */
-	getClassName(){
-		return "BayrellLang.OpCodes.OpFunctionArrowDeclare";
+	static getFieldInfoByName(field_name){
+		return null;
 	}
 }

@@ -18,31 +18,36 @@
  */
 if (typeof BayrellLang == 'undefined') BayrellLang = {};
 if (typeof BayrellLang.OpCodes == 'undefined') BayrellLang.OpCodes = {};
-BayrellLang.OpCodes.OpAnd = class extends BayrellLang.OpCodes.OpValue2{
+BayrellLang.OpCodes.OpStructDeclare = class extends BayrellLang.OpCodes.OpClassDeclare{
 	/* ======================= Class Init Functions ======================= */
-	getClassName(){return "BayrellLang.OpCodes.OpAnd";}
-	static getParentClassName(){return "BayrellLang.OpCodes.OpValue2";}
+	getClassName(){return "BayrellLang.OpCodes.OpStructDeclare";}
+	static getParentClassName(){return "BayrellLang.OpCodes.OpClassDeclare";}
 	_init(){
 		super._init();
-		this.op = "op_and";
+		this.op = "op_struct";
+		this.is_readonly = false;
 	}
 	assignObject(obj){
-		if (obj instanceof BayrellLang.OpCodes.OpAnd){
+		if (obj instanceof BayrellLang.OpCodes.OpStructDeclare){
 			this.op = Runtime.rtl._clone(obj.op);
+			this.is_readonly = Runtime.rtl._clone(obj.is_readonly);
 		}
 		super.assignObject(obj);
 	}
 	assignValue(variable_name, value){
-		if (variable_name == "op") this.op = Runtime.rtl.correct(value, "string", "op_and", "");
+		if (variable_name == "op") this.op = Runtime.rtl.correct(value, "string", "op_struct", "");
+		else if (variable_name == "is_readonly") this.is_readonly = Runtime.rtl.correct(value, "bool", false, "");
 		else super.assignValue(variable_name, value);
 	}
 	takeValue(variable_name, default_value){
 		if (default_value == undefined) default_value = null;
 		if (variable_name == "op") return this.op;
+		else if (variable_name == "is_readonly") return this.is_readonly;
 		return super.takeValue(variable_name, default_value);
 	}
 	static getFieldsList(names){
 		names.push("op");
+		names.push("is_readonly");
 	}
 	static getFieldInfoByName(field_name){
 		return null;

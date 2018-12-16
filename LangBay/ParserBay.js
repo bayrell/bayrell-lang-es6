@@ -19,15 +19,6 @@
 if (typeof BayrellLang == 'undefined') BayrellLang = {};
 if (typeof BayrellLang.LangBay == 'undefined') BayrellLang.LangBay = {};
 BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
-	getClassName(){return "BayrellLang.LangBay.ParserBay";}
-	static getParentClassName(){return "BayrellLang.CommonParser";}
-	_init(){
-		super._init();
-		this.current_namespace = "";
-		this.current_class_name = "";
-		this.is_interface = false;
-		this.modules = null;
-	}
 	/**
 	 * Tokens Fabric
 	 * @return BayrellParserToken
@@ -1098,6 +1089,19 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 		return flags;
 	}
 	/**
+	 * Read annotation
+	 */
+	readAnnotation(){
+		this.matchNextToken("@");
+		var op_annotation = new BayrellLang.OpCodes.OpAnnotation();
+		op_annotation.kind = this.readTemplateIdentifier();
+		op_annotation.options = this.readMap();
+		if (this.annotations == null){
+			this.annotations = new Runtime.Vector();
+		}
+		this.annotations.push(op_annotation);
+	}
+	/**
 	 * Read declare class arguments
 	 * @return BaseOpCode
 	 */
@@ -1243,10 +1247,16 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 		if (flags != null && flags.p_declare || this.is_interface){
 			is_declare_function = true;
 		}
+		if (this.findNextToken("@")){
+			this.readAnnotation();
+			return ;
+		}
 		op_code = this.readDeclareArrowFunction(true, is_declare_function);
-		if (op_code){
+		if (op_code && op_code instanceof BayrellLang.OpCodes.OpFunctionDeclare){
+			op_code.annotations = this.annotations;
 			op_code.flags = flags;
 			res.childs.push(op_code);
+			this.annotations = null;
 			return ;
 		}
 		op_code = this.readOperatorAssign();
@@ -1254,9 +1264,11 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 			throw this.parserError("Assign are not alowed here");
 		}
 		else if (op_code instanceof BayrellLang.OpCodes.OpAssignDeclare){
+			op_code.annotations = this.annotations;
 			op_code.flags = flags;
-			res.class_variables.push(op_code);
+			res.childs.push(op_code);
 			this.matchNextToken(";");
+			this.annotations = null;
 			return ;
 		}
 		throw this.parserError("Unknown operator");
@@ -1315,7 +1327,7 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 		this.matchNextToken("}");
 	}
 	/**
-	 * Read operator namespace
+	 * Read class
 	 * @return BaseOpCode
 	 */
 	readDeclareClass(class_flags){
@@ -1326,7 +1338,7 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 		return res;
 	}
 	/**
-	 * Read operator namespace
+	 * Read interface
 	 * @return BaseOpCode
 	 */
 	readDeclareInterface(class_flags){
@@ -1335,6 +1347,21 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 		this.is_interface = true;
 		this.readClassHead(res);
 		this.is_interface = false;
+		res.flags = class_flags;
+		return res;
+	}
+	/**
+	 * Read struct
+	 * @return BaseOpCode
+	 */
+	readDeclareStruct(class_flags){
+		var res = new BayrellLang.OpCodes.OpStructDeclare();
+		this.matchNextToken("struct");
+		if (this.findNextToken("readonly")){
+			this.matchNextToken("readonly");
+			res.is_readonly = true;
+		}
+		this.readClassHead(res);
 		res.flags = class_flags;
 		return res;
 	}
@@ -1410,10 +1437,16 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 			}
 			var flags = this.readFlags();
 			if (this.findNextToken("class")){
+				this.annotations = null;
 				res.push(this.readDeclareClass(flags));
 			}
 			else if (this.findNextToken("interface")){
+				this.annotations = null;
 				res.push(this.readDeclareInterface(flags));
+			}
+			else if (this.findNextToken("struct")){
+				this.annotations = null;
+				res.push(this.readDeclareStruct(flags));
 			}
 			else {
 				throw this.parserError("Unknown token "+Runtime.rtl.toString(this.lookNextToken()));
@@ -1433,5 +1466,16 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 	 */
 	runParser(){
 		this._result = new BayrellLang.OpCodes.OpNope(this.readProgram());
+	}
+	/* ======================= Class Init Functions ======================= */
+	getClassName(){return "BayrellLang.LangBay.ParserBay";}
+	static getParentClassName(){return "BayrellLang.CommonParser";}
+	_init(){
+		super._init();
+		this.current_namespace = "";
+		this.current_class_name = "";
+		this.is_interface = false;
+		this.modules = null;
+		this.annotations = null;
 	}
 }

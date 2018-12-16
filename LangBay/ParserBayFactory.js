@@ -19,18 +19,19 @@
 if (typeof BayrellLang == 'undefined') BayrellLang = {};
 if (typeof BayrellLang.LangBay == 'undefined') BayrellLang.LangBay = {};
 BayrellLang.LangBay.ParserBayFactory = class extends Runtime.ContextObject{
+	/**
+	 * Returns new Instance
+	 */
+	newInstance(context){
+		return new BayrellLang.LangBay.ParserBay(context);
+	}
+	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.LangBay.ParserBayFactory";}
 	static getParentClassName(){return "Runtime.ContextObject";}
 	_init(){
 		super._init();
 		if (this.__implements__ == undefined){this.__implements__ = [];}
 		this.__implements__.push(Runtime.Interfaces.FactoryInterface);
-	}
-	/**
-	 * Returns new Instance
-	 */
-	newInstance(context){
-		return new BayrellLang.LangBay.ParserBay(context);
 	}
 }
 BayrellLang.LangBay.ParserBayFactory.__static_implements__ = [];

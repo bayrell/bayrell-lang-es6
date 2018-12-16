@@ -19,18 +19,19 @@
 if (typeof BayrellLang == 'undefined') BayrellLang = {};
 if (typeof BayrellLang.LangPHP == 'undefined') BayrellLang.LangPHP = {};
 BayrellLang.LangPHP.TranslatorPHPFactory = class extends Runtime.ContextObject{
+	/**
+	 * Returns new Instance
+	 */
+	newInstance(context){
+		return new BayrellLang.LangPHP.TranslatorPHP(context);
+	}
+	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.LangPHP.TranslatorPHPFactory";}
 	static getParentClassName(){return "Runtime.ContextObject";}
 	_init(){
 		super._init();
 		if (this.__implements__ == undefined){this.__implements__ = [];}
 		this.__implements__.push(Runtime.Interfaces.FactoryInterface);
-	}
-	/**
-	 * Returns new Instance
-	 */
-	newInstance(context){
-		return new BayrellLang.LangPHP.TranslatorPHP(context);
 	}
 }
 BayrellLang.LangPHP.TranslatorPHPFactory.__static_implements__ = [];

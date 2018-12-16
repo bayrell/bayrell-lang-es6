@@ -19,6 +19,7 @@
 if (typeof BayrellLang == 'undefined') BayrellLang = {};
 if (typeof BayrellLang.LangES6 == 'undefined') BayrellLang.LangES6 = {};
 BayrellLang.LangES6.BayrellParserES6 = class{
+	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.LangES6.BayrellParserES6";}
 	static getParentClassName(){return "";}
 }

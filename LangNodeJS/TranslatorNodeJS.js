@@ -19,8 +19,6 @@
 if (typeof BayrellLang == 'undefined') BayrellLang = {};
 if (typeof BayrellLang.LangNodeJS == 'undefined') BayrellLang.LangNodeJS = {};
 BayrellLang.LangNodeJS.TranslatorNodeJS = class extends BayrellLang.LangES6.TranslatorES6{
-	getClassName(){return "BayrellLang.LangNodeJS.TranslatorNodeJS";}
-	static getParentClassName(){return "BayrellLang.LangES6.TranslatorES6";}
 	/**
 	 * Get name
 	 */
@@ -42,7 +40,7 @@ BayrellLang.LangNodeJS.TranslatorNodeJS = class extends BayrellLang.LangES6.Tran
 		this.current_module_name = arr.item(0);
 		this.modules.clear();
 		if (this.current_module_name != "Runtime"){
-			return "var rtl = require('bayrell-runtime-nodejs').rtl;"+Runtime.rtl.toString(this.s("var Map = require('bayrell-runtime-nodejs').Map;"))+Runtime.rtl.toString(this.s("var Vector = require('bayrell-runtime-nodejs').Vector;"));
+			return "var rtl = require('bayrell-runtime-nodejs').rtl;"+Runtime.rtl.toString(this.s("var Map = require('bayrell-runtime-nodejs').Map;"))+Runtime.rtl.toString(this.s("var Vector = require('bayrell-runtime-nodejs').Vector;"))+Runtime.rtl.toString(this.s("var IntrospectionInfo = require('bayrell-runtime-nodejs').IntrospectionInfo;"));
 		}
 		return "";
 	}
@@ -64,6 +62,8 @@ BayrellLang.LangNodeJS.TranslatorNodeJS = class extends BayrellLang.LangES6.Tran
 		if (op_code.alias_name != ""){
 			class_name = op_code.alias_name;
 		}
+		this.modules.set(class_name, lib_name);
+		/* If same modules */
 		if (arr1.item(0) == arr2.item(0)){
 			var pos = 0;
 			while (pos < sz_arr1 && pos < sz_arr2 && arr1.item(pos) == arr2.item(pos)){
@@ -122,9 +122,13 @@ BayrellLang.LangNodeJS.TranslatorNodeJS = class extends BayrellLang.LangES6.Tran
 	 */
 	OpClassDeclareFooter(op_code){
 		var res = "";
-		for (var i = 0; i < op_code.class_variables.count(); i++){
-			var variable = op_code.class_variables.item(i);
-			if (variable.flags != null && variable.flags.p_static == true){
+		/* Static variables */
+		for (var i = 0; i < op_code.childs.count(); i++){
+			var variable = op_code.childs.item(i);
+			if (!(variable instanceof BayrellLang.OpCodes.OpAssignDeclare)){
+				continue;
+			}
+			if (variable.flags != null && (variable.isFlag("static") || variable.isFlag("const"))){
 				this.beginOperation();
 				var s = Runtime.rtl.toString(op_code.class_name)+"."+Runtime.rtl.toString(variable.name)+" = "+Runtime.rtl.toString(this.translateRun(variable.value))+";";
 				this.endOperation();
@@ -145,6 +149,52 @@ BayrellLang.LangNodeJS.TranslatorNodeJS = class extends BayrellLang.LangES6.Tran
 		return res;
 	}
 	/**
+	 * Class declare footer
+	 */
+	OpClassDeclareFooterNew(op_code){
+		var ch = "";
+		var res = "";
+		var current_namespace = "";
+		var v = Runtime.rs.explode(".", this.current_namespace);
+		res += this.s("module.exports = {};");
+		for (var i = 0; i < v.count(); i++){
+			if (i == 0){
+				continue;
+			}
+			current_namespace += Runtime.rtl.toString(ch)+Runtime.rtl.toString(v.item(i));
+			s = "if (typeof module.exports."+Runtime.rtl.toString(current_namespace)+" == 'undefined') "+"module.exports."+Runtime.rtl.toString(current_namespace)+" = {};";
+			res += this.s(s);
+			ch = ".";
+		}
+		if (current_namespace == ""){
+			current_namespace = "module.exports";
+		}
+		else {
+			current_namespace = "module.exports."+Runtime.rtl.toString(current_namespace);
+		}
+		res += this.s(Runtime.rtl.toString(current_namespace)+"."+Runtime.rtl.toString(op_code.class_name)+" = "+Runtime.rtl.toString(op_code.class_name));
+		for (var i = 0; i < op_code.class_variables.count(); i++){
+			var variable = op_code.class_variables.item(i);
+			if (variable.flags != null && variable.flags.p_static == true){
+				this.beginOperation();
+				var s = Runtime.rtl.toString(current_namespace)+"."+Runtime.rtl.toString(op_code.class_name)+"."+Runtime.rtl.toString(variable.name)+" = "+Runtime.rtl.toString(this.translateRun(variable.value))+";";
+				this.endOperation();
+				res += this.s(s);
+			}
+		}
+		/* Static implements */
+		var class_implements = op_code.class_implements;
+		if (class_implements != null && class_implements.count() > 0){
+			var name = op_code.class_name;
+			res += this.s(Runtime.rtl.toString(current_namespace)+"."+Runtime.rtl.toString(name)+".__static_implements__ = [];");
+			for (var i = 0; i < class_implements.count(); i++){
+				var value = class_implements.item(i);
+				res += this.s(Runtime.rtl.toString(current_namespace)+"."+Runtime.rtl.toString(name)+".__static_implements__.push("+Runtime.rtl.toString(this.getName(value))+")");
+			}
+		}
+		return res;
+	}
+	/**
 	 * Calc preprocessor condition
 	 */
 	calcPreprocessorCondition(op_case){
@@ -155,4 +205,7 @@ BayrellLang.LangNodeJS.TranslatorNodeJS = class extends BayrellLang.LangES6.Tran
 		}
 		return false;
 	}
+	/* ======================= Class Init Functions ======================= */
+	getClassName(){return "BayrellLang.LangNodeJS.TranslatorNodeJS";}
+	static getParentClassName(){return "BayrellLang.LangES6.TranslatorES6";}
 }

@@ -19,13 +19,6 @@
 if (typeof BayrellLang == 'undefined') BayrellLang = {};
 if (typeof BayrellLang.LangBay == 'undefined') BayrellLang.LangBay = {};
 BayrellLang.LangBay.ParserBayToken = class extends BayrellParser.ParserToken{
-	getClassName(){return "BayrellLang.LangBay.ParserBayToken";}
-	static getParentClassName(){return "BayrellParser.ParserToken";}
-	_init(){
-		super._init();
-		this._special_tokens = null;
-		this.parser = null;
-	}
 	/**
 	 * Current content of the file
 	 */
@@ -177,6 +170,14 @@ BayrellLang.LangBay.ParserBayToken = class extends BayrellParser.ParserToken{
 			return ;
 		}
 		this.readNextTokenBase();
+	}
+	/* ======================= Class Init Functions ======================= */
+	getClassName(){return "BayrellLang.LangBay.ParserBayToken";}
+	static getParentClassName(){return "BayrellParser.ParserToken";}
+	_init(){
+		super._init();
+		this._special_tokens = null;
+		this.parser = null;
 	}
 }
 BayrellLang.LangBay.ParserBayToken.TOKEN_NONE = "none";

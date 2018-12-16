@@ -19,11 +19,18 @@
 if (typeof BayrellLang == 'undefined') BayrellLang = {};
 if (typeof BayrellLang.OpCodes == 'undefined') BayrellLang.OpCodes = {};
 BayrellLang.OpCodes.OpBitAnd = class extends BayrellLang.OpCodes.OpValue2{
+	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.OpCodes.OpBitAnd";}
 	static getParentClassName(){return "BayrellLang.OpCodes.OpValue2";}
 	_init(){
 		super._init();
 		this.op = "op_bit_and";
+	}
+	assignObject(obj){
+		if (obj instanceof BayrellLang.OpCodes.OpBitAnd){
+			this.op = Runtime.rtl._clone(obj.op);
+		}
+		super.assignObject(obj);
 	}
 	assignValue(variable_name, value){
 		if (variable_name == "op") this.op = Runtime.rtl.correct(value, "string", "op_bit_and", "");
@@ -34,15 +41,10 @@ BayrellLang.OpCodes.OpBitAnd = class extends BayrellLang.OpCodes.OpValue2{
 		if (variable_name == "op") return this.op;
 		return super.takeValue(variable_name, default_value);
 	}
-	getVariablesNames(names){
-		super.getVariablesNames(names);
+	static getFieldsList(names){
 		names.push("op");
 	}
-	/**
-	 * Returns classname of the object
-	 * @return string
-	 */
-	getClassName(){
-		return "BayrellLang.OpCodes.OpBitAnd";
+	static getFieldInfoByName(field_name){
+		return null;
 	}
 }
