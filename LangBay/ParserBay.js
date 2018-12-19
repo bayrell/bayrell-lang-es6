@@ -1435,18 +1435,29 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 				res.push(this.readPreprocessor());
 				continue;
 			}
+			if (this.findNextToken("@")){
+				this.readAnnotation();
+				continue;
+			}
 			var flags = this.readFlags();
-			if (this.findNextToken("class")){
+			var is_class = this.findNextToken("class");
+			var is_interface = this.findNextToken("interface");
+			var is_struct = this.findNextToken("struct");
+			if (is_class || is_interface || is_struct){
+				var annotations = this.annotations;
 				this.annotations = null;
-				res.push(this.readDeclareClass(flags));
-			}
-			else if (this.findNextToken("interface")){
-				this.annotations = null;
-				res.push(this.readDeclareInterface(flags));
-			}
-			else if (this.findNextToken("struct")){
-				this.annotations = null;
-				res.push(this.readDeclareStruct(flags));
+				var op_code = null;
+				if (is_class){
+					op_code = this.readDeclareClass(flags);
+				}
+				else if (is_interface){
+					op_code = this.readDeclareInterface(flags);
+				}
+				else if (is_struct){
+					op_code = this.readDeclareStruct(flags);
+				}
+				op_code.annotations = annotations;
+				res.push(op_code);
 			}
 			else {
 				throw this.parserError("Unknown token "+Runtime.rtl.toString(this.lookNextToken()));

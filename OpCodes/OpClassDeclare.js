@@ -33,6 +33,12 @@ BayrellLang.OpCodes.OpClassDeclare = class extends BayrellLang.OpCodes.BaseOpCod
 		return this.flags.takeValue(name);
 	}
 	/**
+	 * Has Annotations
+	 */
+	hasAnnotations(){
+		return this.annotations != null && this.annotations.count() > 0;
+	}
+	/**
 	 * Constructor
 	 */
 	constructor(){
@@ -60,6 +66,7 @@ BayrellLang.OpCodes.OpClassDeclare = class extends BayrellLang.OpCodes.BaseOpCod
 		this.childs = null;
 		this.class_template = null;
 		this.flags = null;
+		this.annotations = null;
 	}
 	assignObject(obj){
 		if (obj instanceof BayrellLang.OpCodes.OpClassDeclare){
@@ -70,6 +77,7 @@ BayrellLang.OpCodes.OpClassDeclare = class extends BayrellLang.OpCodes.BaseOpCod
 			this.childs = Runtime.rtl._clone(obj.childs);
 			this.class_template = Runtime.rtl._clone(obj.class_template);
 			this.flags = Runtime.rtl._clone(obj.flags);
+			this.annotations = Runtime.rtl._clone(obj.annotations);
 		}
 		super.assignObject(obj);
 	}
@@ -81,6 +89,7 @@ BayrellLang.OpCodes.OpClassDeclare = class extends BayrellLang.OpCodes.BaseOpCod
 		else if (variable_name == "childs") this.childs = Runtime.rtl.correct(value, "Runtime.Vector", null, "BayrellLang.OpCodes.BaseOpCode");
 		else if (variable_name == "class_template") this.class_template = Runtime.rtl.correct(value, "Runtime.Vector", null, "BayrellLang.OpCodes.BaseOpCode");
 		else if (variable_name == "flags") this.flags = Runtime.rtl.correct(value, "BayrellLang.OpCodes.OpFlags", null, "");
+		else if (variable_name == "annotations") this.annotations = Runtime.rtl.correct(value, "Runtime.Vector", null, "OpAnnotation");
 		else super.assignValue(variable_name, value);
 	}
 	takeValue(variable_name, default_value){
@@ -92,6 +101,7 @@ BayrellLang.OpCodes.OpClassDeclare = class extends BayrellLang.OpCodes.BaseOpCod
 		else if (variable_name == "childs") return this.childs;
 		else if (variable_name == "class_template") return this.class_template;
 		else if (variable_name == "flags") return this.flags;
+		else if (variable_name == "annotations") return this.annotations;
 		return super.takeValue(variable_name, default_value);
 	}
 	static getFieldsList(names){
@@ -102,6 +112,7 @@ BayrellLang.OpCodes.OpClassDeclare = class extends BayrellLang.OpCodes.BaseOpCod
 		names.push("childs");
 		names.push("class_template");
 		names.push("flags");
+		names.push("annotations");
 	}
 	static getFieldInfoByName(field_name){
 		return null;
