@@ -19,19 +19,6 @@
 if (typeof BayrellLang == 'undefined') BayrellLang = {};
 if (typeof BayrellLang.OpCodes == 'undefined') BayrellLang.OpCodes = {};
 BayrellLang.OpCodes.BaseOpCode = class extends Runtime.CoreObject{
-	/**
-	 * Constructor
-	 */
-	constructor(){
-		super(null);
-	}
-	/**
-	 * Returns classname of the object
-	 * @return string
-	 */
-	getClassName(){
-		return "BayrellLang.OpCodes.BaseOpCode";
-	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.OpCodes.BaseOpCode";}
 	static getParentClassName(){return "Runtime.CoreObject";}

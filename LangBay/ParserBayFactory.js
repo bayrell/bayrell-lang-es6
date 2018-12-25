@@ -23,6 +23,7 @@ BayrellLang.LangBay.ParserBayFactory = class extends Runtime.ContextObject{
 	 * Returns new Instance
 	 */
 	newInstance(context){
+		if (context == undefined) context=null;
 		return new BayrellLang.LangBay.ParserBay(context);
 	}
 	/* ======================= Class Init Functions ======================= */

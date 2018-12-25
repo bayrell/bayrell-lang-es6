@@ -126,7 +126,7 @@ BayrellLang.LangBay.ParserBayToken = class extends BayrellParser.ParserToken{
 	 */
 	skipComments(){
 		var look = this.lookString(2);
-		while (look == "/*"){
+		while (look == "/*" && !this.isEOF()){
 			/* */
 			this.readComment(look);
 			this.skipSystemChar();

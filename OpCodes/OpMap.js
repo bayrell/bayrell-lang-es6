@@ -20,13 +20,6 @@ if (typeof BayrellLang == 'undefined') BayrellLang = {};
 if (typeof BayrellLang.OpCodes == 'undefined') BayrellLang.OpCodes = {};
 BayrellLang.OpCodes.OpMap = class extends BayrellLang.OpCodes.BaseOpCode{
 	/**
-	 * Returns classname of the object
-	 * @return string
-	 */
-	getClassName(){
-		return "BayrellLang.OpCodes.OpMap";
-	}
-	/**
 	 * Constructor
 	 */
 	constructor(){

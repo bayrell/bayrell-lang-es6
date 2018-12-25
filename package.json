@@ -1,5 +1,12 @@
 {
   "description": "Bayrell Lang",
+  "license": "Apache-2.0",
+  "contributors": [
+    {
+      "name": "Ildar Bikmamatov",
+      "email": "support@bayrell.org"
+    }
+  ],
   "files": [
 	"Exceptions/*.js",
 	"LangBay/*.js",
@@ -11,5 +18,5 @@
   ],
   "main": "index.js",
   "name": "bayrell-lang-es6",
-  "version": "0.6.1"
+  "version": "0.6.2"
 }

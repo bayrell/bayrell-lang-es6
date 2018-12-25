@@ -1619,6 +1619,7 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 		}
 		var s = "";
 		var res = "";
+		var has_assignable = false;
 		var has_serializable = false;
 		var has_cloneable = false;
 		var has_variables = false;
@@ -1636,7 +1637,7 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 					has_cloneable = true;
 				}
 				if (variable.isFlag("assignable")){
-					has_serializable = true;
+					has_assignable = true;
 				}
 				if (!variable.isFlag("static") && !variable.isFlag("const")){
 					has_variables = true;
@@ -1694,7 +1695,7 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 				this.levelDec();
 				res += this.s("}");
 			}
-			if (has_cloneable){
+			if (has_cloneable || has_assignable){
 				res += this.s("assignObject(obj){");
 				this.levelInc();
 				res += this.s("if (obj instanceof "+Runtime.rtl.toString(this.getName(this.current_class_name))+"){");
@@ -1715,7 +1716,7 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 				this.levelDec();
 				res += this.s("}");
 			}
-			if (has_serializable){
+			if (has_serializable || has_assignable){
 				var class_variables_serializable_count = 0;
 				res += this.s("assignValue(variable_name, value){");
 				this.levelInc();
@@ -1778,7 +1779,7 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 				this.levelDec();
 				res += this.s("}");
 			}
-			if (has_serializable || has_fields_annotations){
+			if (has_serializable || has_assignable || has_fields_annotations){
 				res += this.s("static getFieldsList(names){");
 				this.levelInc();
 				for (var i = 0; i < childs.count(); i++){
@@ -1787,7 +1788,7 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 						continue;
 					}
 					var is_struct = this.is_struct && !variable.isFlag("static") && !variable.isFlag("const");
-					if (variable.isFlag("public") && (variable.isFlag("serializable") || is_struct || variable.hasAnnotations())){
+					if (variable.isFlag("public") && (variable.isFlag("serializable") || variable.isFlag("assignable") || is_struct || variable.hasAnnotations())){
 						res += this.s("names.push("+Runtime.rtl.toString(this.convertString(variable.name))+");");
 					}
 				}

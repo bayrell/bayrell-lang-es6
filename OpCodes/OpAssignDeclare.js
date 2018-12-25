@@ -38,13 +38,6 @@ BayrellLang.OpCodes.OpAssignDeclare = class extends BayrellLang.OpCodes.BaseOpCo
 		return this.annotations != null && this.annotations.count() > 0;
 	}
 	/**
-	 * Returns classname of the object
-	 * @return string
-	 */
-	getClassName(){
-		return "BayrellLang.OpCodes.OpAssignDeclare";
-	}
-	/**
 	 * Constructor
 	 */
 	constructor(tp, name, value){
