@@ -20,6 +20,15 @@ if (typeof BayrellLang == 'undefined') BayrellLang = {};
 if (typeof BayrellLang.OpCodes == 'undefined') BayrellLang.OpCodes = {};
 BayrellLang.OpCodes.OpFlags = class extends BayrellLang.OpCodes.BaseOpCode{
 	/**
+	 * Read is Flag
+	 */
+	isFlag(name){
+		if (!BayrellLang.OpCodes.OpFlags.hasFlag(name)){
+			return false;
+		}
+		return this.takeValue(name);
+	}
+	/**
 	 * Returns name of variables to serialization
 	 * @return Vector<string>
 	 */
@@ -36,6 +45,8 @@ BayrellLang.OpCodes.OpFlags = class extends BayrellLang.OpCodes.BaseOpCode{
 		names.push("serializable");
 		names.push("cloneable");
 		names.push("assignable");
+		names.push("memorize");
+		names.push("pure");
 	}
 	/**
 	 * Returns instance of the value by variable name
@@ -76,6 +87,12 @@ BayrellLang.OpCodes.OpFlags = class extends BayrellLang.OpCodes.BaseOpCode{
 		}
 		else if (variable_name == "assignable"){
 			return this.p_assignable;
+		}
+		else if (variable_name == "memorize"){
+			return this.p_memorize;
+		}
+		else if (variable_name == "pure"){
+			return this.p_pure;
 		}
 		return super.takeValue(variable_name, default_value);
 	}
@@ -118,6 +135,12 @@ BayrellLang.OpCodes.OpFlags = class extends BayrellLang.OpCodes.BaseOpCode{
 		else if (variable_name == "assignable"){
 			this.p_assignable = value;
 		}
+		else if (variable_name == "memorize"){
+			this.p_memorize = value;
+		}
+		else if (variable_name == "pure"){
+			this.p_pure = value;
+		}
 		else {
 			super.assignValue(variable_name, value);
 		}
@@ -136,13 +159,13 @@ BayrellLang.OpCodes.OpFlags = class extends BayrellLang.OpCodes.BaseOpCode{
 	 * Get flags
 	 */
 	static getFlags(){
-		return (new Runtime.Vector()).push("async").push("export").push("static").push("const").push("public").push("private").push("declare").push("protected").push("serializable").push("cloneable").push("assignable");
+		return (new Runtime.Vector()).push("async").push("export").push("static").push("const").push("public").push("private").push("declare").push("protected").push("serializable").push("cloneable").push("assignable").push("memorize").push("pure");
 	}
 	/**
 	 * Get flags
 	 */
 	static hasFlag(flag_name){
-		if (flag_name == "async" || flag_name == "export" || flag_name == "static" || flag_name == "const" || flag_name == "public" || flag_name == "private" || flag_name == "declare" || flag_name == "protected" || flag_name == "serializable" || flag_name == "cloneable" || flag_name == "assignable"){
+		if (flag_name == "async" || flag_name == "export" || flag_name == "static" || flag_name == "const" || flag_name == "public" || flag_name == "private" || flag_name == "declare" || flag_name == "protected" || flag_name == "serializable" || flag_name == "cloneable" || flag_name == "assignable" || flag_name == "memorize" || flag_name == "pure"){
 			return true;
 		}
 		return false;
@@ -164,5 +187,7 @@ BayrellLang.OpCodes.OpFlags = class extends BayrellLang.OpCodes.BaseOpCode{
 		this.p_serializable = false;
 		this.p_cloneable = false;
 		this.p_assignable = false;
+		this.p_memorize = false;
+		this.p_pure = false;
 	}
 }

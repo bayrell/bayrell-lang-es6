@@ -25,29 +25,27 @@ BayrellLang.OpCodes.OpStructDeclare = class extends BayrellLang.OpCodes.OpClassD
 	_init(){
 		super._init();
 		this.op = "op_struct";
-		this.is_readonly = false;
 	}
 	assignObject(obj){
 		if (obj instanceof BayrellLang.OpCodes.OpStructDeclare){
 			this.op = Runtime.rtl._clone(obj.op);
-			this.is_readonly = Runtime.rtl._clone(obj.is_readonly);
 		}
 		super.assignObject(obj);
 	}
-	assignValue(variable_name, value){
-		if (variable_name == "op") this.op = Runtime.rtl.correct(value, "string", "op_struct", "");
-		else if (variable_name == "is_readonly") this.is_readonly = Runtime.rtl.correct(value, "bool", false, "");
-		else super.assignValue(variable_name, value);
+	assignValue(variable_name, value, sender){if(sender==undefined)sender=null;
+		if (variable_name == "op")this.op = Runtime.rtl.correct(value,"string","op_struct","");
+		else super.assignValue(variable_name, value, sender);
 	}
 	takeValue(variable_name, default_value){
 		if (default_value == undefined) default_value = null;
 		if (variable_name == "op") return this.op;
-		else if (variable_name == "is_readonly") return this.is_readonly;
 		return super.takeValue(variable_name, default_value);
 	}
-	static getFieldsList(names){
-		names.push("op");
-		names.push("is_readonly");
+	static getFieldsList(names, flag){
+		if (flag==undefined)flag=0;
+		if ((flag | 3)==3){
+			names.push("op");
+		}
 	}
 	static getFieldInfoByName(field_name){
 		return null;

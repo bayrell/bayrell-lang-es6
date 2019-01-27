@@ -172,6 +172,9 @@ BayrellLang.CommonTranslator = class extends Runtime.ContextObject{
 	OpContinue(op_code){
 		return "";
 	}
+	OpCopyStruct(op_code){
+		return "";
+	}
 	OpDelete(op_code){
 		return "";
 	}
@@ -292,6 +295,19 @@ BayrellLang.CommonTranslator = class extends Runtime.ContextObject{
 	OpWhile(op_code){
 		return "";
 	}
+	/* =========================== HTML OP Codes ========================== */
+	OpHtmlJson(op_code){
+		return "";
+	}
+	OpHtmlRaw(op_code){
+		return "";
+	}
+	OpHtmlTag(op_code){
+		return "";
+	}
+	OpHtmlView(op_code){
+		return "";
+	}
 	/**
 	 * Translate to language
 	 * @param BaseOpCode op_code - Abstract syntax tree
@@ -325,7 +341,7 @@ BayrellLang.CommonTranslator = class extends Runtime.ContextObject{
 	 * @param BaseOpCode op_code - Abstract syntax tree
 	 * @returns string - The result
 	 */
-	translateRun(op_code){
+	translateItem(op_code){
 		if (op_code instanceof BayrellLang.OpCodes.OpNope){
 			return this.translateChilds(op_code.childs);
 		}
@@ -385,6 +401,9 @@ BayrellLang.CommonTranslator = class extends Runtime.ContextObject{
 		}
 		else if (op_code instanceof BayrellLang.OpCodes.OpContinue){
 			return this.OpContinue(op_code);
+		}
+		else if (op_code instanceof BayrellLang.OpCodes.OpCopyStruct){
+			return this.OpCopyStruct(op_code);
 		}
 		else if (op_code instanceof BayrellLang.OpCodes.OpDelete){
 			return this.OpDelete(op_code);
@@ -506,7 +525,33 @@ BayrellLang.CommonTranslator = class extends Runtime.ContextObject{
 		else if (op_code instanceof BayrellLang.OpCodes.OpWhile){
 			return this.OpWhile(op_code);
 		}
+		else if (op_code instanceof BayrellLang.OpCodes.OpHtmlJson){
+			return this.OpHtmlJson(op_code);
+		}
+		else if (op_code instanceof BayrellLang.OpCodes.OpHtmlRaw){
+			return this.OpHtmlRaw(op_code);
+		}
+		else if (op_code instanceof BayrellLang.OpCodes.OpHtmlTag){
+			return this.OpHtmlTag(op_code);
+		}
+		else if (op_code instanceof BayrellLang.OpCodes.OpHtmlText){
+			return this.OpString(op_code);
+		}
+		else if (op_code instanceof BayrellLang.OpCodes.OpHtmlView){
+			return this.OpHtmlView(op_code);
+		}
 		return "";
+	}
+	/**
+	 * Translate to language
+	 * @param BaseOpCode op_code - Abstract syntax tree
+	 * @returns string - The result
+	 */
+	translateRun(op_code){
+		this.op_code_stack.push(op_code);
+		var res = this.translateItem(op_code);
+		this.op_code_stack.pop();
+		return res;
 	}
 	/**
 	 * Reset translator to default settings
@@ -517,6 +562,7 @@ BayrellLang.CommonTranslator = class extends Runtime.ContextObject{
 		this.current_opcode_level = 0;
 		this.max_opcode_level = 100;
 		this.indent_level = 0;
+		this.op_code_stack = new Runtime.Vector();
 	}
 	/**
 	 * Translate to language
@@ -532,6 +578,7 @@ BayrellLang.CommonTranslator = class extends Runtime.ContextObject{
 	static getParentClassName(){return "Runtime.ContextObject";}
 	_init(){
 		super._init();
+		this.op_code_stack = null;
 		this.one_lines = null;
 		this.is_operation = false;
 		this.current_opcode_level = 0;

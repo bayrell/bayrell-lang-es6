@@ -176,6 +176,10 @@ BayrellLang.LangBay.ParserBayToken = class extends BayrellParser.ParserToken{
 	static getParentClassName(){return "BayrellParser.ParserToken";}
 	_init(){
 		super._init();
+		this.TOKEN_NONE = "none";
+		this.TOKEN_BASE = "base";
+		this.TOKEN_STRING = "string";
+		this.TOKEN_COMMENT = "comment";
 		this._special_tokens = null;
 		this.parser = null;
 	}

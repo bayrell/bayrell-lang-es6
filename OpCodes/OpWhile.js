@@ -51,10 +51,10 @@ BayrellLang.OpCodes.OpWhile = class extends BayrellLang.OpCodes.BaseOpCode{
 		}
 		super.assignObject(obj);
 	}
-	assignValue(variable_name, value){
-		if (variable_name == "condition") this.condition = Runtime.rtl.correct(value, "BayrellLang.OpCodes.BaseOpCode", null, "");
-		else if (variable_name == "childs") this.childs = Runtime.rtl.correct(value, "Runtime.Vector", null, "BayrellLang.OpCodes.BaseOpCode");
-		else super.assignValue(variable_name, value);
+	assignValue(variable_name, value, sender){if(sender==undefined)sender=null;
+		if (variable_name == "condition")this.condition = Runtime.rtl.correct(value,"BayrellLang.OpCodes.BaseOpCode",null,"");
+		else if (variable_name == "childs")this.childs = Runtime.rtl.correct(value,"Runtime.Vector",null,"BayrellLang.OpCodes.BaseOpCode");
+		else super.assignValue(variable_name, value, sender);
 	}
 	takeValue(variable_name, default_value){
 		if (default_value == undefined) default_value = null;
@@ -62,9 +62,12 @@ BayrellLang.OpCodes.OpWhile = class extends BayrellLang.OpCodes.BaseOpCode{
 		else if (variable_name == "childs") return this.childs;
 		return super.takeValue(variable_name, default_value);
 	}
-	static getFieldsList(names){
-		names.push("condition");
-		names.push("childs");
+	static getFieldsList(names, flag){
+		if (flag==undefined)flag=0;
+		if ((flag | 3)==3){
+			names.push("condition");
+			names.push("childs");
+		}
 	}
 	static getFieldInfoByName(field_name){
 		return null;

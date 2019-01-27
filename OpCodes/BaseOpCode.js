@@ -18,10 +18,10 @@
  */
 if (typeof BayrellLang == 'undefined') BayrellLang = {};
 if (typeof BayrellLang.OpCodes == 'undefined') BayrellLang.OpCodes = {};
-BayrellLang.OpCodes.BaseOpCode = class extends Runtime.CoreObject{
+BayrellLang.OpCodes.BaseOpCode = class extends Runtime.CoreStruct{
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.OpCodes.BaseOpCode";}
-	static getParentClassName(){return "Runtime.CoreObject";}
+	static getParentClassName(){return "Runtime.CoreStruct";}
 	_init(){
 		super._init();
 		this.op = "";
@@ -34,17 +34,20 @@ BayrellLang.OpCodes.BaseOpCode = class extends Runtime.CoreObject{
 		}
 		super.assignObject(obj);
 	}
-	assignValue(variable_name, value){
-		if (variable_name == "op") this.op = Runtime.rtl.correct(value, "string", "", "");
-		else super.assignValue(variable_name, value);
+	assignValue(variable_name, value, sender){if(sender==undefined)sender=null;
+		if (variable_name == "op")this.op = Runtime.rtl.correct(value,"string","","");
+		else super.assignValue(variable_name, value, sender);
 	}
 	takeValue(variable_name, default_value){
 		if (default_value == undefined) default_value = null;
 		if (variable_name == "op") return this.op;
 		return super.takeValue(variable_name, default_value);
 	}
-	static getFieldsList(names){
-		names.push("op");
+	static getFieldsList(names, flag){
+		if (flag==undefined)flag=0;
+		if ((flag | 3)==3){
+			names.push("op");
+		}
 	}
 	static getFieldInfoByName(field_name){
 		return null;

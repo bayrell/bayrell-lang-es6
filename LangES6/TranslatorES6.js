@@ -209,6 +209,9 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 		else if (name == "self"){
 			return Runtime.rtl.toString(this.current_namespace)+"."+Runtime.rtl.toString(this.current_class_name);
 		}
+		else if (name == "static"){
+			return "this";
+		}
 		else if (this.modules.has(name)){
 			return this.modules.item(name);
 		}
@@ -564,6 +567,26 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 		var res = "("+Runtime.rtl.toString(this.translateRun(op_code.condition))+") ? "+"("+Runtime.rtl.toString(this.s(this.translateRun(op_code.if_true)))+") : "+"("+Runtime.rtl.toString(this.s(this.translateRun(op_code.if_false)))+")";
 		this.current_opcode_level = 4;
 		return res;
+	}
+	/**
+	 * Copy struct
+	 */
+	copyStruct(op_code, names){
+		if (op_code.item instanceof BayrellLang.OpCodes.OpCopyStruct){
+			names.push(op_code.name);
+			var name = Runtime.rs.implode(".", names);
+			return Runtime.rtl.toString(name)+".copy( new "+Runtime.rtl.toString(this.getName("Map"))+"({ "+Runtime.rtl.toString(this.convertString(op_code.item.name))+": "+Runtime.rtl.toString(this.copyStruct(op_code.item, names))+" })  )";
+		}
+		return this.translateItem(op_code.item);
+	}
+	/**
+	 * Copy struct
+	 */
+	OpCopyStruct(op_code){
+		if (this.is_operation){
+			return this.copyStruct(op_code, (new Runtime.Vector()));
+		}
+		return Runtime.rtl.toString(op_code.name)+" = "+Runtime.rtl.toString(this.copyStruct(op_code, (new Runtime.Vector())))+";";
 	}
 	/** ========================== Vector and Map ========================= */
 	/**
@@ -1231,9 +1254,11 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 		this.modules.clear();
 		if (this.current_module_name != "Runtime"){
 			this.modules.set("rtl", "Runtime.rtl");
+			this.modules.set("rs", "Runtime.rs");
 			this.modules.set("Map", "Runtime.Map");
 			this.modules.set("Vector", "Runtime.Vector");
 			this.modules.set("IntrospectionInfo", "Runtime.IntrospectionInfo");
+			this.modules.set("UIStruct", "Runtime.UIStruct");
 		}
 		return "";
 	}
@@ -1263,8 +1288,10 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 			variables.push(op_code.name);
 		}
 		else if (op_code instanceof BayrellLang.OpCodes.OpFunctionDeclare){
-			for (var i = 0; i < op_code.childs.count(); i++){
-				this.detectAsyncDeclareVariables(op_code.childs.item(i), variables);
+			if (op_code.childs != null){
+				for (var i = 0; i < op_code.childs.count(); i++){
+					this.detectAsyncDeclareVariables(op_code.childs.item(i), variables);
+				}
 			}
 		}
 		else if (op_code instanceof BayrellLang.OpCodes.OpFor){
@@ -1405,30 +1432,6 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 		return res;
 	}
 	/**
-	 * Function arrow declare
-	 */
-	OpFunctionArrowDeclare(op_code){
-		var res = "";
-		/* Skip if declare function */
-		if (op_code.isFlag("declare")){
-			return "";
-		}
-		this.functionPush(op_code.name, false);
-		this.beginOperation();
-		res += this.OpFunctionDeclareHeader(op_code);
-		res += "{";
-		this.endOperation();
-		this.levelInc();
-		this.pushOneLine(false);
-		res += this.s("return ");
-		res += this.OpFunctionDeclare(op_code.return_function);
-		this.popOneLine(false);
-		this.levelDec();
-		res += this.s("}");
-		this.functionPop();
-		return res;
-	}
-	/**
 	 * Function declare
 	 */
 	OpFunctionDeclare(op_code){
@@ -1469,9 +1472,22 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 		}
 		/* Childs */
 		if (op_code.childs != null){
-			for (var i = 0; i < op_code.childs.count(); i++){
-				res += this.s(this.translateRun(op_code.childs.item(i)));
+			if (op_code.is_lambda){
+				if (op_code.childs.count() > 0){
+					var old_is_operation = this.beginOperation(true);
+					var lambda_res = this.translateRun(op_code.childs.item(0));
+					this.endOperation(old_is_operation);
+					res += this.s("return "+Runtime.rtl.toString(lambda_res)+";");
+				}
 			}
+			else {
+				for (var i = 0; i < op_code.childs.count(); i++){
+					res += this.s(this.translateRun(op_code.childs.item(i)));
+				}
+			}
+		}
+		else if (op_code.return_function != null){
+			res += this.s("return "+Runtime.rtl.toString(this.translateItem(op_code.return_function)));
 		}
 		if (op_code.isFlag("async")){
 			this.levelDec();
@@ -1674,9 +1690,17 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 						if (!(variable instanceof BayrellLang.OpCodes.OpAssignDeclare)){
 							continue;
 						}
-						if (!variable.isFlag("static") && !variable.isFlag("const")){
+						var var_prefix = "";
+						if (this.is_struct && variable.isFlag("public") && !variable.isFlag("static")){
+							var_prefix = "__";
+						}
+						var is_struct = this.is_struct && !variable.isFlag("static") && !variable.isFlag("const");
+						if (is_struct){
+							res += this.s("Object.defineProperty(this, "+Runtime.rtl.toString(this.convertString(variable.name))+", { get: function() { return this.__"+Runtime.rtl.toString(variable.name)+"; }, set: function(value) { throw new Runtime.Exceptions.AssignStructValueError("+Runtime.rtl.toString(this.convertString(variable.name))+") }});");
+						}
+						else {
 							this.beginOperation();
-							s = "this."+Runtime.rtl.toString(variable.name)+" = "+Runtime.rtl.toString(this.translateRun(variable.value))+";";
+							s = "this."+Runtime.rtl.toString(var_prefix)+Runtime.rtl.toString(variable.name)+" = "+Runtime.rtl.toString(this.translateRun(variable.value))+";";
 							this.endOperation();
 							res += this.s(s);
 						}
@@ -1706,8 +1730,12 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 						continue;
 					}
 					var is_struct = this.is_struct && !variable.isFlag("static") && !variable.isFlag("const");
+					var var_prefix = "";
+					if (this.is_struct && variable.isFlag("public") && !variable.isFlag("static")){
+						var_prefix = "__";
+					}
 					if (variable.isFlag("public") && (variable.isFlag("cloneable") || variable.isFlag("serializable") || is_struct)){
-						res += this.s("this."+Runtime.rtl.toString(variable.name)+" = "+Runtime.rtl.toString(this.getName("rtl"))+"._clone("+"obj."+Runtime.rtl.toString(variable.name)+");");
+						res += this.s("this."+Runtime.rtl.toString(var_prefix)+Runtime.rtl.toString(variable.name)+" = "+Runtime.rtl.toString(this.getName("rtl"))+"._clone("+"obj."+Runtime.rtl.toString(variable.name)+");");
 					}
 				}
 				this.levelDec();
@@ -1718,7 +1746,7 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 			}
 			if (has_serializable || has_assignable){
 				var class_variables_serializable_count = 0;
-				res += this.s("assignValue(variable_name, value){");
+				res += this.s("assignValue(variable_name, value, sender){if(sender==undefined)sender=null;");
 				this.levelInc();
 				class_variables_serializable_count = 0;
 				for (var i = 0; i < childs.count(); i++){
@@ -1727,6 +1755,10 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 						continue;
 					}
 					var is_struct = this.is_struct && !variable.isFlag("static") && !variable.isFlag("const");
+					var var_prefix = "";
+					if (this.is_struct && variable.isFlag("public") && !variable.isFlag("static")){
+						var_prefix = "__";
+					}
 					if (variable.isFlag("public") && (variable.isFlag("serializable") || variable.isFlag("assignable") || is_struct)){
 						var type_value = this.getAssignDeclareTypeValue(variable);
 						var type_template = this.getAssignDeclareTypeTemplate(variable);
@@ -1734,9 +1766,9 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 						if (variable.value != null){
 							def_val = this.translateRun(variable.value);
 						}
-						var s = "if (variable_name == "+Runtime.rtl.toString(this.convertString(variable.name))+") ";
-						s += "this."+Runtime.rtl.toString(variable.name)+" = ";
-						s += Runtime.rtl.toString(this.getName("rtl"))+".correct(value, \""+Runtime.rtl.toString(type_value)+"\", "+Runtime.rtl.toString(def_val)+", \""+Runtime.rtl.toString(type_template)+"\");";
+						var s = "if (variable_name == "+Runtime.rtl.toString(this.convertString(variable.name))+")";
+						s += "this."+Runtime.rtl.toString(var_prefix)+Runtime.rtl.toString(variable.name)+" = ";
+						s += Runtime.rtl.toString(this.getName("rtl"))+".correct(value,\""+Runtime.rtl.toString(type_value)+"\","+Runtime.rtl.toString(def_val)+",\""+Runtime.rtl.toString(type_template)+"\");";
 						if (class_variables_serializable_count == 0){
 							res += this.s(s);
 						}
@@ -1747,10 +1779,10 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 					}
 				}
 				if (class_variables_serializable_count == 0){
-					res += this.s("super.assignValue(variable_name, value);");
+					res += this.s("super.assignValue(variable_name, value, sender);");
 				}
 				else {
-					res += this.s("else super.assignValue(variable_name, value);");
+					res += this.s("else super.assignValue(variable_name, value, sender);");
 				}
 				this.levelDec();
 				res += this.s("}");
@@ -1764,8 +1796,12 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 						continue;
 					}
 					var is_struct = this.is_struct && !variable.isFlag("static") && !variable.isFlag("const");
+					var var_prefix = "";
+					if (this.is_struct && variable.isFlag("public") && !variable.isFlag("static")){
+						var_prefix = "__";
+					}
 					if (variable.isFlag("public") && (variable.isFlag("serializable") || variable.isFlag("assignable") || is_struct)){
-						var take_value_s = "if (variable_name == "+Runtime.rtl.toString(this.convertString(variable.name))+") "+"return this."+Runtime.rtl.toString(variable.name)+";";
+						var take_value_s = "if (variable_name == "+Runtime.rtl.toString(this.convertString(variable.name))+") "+"return this."+Runtime.rtl.toString(var_prefix)+Runtime.rtl.toString(variable.name)+";";
 						if (class_variables_serializable_count == 0){
 							res += this.s(take_value_s);
 						}
@@ -1780,18 +1816,57 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 				res += this.s("}");
 			}
 			if (has_serializable || has_assignable || has_fields_annotations){
-				res += this.s("static getFieldsList(names){");
+				res += this.s("static getFieldsList(names, flag){");
 				this.levelInc();
+				res += this.s("if (flag==undefined)flag=0;");
+				var vars = new Runtime.Map();
 				for (var i = 0; i < childs.count(); i++){
 					var variable = childs.item(i);
 					if (!(variable instanceof BayrellLang.OpCodes.OpAssignDeclare)){
 						continue;
 					}
+					if (!variable.isFlag("public")){
+						continue;
+					}
 					var is_struct = this.is_struct && !variable.isFlag("static") && !variable.isFlag("const");
-					if (variable.isFlag("public") && (variable.isFlag("serializable") || variable.isFlag("assignable") || is_struct || variable.hasAnnotations())){
-						res += this.s("names.push("+Runtime.rtl.toString(this.convertString(variable.name))+");");
+					var is_static = variable.isFlag("static");
+					var is_serializable = variable.isFlag("serializable");
+					var is_assignable = variable.isFlag("assignable");
+					var has_annotation = variable.hasAnnotations();
+					if (is_struct){
+						is_serializable = true;
+						is_assignable = true;
+					}
+					if (is_serializable){
+						is_assignable = true;
+					}
+					var flag = 0;
+					if (is_serializable){
+						flag = flag | 1;
+					}
+					if (is_assignable){
+						flag = flag | 2;
+					}
+					if (has_annotation){
+						flag = flag | 4;
+					}
+					if (flag != 0){
+						if (!vars.has(flag)){
+							vars.set(flag, new Runtime.Vector());
+						}
+						var v = vars.item(flag);
+						v.push(variable.name);
 					}
 				}
+				vars.each((flag, v) => {
+					res += this.s("if ((flag | "+Runtime.rtl.toString(flag)+")=="+Runtime.rtl.toString(flag)+"){");
+					this.levelInc();
+					v.each((varname) => {
+						res += this.s("names.push("+Runtime.rtl.toString(this.convertString(varname))+");");
+					});
+					this.levelDec();
+					res += this.s("}");
+				});
 				this.levelDec();
 				res += this.s("}");
 				res += this.s("static getFieldInfoByName(field_name){");
@@ -1983,9 +2058,170 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 	 */
 	OpStructDeclare(op_code){
 		this.is_struct = true;
-		this.struct_read_only = op_code.is_readonly;
 		var res = this.OpClassDeclare(op_code);
 		this.is_struct = false;
+		return res;
+	}
+	/* =========================== HTML OP Codes ========================== */
+	/**
+	 * Check if name is component
+	 * @param string name
+	 * @return bool
+	 */
+	isComponent(name){
+		var ch = Runtime.rs.charAt(name, 0);
+		return Runtime.rs.strtoupper(ch) == ch && ch != "";
+	}
+	/**
+	 * OpHtmlJson
+	 */
+	OpHtmlJson(op_code){
+		var value = Runtime.rtl.toString(this.getName("rs"))+".json_encode("+Runtime.rtl.toString(this.translateRun(op_code.value))+")";
+		var res = "";
+		res = "new "+Runtime.rtl.toString(this.getName("UIStruct"))+"(";
+		res += this.s("(new "+Runtime.rtl.toString(this.getName("Map"))+"())");
+		res += this.s(".set(\"name\", \"span\")");
+		res += this.s(".set(\"props\", (new "+Runtime.rtl.toString(this.getName("Map"))+"())");
+		res += this.s(".set("+Runtime.rtl.toString(this.convertString("dangerouslySetInnerHTML"))+", RuntimeWeb.Lib.html("+Runtime.rtl.toString(value)+")"+")");
+		res += this.s(")");
+		return res;
+	}
+	/**
+	 * OpHtmlRaw
+	 */
+	OpHtmlRaw(op_code){
+		var value = this.translateRun(op_code.value);
+		var res = "";
+		res = "new "+Runtime.rtl.toString(this.getName("UIStruct"))+"(";
+		res += this.s("(new "+Runtime.rtl.toString(this.getName("Map"))+"())");
+		res += this.s(".set(\"name\", \"span\")");
+		res += this.s(".set(\"props\", (new "+Runtime.rtl.toString(this.getName("Map"))+"())");
+		res += this.s(".set("+Runtime.rtl.toString(this.convertString("dangerouslySetInnerHTML"))+", RuntimeWeb.Lib.html("+Runtime.rtl.toString(value)+")"+")");
+		res += this.s(")");
+		return res;
+	}
+	/**
+	 * Html tag
+	 */
+	OpHtmlTag(op_code){
+		var is_component = false;
+		var res = "";
+		this.pushOneLine(false);
+		this.levelInc();
+		/* isComponent */
+		if (this.modules.has(op_code.tag_name)){
+			res = "new "+Runtime.rtl.toString(this.getName("UIStruct"))+"(";
+			res += this.s("(new "+Runtime.rtl.toString(this.getName("Map"))+"())");
+			res += this.s(".set(\"kind\", \"component\")");
+			res += this.s(".set(\"name\", "+Runtime.rtl.toString(this.convertString(this.modules.item(op_code.tag_name)))+")");
+			is_component = true;
+		}
+		else {
+			res = "new "+Runtime.rtl.toString(this.getName("UIStruct"))+"(";
+			res += this.s("(new "+Runtime.rtl.toString(this.getName("Map"))+"())");
+			res += this.s(".set(\"name\", "+Runtime.rtl.toString(this.convertString(op_code.tag_name))+")");
+		}
+		var raw_item = null;
+		if (!op_code.is_plain && op_code.childs != null && op_code.childs.count() == 1){
+			var item = op_code.childs.item(0);
+			if (item instanceof BayrellLang.OpCodes.OpHtmlJson){
+				raw_item = item;
+			}
+			else if (item instanceof BayrellLang.OpCodes.OpHtmlRaw){
+				raw_item = item;
+			}
+		}
+		if (is_component){
+			res += this.s(".set(\"props\", this.getElementAttrs()");
+		}
+		else {
+			res += this.s(".set(\"props\", (new "+Runtime.rtl.toString(this.getName("Map"))+"())");
+		}
+		if (op_code.attributes != null && op_code.attributes.count() > 0){
+			op_code.attributes.each((item) => {
+				this.pushOneLine(true);
+				var value = this.translateRun(item.value);
+				this.popOneLine();
+				res += this.s(".set("+Runtime.rtl.toString(this.convertString(item.key))+", "+Runtime.rtl.toString(value)+")");
+			});
+		}
+		if (op_code.spreads != null && op_code.spreads.count() > 0){
+			op_code.spreads.each((item) => {
+				res += this.s(".addMap("+Runtime.rtl.toString(item)+")");
+			});
+		}
+		if (op_code.is_plain){
+			if (op_code.childs != null){
+				var value = op_code.childs.reduce((res, item) => {
+					var value = "";
+					if (item instanceof BayrellLang.OpCodes.OpHtmlJson){
+						value = Runtime.rtl.toString(this.getName("rs"))+".json_encode("+Runtime.rtl.toString(this.translateRun(item.value))+")";
+						value = Runtime.rtl.toString(this.getName("rtl"))+".toString("+Runtime.rtl.toString(value)+")";
+					}
+					else if (item instanceof BayrellLang.OpCodes.OpHtmlRaw){
+						value = this.translateRun(item.value);
+						value = Runtime.rtl.toString(this.getName("rtl"))+".toString("+Runtime.rtl.toString(value)+")";
+					}
+					else if (item instanceof BayrellLang.OpCodes.OpConcat || item instanceof BayrellLang.OpCodes.OpString || item instanceof BayrellLang.OpCodes.OpHtmlText){
+						value = this.translateRun(item);
+					}
+					else if (item instanceof BayrellLang.OpCodes.OpHtmlEscape){
+						value = this.translateRun(item);
+						value = Runtime.rtl.toString(this.getName("rs"))+".htmlEscape("+Runtime.rtl.toString(value)+")";
+					}
+					else {
+						value = this.translateRun(item);
+						value = Runtime.rtl.toString(this.getName("rtl"))+".toString("+Runtime.rtl.toString(value)+")";
+					}
+					if (res == ""){
+						return value;
+					}
+					return Runtime.rtl.toString(res)+"+"+Runtime.rtl.toString(value);
+				}, "");
+				res += this.s(".set("+Runtime.rtl.toString(this.convertString("dangerouslySetInnerHTML"))+", "+Runtime.rtl.toString(value)+")");
+			}
+		}
+		else if (raw_item != null){
+			if (raw_item instanceof BayrellLang.OpCodes.OpHtmlJson){
+				var value = Runtime.rtl.toString(this.getName("rs"))+".json_encode("+Runtime.rtl.toString(this.translateRun(raw_item.value))+")";
+				res += this.s(".set("+Runtime.rtl.toString(this.convertString("dangerouslySetInnerHTML"))+", RuntimeWeb.Lib.html("+Runtime.rtl.toString(value)+")"+")");
+			}
+			else if (raw_item instanceof BayrellLang.OpCodes.OpHtmlRaw){
+				var value = this.translateRun(raw_item.value);
+				res += this.s(".set("+Runtime.rtl.toString(this.convertString("dangerouslySetInnerHTML"))+", RuntimeWeb.Lib.html("+Runtime.rtl.toString(value)+")"+")");
+			}
+		}
+		res += this.s(")");
+		/* Childs */
+		if (raw_item == null && !op_code.is_plain){
+			if (op_code.childs == null || op_code.childs.count() == 0){
+			}
+			else {
+				res += this.s(".set(\"children\", (new "+Runtime.rtl.toString(this.getName("Vector"))+"())");
+				op_code.childs.each((item) => {
+					if (item instanceof BayrellLang.OpCodes.OpComment){
+						return ;
+					}
+					res += this.s(".push("+Runtime.rtl.toString(this.translateRun(item))+")");
+				});
+				res += this.s(")");
+			}
+		}
+		this.levelDec();
+		res += this.s(")");
+		this.popOneLine();
+		return res;
+	}
+	/**
+	 * Html tag
+	 */
+	OpHtmlView(op_code){
+		this.pushOneLine(false);
+		var res = "(new "+Runtime.rtl.toString(this.getName("Vector"))+"())";
+		op_code.childs.each((item) => {
+			res += this.s(".push("+Runtime.rtl.toString(this.translateRun(item))+")");
+		});
+		this.popOneLine();
 		return res;
 	}
 	/** =========================== Preprocessor ========================== */
@@ -2046,6 +2282,5 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 		this.is_return = false;
 		this.is_async_opcode = false;
 		this.is_async_await_op_call = false;
-		this.struct_read_only = false;
 	}
 }

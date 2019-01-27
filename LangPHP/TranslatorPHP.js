@@ -34,6 +34,9 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 			return "parent";
 		}
 		else if (name == "self"){
+			return "self";
+		}
+		else if (name == "static"){
 			return "static";
 		}
 		else if (this.modules.has(name)){
@@ -138,6 +141,12 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 	 * Static load
 	 */
 	OpStatic(op_code){
+		var op_code_last = this.op_code_stack.last(null, -2);
+		if (op_code_last instanceof BayrellLang.OpCodes.OpAssign || op_code_last instanceof BayrellLang.OpCodes.OpAssignDeclare || op_code_last instanceof BayrellLang.OpCodes.OpDynamic){
+			if (op_code.name != Runtime.rs.strtoupper(op_code.name)){
+				return Runtime.rtl.toString(this.translateRun(op_code.value))+"::$"+Runtime.rtl.toString(op_code.name);
+			}
+		}
 		return Runtime.rtl.toString(this.translateRun(op_code.value))+"::"+Runtime.rtl.toString(op_code.name);
 	}
 	/**
@@ -405,6 +414,26 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 		this.current_opcode_level = 4;
 		return res;
 	}
+	/**
+	 * Copy struct
+	 */
+	copyStruct(op_code, names){
+		if (op_code.item instanceof BayrellLang.OpCodes.OpCopyStruct){
+			names.push(op_code.name);
+			var name = "$"+Runtime.rtl.toString(Runtime.rs.implode("->", names));
+			return Runtime.rtl.toString(name)+"->copy( new Map([ "+Runtime.rtl.toString(this.convertString(op_code.item.name))+" => "+Runtime.rtl.toString(this.copyStruct(op_code.item, names))+" ])  )";
+		}
+		return this.translateItem(op_code.item);
+	}
+	/**
+	 * Copy struct
+	 */
+	OpCopyStruct(op_code){
+		if (this.is_operation){
+			return this.copyStruct(op_code, (new Runtime.Vector()));
+		}
+		return "$"+Runtime.rtl.toString(op_code.name)+" = "+Runtime.rtl.toString(this.copyStruct(op_code, (new Runtime.Vector())))+";";
+	}
 	/** ========================== Vector and Map ========================= */
 	/**
 	 * Vector
@@ -502,7 +531,7 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 			ch_var = "";
 		}
 		var var_prefix = "";
-		if (this.struct_read_only && this.is_struct && op_code.isFlag("public") && !op_code.isFlag("static")){
+		if (this.is_struct && op_code.isFlag("public") && !op_code.isFlag("static")){
 			var_prefix = "__";
 		}
 		if (op_code.value == null || !output_value && !op_code.isFlag("static") && !op_code.isFlag("const")){
@@ -720,14 +749,18 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 		this.modules.clear();
 		var res = "namespace "+Runtime.rtl.toString(Runtime.rs.implode("\\", arr))+";";
 		if (this.current_module_name != "Runtime"){
+			res += this.s("use Runtime\\rs;");
 			res += this.s("use Runtime\\rtl;");
 			res += this.s("use Runtime\\Map;");
 			res += this.s("use Runtime\\Vector;");
 			res += this.s("use Runtime\\IntrospectionInfo;");
+			res += this.s("use Runtime\\UIStruct;");
+			this.modules.set("rs", "Runtime.rs");
 			this.modules.set("rtl", "Runtime.rtl");
 			this.modules.set("Map", "Runtime.Map");
 			this.modules.set("Vector", "Runtime.Vector");
 			this.modules.set("IntrospectionInfo", "Runtime.IntrospectionInfo");
+			this.modules.set("UIStruct", "Runtime.UIStruct");
 		}
 		return res;
 	}
@@ -751,56 +784,6 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 		return "use "+Runtime.rtl.toString(res)+";";
 	}
 	/** ============================= Classes ============================= */
-	/**
-	 * Function arrow declare
-	 */
-	OpFunctionArrowDeclare(op_code){
-		var res = "";
-		var ch = "";
-		var use_vars = new Runtime.Vector();
-		/* Skip if declare function */
-		if (op_code.isFlag("declare")){
-			return "";
-		}
-		if (op_code.isFlag("static")){
-			res += "static function ";
-			if (this.current_function_name.count() == 0){
-				this.current_function_is_static = true;
-			}
-		}
-		else {
-			res += "function ";
-			if (this.current_function_name.count() == 0){
-				this.current_function_is_static = false;
-			}
-		}
-		this.current_function_name.push(op_code.name);
-		res += op_code.name;
-		res += "(";
-		for (var i = 0; i < op_code.args.count(); i++){
-			var variable = op_code.args.item(i);
-			this.pushOneLine(true);
-			res += Runtime.rtl.toString(ch)+"$"+Runtime.rtl.toString(variable.name);
-			if (variable.value != null){
-				res += " = "+Runtime.rtl.toString(this.translateRun(variable.value));
-			}
-			this.popOneLine();
-			use_vars.push(variable.name);
-			ch = ", ";
-		}
-		res += ")";
-		res += "{";
-		this.setOperation(false);
-		this.pushOneLine(false);
-		this.levelInc();
-		res += this.s("return ");
-		res += this.OpFunctionDeclare(op_code.return_function, true, use_vars);
-		this.levelDec();
-		res += this.s("}");
-		this.popOneLine();
-		this.current_function_name.pop();
-		return res;
-	}
 	/**
 	 * Function declare
 	 */
@@ -890,9 +873,22 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 			this.pushOneLine(false);
 			this.levelInc();
 			if (op_code.childs != null){
-				for (var i = 0; i < op_code.childs.count(); i++){
-					res += this.s(this.translateRun(op_code.childs.item(i)));
+				if (op_code.is_lambda){
+					if (op_code.childs.count() > 0){
+						var old_is_operation = this.beginOperation(true);
+						var lambda_res = this.translateRun(op_code.childs.item(0));
+						this.endOperation(old_is_operation);
+						res += this.s("return "+Runtime.rtl.toString(lambda_res)+";");
+					}
 				}
+				else {
+					for (var i = 0; i < op_code.childs.count(); i++){
+						res += this.s(this.translateRun(op_code.childs.item(i)));
+					}
+				}
+			}
+			else if (op_code.return_function != null){
+				res += this.s("return "+Runtime.rtl.toString(this.translateItem(op_code.return_function)));
 			}
 			this.levelDec();
 			res += this.s("}"+Runtime.rtl.toString((end_semicolon) ? (";") : ("")));
@@ -965,7 +961,7 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 				if (op_code.isFlag("protected")){
 					s += "protected ";
 				}
-				else if (this.struct_read_only && this.is_struct && op_code.isFlag("public") && !op_code.isFlag("static")){
+				else if (this.is_struct && op_code.isFlag("public") && !op_code.isFlag("static")){
 					s += "protected ";
 				}
 				else {
@@ -1102,10 +1098,11 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 							continue;
 						}
 						var var_prefix = "";
-						if (this.struct_read_only && this.is_struct && variable.isFlag("public") && !variable.isFlag("static")){
+						if (this.is_struct && variable.isFlag("public") && !variable.isFlag("static")){
 							var_prefix = "__";
 						}
-						if (!variable.isFlag("static") && !variable.isFlag("const")){
+						var is_struct = this.is_struct && !variable.isFlag("static") && !variable.isFlag("const");
+						if (is_struct){
 							this.beginOperation();
 							var s = "$this->"+Runtime.rtl.toString(var_prefix)+Runtime.rtl.toString(variable.name)+" = "+Runtime.rtl.toString(this.translateRun(variable.value))+";";
 							this.endOperation();
@@ -1128,7 +1125,7 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 						continue;
 					}
 					var var_prefix = "";
-					if (this.struct_read_only && this.is_struct && variable.isFlag("public") && !variable.isFlag("static")){
+					if (this.is_struct && variable.isFlag("public") && !variable.isFlag("static")){
 						var_prefix = "__";
 					}
 					var is_struct = this.is_struct && !variable.isFlag("static") && !variable.isFlag("const");
@@ -1145,7 +1142,7 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 			if (has_serializable || has_assignable){
 				var class_variables_serializable_count = 0;
 				var s1 = "public";
-				res += this.s(Runtime.rtl.toString(s1)+" function assignValue($variable_name, $value){");
+				res += this.s(Runtime.rtl.toString(s1)+" function assignValue($variable_name, $value, $sender = null){");
 				this.levelInc();
 				class_variables_serializable_count = 0;
 				for (var i = 0; i < childs.count(); i++){
@@ -1154,7 +1151,7 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 						continue;
 					}
 					var var_prefix = "";
-					if (this.struct_read_only && this.is_struct && variable.isFlag("public") && !variable.isFlag("static")){
+					if (this.is_struct && variable.isFlag("public") && !variable.isFlag("static")){
 						var_prefix = "__";
 					}
 					var is_struct = this.is_struct && !variable.isFlag("static") && !variable.isFlag("const");
@@ -1165,9 +1162,9 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 						if (variable.value != null){
 							def_val = this.translateRun(variable.value);
 						}
-						var s = "if ($variable_name == "+Runtime.rtl.toString(this.convertString(variable.name))+") ";
+						var s = "if ($variable_name == "+Runtime.rtl.toString(this.convertString(variable.name))+")";
 						s += "$this->"+Runtime.rtl.toString(var_prefix)+Runtime.rtl.toString(variable.name)+" = ";
-						s += "rtl::correct($value, \""+Runtime.rtl.toString(type_value)+"\", "+Runtime.rtl.toString(def_val)+", \""+Runtime.rtl.toString(type_template)+"\");";
+						s += "rtl::correct($value,\""+Runtime.rtl.toString(type_value)+"\","+Runtime.rtl.toString(def_val)+",\""+Runtime.rtl.toString(type_template)+"\");";
 						if (class_variables_serializable_count == 0){
 							res += this.s(s);
 						}
@@ -1178,10 +1175,10 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 					}
 				}
 				if (class_variables_serializable_count == 0){
-					res += this.s("parent::assignValue($variable_name, $value);");
+					res += this.s("parent::assignValue($variable_name, $value, $sender);");
 				}
 				else {
-					res += this.s("else parent::assignValue($variable_name, $value);");
+					res += this.s("else parent::assignValue($variable_name, $value, $sender);");
 				}
 				this.levelDec();
 				res += this.s("}");
@@ -1194,7 +1191,7 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 						continue;
 					}
 					var var_prefix = "";
-					if (this.struct_read_only && this.is_struct && variable.isFlag("public") && !variable.isFlag("static")){
+					if (this.is_struct && variable.isFlag("public") && !variable.isFlag("static")){
 						var_prefix = "__";
 					}
 					var is_struct = this.is_struct && !variable.isFlag("static") && !variable.isFlag("const");
@@ -1214,18 +1211,56 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 				res += this.s("}");
 			}
 			if (has_serializable || has_assignable || has_fields_annotations){
-				res += this.s("public static function getFieldsList($names){");
+				res += this.s("public static function getFieldsList($names, $flag=0){");
 				this.levelInc();
+				var vars = new Runtime.Map();
 				for (var i = 0; i < childs.count(); i++){
 					var variable = childs.item(i);
 					if (!(variable instanceof BayrellLang.OpCodes.OpAssignDeclare)){
 						continue;
 					}
+					if (!variable.isFlag("public")){
+						continue;
+					}
 					var is_struct = this.is_struct && !variable.isFlag("static") && !variable.isFlag("const");
-					if (variable.isFlag("public") && (variable.isFlag("serializable") || variable.isFlag("assignable") || is_struct || variable.hasAnnotations())){
-						res += this.s("$names->push("+Runtime.rtl.toString(this.convertString(variable.name))+");");
+					var is_static = variable.isFlag("static");
+					var is_serializable = variable.isFlag("serializable");
+					var is_assignable = variable.isFlag("assignable");
+					var has_annotation = variable.hasAnnotations();
+					if (is_struct){
+						is_serializable = true;
+						is_assignable = true;
+					}
+					if (is_serializable){
+						is_assignable = true;
+					}
+					var flag = 0;
+					if (is_serializable){
+						flag = flag | 1;
+					}
+					if (is_assignable){
+						flag = flag | 2;
+					}
+					if (has_annotation){
+						flag = flag | 4;
+					}
+					if (flag != 0){
+						if (!vars.has(flag)){
+							vars.set(flag, new Runtime.Vector());
+						}
+						var v = vars.item(flag);
+						v.push(variable.name);
 					}
 				}
+				vars.each((flag, v) => {
+					res += this.s("if (($flag | "+Runtime.rtl.toString(flag)+")=="+Runtime.rtl.toString(flag)+"){");
+					this.levelInc();
+					v.each((varname) => {
+						res += this.s("$names->push("+Runtime.rtl.toString(this.convertString(varname))+");");
+					});
+					this.levelDec();
+					res += this.s("}");
+				});
 				this.levelDec();
 				res += this.s("}");
 				res += this.s("public static function getFieldInfoByName($field_name){");
@@ -1321,9 +1356,9 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 				this.levelDec();
 				res += this.s("}");
 			}
-			if (this.struct_read_only && this.is_struct){
+			if (this.is_struct){
 				res += this.s("public function __get($key){ return $this->takeValue($key); }");
-				res += this.s("public function __set($key, $value){}");
+				res += this.s("public function __set($key, $value){"+"throw new \\Runtime\\Exceptions\\AssignStructValueError($key);"+"}");
 			}
 		}
 		if (op_code.hasAnnotations()){
@@ -1414,9 +1449,168 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 	 */
 	OpStructDeclare(op_code){
 		this.is_struct = true;
-		this.struct_read_only = op_code.is_readonly;
 		var res = this.OpClassDeclare(op_code);
 		this.is_struct = false;
+		return res;
+	}
+	/** ========================== HTML OP Codes ========================== */
+	/**
+	 * Check if name is component
+	 * @param string name
+	 * @return bool
+	 */
+	isComponent(name){
+		var ch = Runtime.rs.charAt(name, 0);
+		return Runtime.rs.strtoupper(ch) == ch && ch != "";
+	}
+	/**
+	 * OpHtmlJson
+	 */
+	OpHtmlJson(op_code){
+		var value = "rs::json_encode("+Runtime.rtl.toString(this.translateRun(op_code.value))+")";
+		var res = "";
+		res = "new UIStruct(";
+		res += this.s("(new "+Runtime.rtl.toString(this.getName("Map"))+"())");
+		res += this.s("->set(\"name\", \"span\")");
+		res += this.s("->set(\"props\", (new "+Runtime.rtl.toString(this.getName("Map"))+"())");
+		res += this.s("->set("+Runtime.rtl.toString(this.convertString("dangerouslySetInnerHTML"))+", "+Runtime.rtl.toString(value)+")");
+		res += this.s(")");
+		return res;
+	}
+	/**
+	 * OpHtmlRaw
+	 */
+	OpHtmlRaw(op_code){
+		var value = this.translateRun(op_code.value);
+		var res = "";
+		res = "new UIStruct(";
+		res += this.s("(new "+Runtime.rtl.toString(this.getName("Map"))+"())");
+		res += this.s("->set(\"name\", \"span\")");
+		res += this.s("->set(\"props\", (new "+Runtime.rtl.toString(this.getName("Map"))+"())");
+		res += this.s("->set("+Runtime.rtl.toString(this.convertString("dangerouslySetInnerHTML"))+", "+Runtime.rtl.toString(value)+")");
+		res += this.s(")");
+		return res;
+	}
+	/**
+	 * Html tag
+	 */
+	OpHtmlTag(op_code){
+		var is_component = false;
+		var res = "";
+		this.pushOneLine(false);
+		this.levelInc();
+		/* isComponent */
+		if (this.modules.has(op_code.tag_name)){
+			res = "new UIStruct(";
+			res += this.s("(new "+Runtime.rtl.toString(this.getName("Map"))+"())");
+			res += this.s("->set(\"kind\", \"component\")");
+			res += this.s("->set(\"name\", "+Runtime.rtl.toString(this.convertString(this.modules.item(op_code.tag_name)))+")");
+			is_component = true;
+		}
+		else {
+			res = "new UIStruct(";
+			res += this.s("(new "+Runtime.rtl.toString(this.getName("Map"))+"())");
+			res += this.s("->set(\"name\", "+Runtime.rtl.toString(this.convertString(op_code.tag_name))+")");
+		}
+		var raw_item = null;
+		if (!op_code.is_plain && op_code.childs != null && op_code.childs.count() == 1){
+			var item = op_code.childs.item(0);
+			if (item instanceof BayrellLang.OpCodes.OpHtmlJson){
+				raw_item = item;
+			}
+			else if (item instanceof BayrellLang.OpCodes.OpHtmlRaw){
+				raw_item = item;
+			}
+		}
+		if (is_component){
+			res += this.s("->set(\"props\", $this->getElementAttrs()");
+		}
+		else {
+			res += this.s("->set(\"props\", (new "+Runtime.rtl.toString(this.getName("Map"))+"())");
+		}
+		if (op_code.attributes != null && op_code.attributes.count() > 0){
+			op_code.attributes.each((item) => {
+				this.pushOneLine(true);
+				var value = this.translateRun(item.value);
+				this.popOneLine();
+				res += this.s("->set("+Runtime.rtl.toString(this.convertString(item.key))+", "+Runtime.rtl.toString(value)+")");
+			});
+		}
+		if (op_code.spreads != null && op_code.spreads.count() > 0){
+			op_code.spreads.each((item) => {
+				res += this.s("->addMap($"+Runtime.rtl.toString(item)+")");
+			});
+		}
+		if (op_code.is_plain){
+			if (op_code.childs != null){
+				var value = op_code.childs.reduce((res, item) => {
+					var value = "";
+					if (item instanceof BayrellLang.OpCodes.OpHtmlJson){
+						value = "rs::json_encode("+Runtime.rtl.toString(this.translateRun(item.value))+")";
+						value = "rtl::toString("+Runtime.rtl.toString(value)+")";
+					}
+					else if (item instanceof BayrellLang.OpCodes.OpHtmlRaw){
+						value = this.translateRun(item.value);
+						value = "rtl::toString("+Runtime.rtl.toString(value)+")";
+					}
+					else if (item instanceof BayrellLang.OpCodes.OpConcat || item instanceof BayrellLang.OpCodes.OpString || item instanceof BayrellLang.OpCodes.OpHtmlText){
+						value = this.translateRun(item);
+					}
+					else if (item instanceof BayrellLang.OpCodes.OpHtmlEscape){
+						value = this.translateRun(item);
+						value = "rs::htmlEscape("+Runtime.rtl.toString(value)+")";
+					}
+					else {
+						value = this.translateRun(item);
+						value = "rtl::toString("+Runtime.rtl.toString(value)+")";
+					}
+					if (res == ""){
+						return value;
+					}
+					return Runtime.rtl.toString(res)+"."+Runtime.rtl.toString(value);
+				}, "");
+				res += this.s("->set("+Runtime.rtl.toString(this.convertString("dangerouslySetInnerHTML"))+", "+Runtime.rtl.toString(value)+")");
+			}
+		}
+		else if (raw_item != null){
+			if (raw_item instanceof BayrellLang.OpCodes.OpHtmlJson){
+				var value = "rs::json_encode("+Runtime.rtl.toString(this.translateRun(raw_item.value))+")";
+				res += this.s("->set("+Runtime.rtl.toString(this.convertString("dangerouslySetInnerHTML"))+", "+Runtime.rtl.toString(value)+")");
+			}
+			else if (raw_item instanceof BayrellLang.OpCodes.OpHtmlRaw){
+				var value = this.translateRun(raw_item.value);
+				res += this.s("->set("+Runtime.rtl.toString(this.convertString("dangerouslySetInnerHTML"))+", "+Runtime.rtl.toString(value)+")");
+			}
+		}
+		res += this.s(")");
+		/* Childs */
+		if (raw_item == null && !op_code.is_plain){
+			if (op_code.childs != null && op_code.childs.count() > 0){
+				res += this.s("->set(\"children\", (new "+Runtime.rtl.toString(this.getName("Vector"))+"())");
+				op_code.childs.each((item) => {
+					if (item instanceof BayrellLang.OpCodes.OpComment){
+						return ;
+					}
+					res += this.s("->push("+Runtime.rtl.toString(this.translateRun(item))+")");
+				});
+				res += this.s(")");
+			}
+		}
+		this.levelDec();
+		res += this.s(")");
+		this.popOneLine();
+		return res;
+	}
+	/**
+	 * Html tag
+	 */
+	OpHtmlView(op_code){
+		this.pushOneLine(false);
+		var res = "(new Vector())";
+		op_code.childs.each((item) => {
+			res += this.s("->push("+Runtime.rtl.toString(this.translateRun(item))+")");
+		});
+		this.popOneLine();
 		return res;
 	}
 	/** =========================== Preprocessor ========================== */
@@ -1476,6 +1670,5 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 		this.is_static = false;
 		this.is_interface = false;
 		this.is_struct = false;
-		this.struct_read_only = false;
 	}
 }

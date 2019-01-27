@@ -59,13 +59,13 @@ BayrellLang.OpCodes.OpIf = class extends BayrellLang.OpCodes.BaseOpCode{
 		}
 		super.assignObject(obj);
 	}
-	assignValue(variable_name, value){
-		if (variable_name == "op") this.op = Runtime.rtl.correct(value, "string", "op_if", "");
-		else if (variable_name == "condition") this.condition = Runtime.rtl.correct(value, "BayrellLang.OpCodes.BaseOpCode", null, "");
-		else if (variable_name == "if_true") this.if_true = Runtime.rtl.correct(value, "Runtime.Vector", null, "BayrellLang.OpCodes.BaseOpCode");
-		else if (variable_name == "if_false") this.if_false = Runtime.rtl.correct(value, "Runtime.Vector", null, "BayrellLang.OpCodes.BaseOpCode");
-		else if (variable_name == "if_else") this.if_else = Runtime.rtl.correct(value, "Runtime.Vector", null, "BayrellLang.OpCodes.OpIfElse");
-		else super.assignValue(variable_name, value);
+	assignValue(variable_name, value, sender){if(sender==undefined)sender=null;
+		if (variable_name == "op")this.op = Runtime.rtl.correct(value,"string","op_if","");
+		else if (variable_name == "condition")this.condition = Runtime.rtl.correct(value,"BayrellLang.OpCodes.BaseOpCode",null,"");
+		else if (variable_name == "if_true")this.if_true = Runtime.rtl.correct(value,"Runtime.Vector",null,"BayrellLang.OpCodes.BaseOpCode");
+		else if (variable_name == "if_false")this.if_false = Runtime.rtl.correct(value,"Runtime.Vector",null,"BayrellLang.OpCodes.BaseOpCode");
+		else if (variable_name == "if_else")this.if_else = Runtime.rtl.correct(value,"Runtime.Vector",null,"BayrellLang.OpCodes.OpIfElse");
+		else super.assignValue(variable_name, value, sender);
 	}
 	takeValue(variable_name, default_value){
 		if (default_value == undefined) default_value = null;
@@ -76,12 +76,15 @@ BayrellLang.OpCodes.OpIf = class extends BayrellLang.OpCodes.BaseOpCode{
 		else if (variable_name == "if_else") return this.if_else;
 		return super.takeValue(variable_name, default_value);
 	}
-	static getFieldsList(names){
-		names.push("op");
-		names.push("condition");
-		names.push("if_true");
-		names.push("if_false");
-		names.push("if_else");
+	static getFieldsList(names, flag){
+		if (flag==undefined)flag=0;
+		if ((flag | 3)==3){
+			names.push("op");
+			names.push("condition");
+			names.push("if_true");
+			names.push("if_false");
+			names.push("if_else");
+		}
 	}
 	static getFieldInfoByName(field_name){
 		return null;
