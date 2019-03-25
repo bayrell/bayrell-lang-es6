@@ -37,6 +37,7 @@ BayrellLang.OpCodes.OpPreprocessorCase = class extends BayrellLang.OpCodes.BaseO
 	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.OpCodes.OpPreprocessorCase";}
+	static getCurrentClassName(){return "BayrellLang.OpCodes.OpPreprocessorCase";}
 	static getParentClassName(){return "BayrellLang.OpCodes.BaseOpCode";}
 	_init(){
 		super._init();
@@ -53,9 +54,9 @@ BayrellLang.OpCodes.OpPreprocessorCase = class extends BayrellLang.OpCodes.BaseO
 		super.assignObject(obj);
 	}
 	assignValue(variable_name, value, sender){if(sender==undefined)sender=null;
-		if (variable_name == "op")this.op = Runtime.rtl.correct(value,"string","op_preprocessor_case","");
-		else if (variable_name == "condition")this.condition = Runtime.rtl.correct(value,"BayrellLang.OpCodes.BaseOpCode",null,"");
-		else if (variable_name == "value")this.value = Runtime.rtl.correct(value,"string",null,"");
+		if (variable_name == "op")this.op = Runtime.rtl.convert(value,"string","op_preprocessor_case","");
+		else if (variable_name == "condition")this.condition = Runtime.rtl.convert(value,"BayrellLang.OpCodes.BaseOpCode",null,"");
+		else if (variable_name == "value")this.value = Runtime.rtl.convert(value,"string",null,"");
 		else super.assignValue(variable_name, value, sender);
 	}
 	takeValue(variable_name, default_value){

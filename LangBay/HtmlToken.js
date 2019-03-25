@@ -29,7 +29,7 @@ BayrellLang.LangBay.HtmlToken = class extends BayrellParser.ParserToken{
 	 * Returns special tokens
 	 */
 	static getSpecialTokens(){
-		return (new Runtime.Vector()).push("...").push("@json{").push("@raw{").push("@{").push("<!--").push("-->").push("<!").push("</").push("/>").push("/*").push("*/");
+		return (new Runtime.Vector()).push("...").push("@code{").push("@json{").push("@raw{").push("@{").push("<!--").push("-->").push("<!").push("</").push("/>").push("/*").push("*/");
 	}
 	/**
 	 * Constructor
@@ -102,6 +102,7 @@ BayrellLang.LangBay.HtmlToken = class extends BayrellParser.ParserToken{
 	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.LangBay.HtmlToken";}
+	static getCurrentClassName(){return "BayrellLang.LangBay.HtmlToken";}
 	static getParentClassName(){return "BayrellParser.ParserToken";}
 	_init(){
 		super._init();

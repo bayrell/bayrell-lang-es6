@@ -31,5 +31,6 @@ BayrellLang.Exceptions.TwiceDeclareElseError = class extends BayrellParser.Excep
 	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.Exceptions.TwiceDeclareElseError";}
+	static getCurrentClassName(){return "BayrellLang.Exceptions.TwiceDeclareElseError";}
 	static getParentClassName(){return "BayrellParser.Exceptions.ParserError";}
 }

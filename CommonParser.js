@@ -208,6 +208,7 @@ BayrellLang.CommonParser = class extends BayrellParser.CoreParser{
 	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.CommonParser";}
+	static getCurrentClassName(){return "BayrellLang.CommonParser";}
 	static getParentClassName(){return "BayrellParser.CoreParser";}
 	_init(){
 		super._init();

@@ -29,11 +29,11 @@ BayrellLang.LangBay.TranslatorBay = class extends BayrellLang.CoreTranslator{
 	 * Escape string
 	 */
 	convertString(s){
-		s = re.replace("\\\\", "\\\\", s);
-		s = re.replace("\"", "\\\"", s);
-		s = re.replace("\n", "\\n", s);
-		s = re.replace("\r", "\\r", s);
-		s = re.replace("\t", "\\t", s);
+		s = (Runtime.rtl.method(re.getClassName(), "replace"))("\\\\", "\\\\", s);
+		s = (Runtime.rtl.method(re.getClassName(), "replace"))("\"", "\\\"", s);
+		s = (Runtime.rtl.method(re.getClassName(), "replace"))("\n", "\\n", s);
+		s = (Runtime.rtl.method(re.getClassName(), "replace"))("\r", "\\r", s);
+		s = (Runtime.rtl.method(re.getClassName(), "replace"))("\t", "\\t", s);
 		return s;
 	}
 	/**
@@ -839,6 +839,7 @@ BayrellLang.LangBay.TranslatorBay = class extends BayrellLang.CoreTranslator{
 	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.LangBay.TranslatorBay";}
+	static getCurrentClassName(){return "BayrellLang.LangBay.TranslatorBay";}
 	static getParentClassName(){return "BayrellLang.CoreTranslator";}
 	_init(){
 		super._init();

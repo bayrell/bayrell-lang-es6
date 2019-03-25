@@ -29,6 +29,7 @@ BayrellLang.LangBay.ParserBayNameToken = class extends BayrellParser.ParserToken
 	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.LangBay.ParserBayNameToken";}
+	static getCurrentClassName(){return "BayrellLang.LangBay.ParserBayNameToken";}
 	static getParentClassName(){return "BayrellParser.ParserToken";}
 }
 BayrellLang.LangBay.ParserBayNameToken.TOKEN_NONE = "none";

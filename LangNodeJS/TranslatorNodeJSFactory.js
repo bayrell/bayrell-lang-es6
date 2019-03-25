@@ -27,6 +27,7 @@ BayrellLang.LangNodeJS.TranslatorNodeJSFactory = class extends Runtime.ContextOb
 	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.LangNodeJS.TranslatorNodeJSFactory";}
+	static getCurrentClassName(){return "BayrellLang.LangNodeJS.TranslatorNodeJSFactory";}
 	static getParentClassName(){return "Runtime.ContextObject";}
 	_init(){
 		super._init();

@@ -19,20 +19,9 @@
 if (typeof BayrellLang == 'undefined') BayrellLang = {};
 if (typeof BayrellLang.OpCodes == 'undefined') BayrellLang.OpCodes = {};
 BayrellLang.OpCodes.OpHtmlAttribute = class extends BayrellLang.OpCodes.BaseOpCode{
-	/**
-	 * Constructor
-	 */
-	constructor(){
-		super();
-	}
-	/**
-	 * Destructor
-	 */
-	destructor(){
-		super.destructor();
-	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.OpCodes.OpHtmlAttribute";}
+	static getCurrentClassName(){return "BayrellLang.OpCodes.OpHtmlAttribute";}
 	static getParentClassName(){return "BayrellLang.OpCodes.BaseOpCode";}
 	_init(){
 		super._init();
@@ -49,9 +38,9 @@ BayrellLang.OpCodes.OpHtmlAttribute = class extends BayrellLang.OpCodes.BaseOpCo
 		super.assignObject(obj);
 	}
 	assignValue(variable_name, value, sender){if(sender==undefined)sender=null;
-		if (variable_name == "op")this.op = Runtime.rtl.correct(value,"string","op_html_attribute","");
-		else if (variable_name == "key")this.key = Runtime.rtl.correct(value,"string","","");
-		else if (variable_name == "value")this.value = Runtime.rtl.correct(value,"BayrellLang.OpCodes.BaseOpCode",null,"");
+		if (variable_name == "op")this.op = Runtime.rtl.convert(value,"string","op_html_attribute","");
+		else if (variable_name == "key")this.key = Runtime.rtl.convert(value,"string","","");
+		else if (variable_name == "value")this.value = Runtime.rtl.convert(value,"mixed",null,"");
 		else super.assignValue(variable_name, value, sender);
 	}
 	takeValue(variable_name, default_value){

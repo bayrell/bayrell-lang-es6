@@ -106,5 +106,6 @@ BayrellLang.Utils = class extends Runtime.ContextObject{
 	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.Utils";}
+	static getCurrentClassName(){return "BayrellLang.Utils";}
 	static getParentClassName(){return "Runtime.ContextObject";}
 }

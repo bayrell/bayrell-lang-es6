@@ -175,8 +175,15 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 	readNewInstance(){
 		this.matchNextToken("new");
 		var ident = this.readTemplateIdentifier();
-		var v = this.readCallBody();
-		return new BayrellLang.OpCodes.OpNew(ident, v);
+		if (this.findNextToken("(")){
+			var v = this.readCallBody();
+			return new BayrellLang.OpCodes.OpNew(ident, v);
+		}
+		else if (this.findNextToken("{")){
+			var v = this.readMap();
+			return new BayrellLang.OpCodes.OpNew(ident, (new Runtime.Vector()).push(v));
+		}
+		return new BayrellLang.OpCodes.OpNew(ident);
 	}
 	/**
 	 * Read call await
@@ -215,6 +222,40 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 		}
 		var value = this.readCallDynamic(true, false, true, false);
 		return new BayrellLang.OpCodes.OpMethod(value);
+	}
+	/**
+	 * Read pipe
+	 * @return BaseOpCode
+	 */
+	readPipe(){
+		var item = null;
+		var items = new Runtime.Vector();
+		var is_return_value = false;
+		var value = null;
+		this.matchNextToken("pipe");
+		this.matchNextToken("(");
+		if (!this.findNextToken(")")){
+			value = this.readExpression();
+		}
+		this.matchNextToken(")");
+		while (this.findNextToken(">>")){
+			this.matchNextToken(">>");
+			if (this.findNextToken("method")){
+				item = this.readMethod();
+			}
+			else if (this.findNextToken("value")){
+				break;
+			}
+			else {
+				item = this.readCallDynamic(true, true, true, true);
+			}
+			items.push(item);
+		}
+		if (this.findNextToken("value")){
+			this.matchNextToken("value");
+			is_return_value = true;
+		}
+		return new BayrellLang.OpCodes.OpPipe((new Runtime.Map()).set("value", value).set("items", items).set("is_return_value", is_return_value));
 	}
 	/**
 	 * Read get class name
@@ -397,20 +438,28 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 			if (this.findNextToken("@")){
 				spec_attr = true;
 				this.matchNextToken("@");
-				attr.key = this.readNextToken().token;
+				attr.key = "@"+Runtime.rtl.toString(this.readNextToken().token);
 			}
 			else {
 				attr.key = this.readNextToken().token;
 			}
-			if (this.findNextToken("=")){
+			if (attr.key == "@lambda"){
+				attr.value = this.readDeclareFunctionHeader(new BayrellLang.OpCodes.OpFunctionDeclare());
+			}
+			else if (this.findNextToken("=")){
 				this.matchNextToken("=");
 				if (this.findNextToken("'") || this.findNextToken("\"")){
 					this.pushToken(new BayrellLang.LangBay.ParserBayToken(this.context(), this));
 					attr.value = new BayrellLang.OpCodes.OpString(this.readAnyNextToken().token);
 					this.popRestoreToken();
 				}
-				else if (this.findNextToken("{")){
-					this.matchNextToken("{");
+				else if (this.findNextToken("@{") || this.findNextToken("{")){
+					if (this.findNextToken("@{")){
+						this.matchNextToken("@{");
+					}
+					else if (this.findNextToken("{")){
+						this.matchNextToken("{");
+					}
 					this.pushToken(new BayrellLang.LangBay.ParserBayToken(this.context(), this));
 					attr.value = this.readExpression();
 					this.popRestoreToken();
@@ -423,9 +472,6 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 			else {
 				attr.bracket = "\"";
 				attr.value = new BayrellLang.OpCodes.OpString(attr.key);
-			}
-			if (spec_attr && attr.key == "class"){
-				attr.value = new BayrellLang.OpCodes.OpCall(new BayrellLang.OpCodes.OpDynamic(new BayrellLang.OpCodes.OpIdentifier("this"), "css"), (new Runtime.Vector()).push(attr.value));
 			}
 			this.addAttribute(attributes, attr);
 		}
@@ -444,30 +490,41 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 		var look_str = this.current_token.lookString(len_match);
 		var childs = new Runtime.Vector();
 		var special_tokens = BayrellLang.LangBay.HtmlToken.getSpecialTokens();
+		special_tokens.removeValue("{");
 		special_tokens.removeValue("@{");
 		special_tokens.removeValue("@raw{");
 		special_tokens.removeValue("@json{");
+		/*special_tokens.removeValue("@code{");*/
 		special_tokens.removeValue("<!--");
 		var bracket_level = 0;
 		var s = "";
+		var is_next_html_token = false;
+		var is_next_special_token = false;
+		var is_prev_special_token = false;
 		/* Main loop */
 		while (look_str != "" && !this.current_token.isEOF() && (look_str != match_str || look_str == "}" && bracket_level > 0)){
+			is_next_html_token = this.current_token.findString("<");
+			is_next_special_token = this.current_token.findVector(special_tokens) != -1;
 			var res = null;
 			if (!is_plain){
-				var is_next_html_token = this.current_token.findString("<");
-				var is_next_special_token = this.current_token.findVector(special_tokens) != -1;
 				if (is_next_special_token || is_next_html_token){
-					s = Runtime.rs.trim(s, "\\t\\r\\n");
+					if (is_next_special_token || is_prev_special_token){
+						s = Runtime.rs.trim(s, "\\t\\r\\n");
+					}
+					else {
+						s = Runtime.rs.trim(s, "\\t\\r\\n");
+					}
 					if (s != ""){
 						childs.push(new BayrellLang.OpCodes.OpHtmlText(s));
 					}
 					s = "";
 					this.assignCurrentToken(this.current_token);
 					res = this.readHtmlTag();
+					is_prev_special_token = false;
 				}
 			}
 			if (res == null){
-				if (this.current_token.findString("{") && !is_plain || this.current_token.findString("@{") || this.current_token.findString("@raw{") || this.current_token.findString("@json{")){
+				if (this.current_token.findString("{") || this.current_token.findString("@{") || this.current_token.findString("@raw{") || this.current_token.findString("@json{")){
 					if (!is_plain){
 						s = Runtime.rs.trim(s, "\\t\\r\\n");
 					}
@@ -477,6 +534,7 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 					s = "";
 					var is_raw = false;
 					var is_json = false;
+					var is_code = false;
 					if (this.current_token.findString("@raw{")){
 						is_raw = true;
 						this.current_token.match("@raw{");
@@ -484,6 +542,10 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 					else if (this.current_token.findString("@json{")){
 						is_json = true;
 						this.current_token.match("@json{");
+					}
+					else if (this.current_token.findString("@code{")){
+						is_code = true;
+						this.current_token.match("@code{");
 					}
 					else if (this.current_token.findString("@{")){
 						this.current_token.match("@{");
@@ -500,11 +562,15 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 					else if (is_json){
 						res = new BayrellLang.OpCodes.OpHtmlJson(res);
 					}
+					else if (is_code){
+						res = new BayrellLang.OpCodes.OpHtmlRaw(res);
+					}
 					else {
 						res = new BayrellLang.OpCodes.OpHtmlEscape(res);
 					}
 					this.popRestoreToken();
 					this.matchNextToken("}");
+					is_prev_special_token = true;
 				}
 			}
 			if (res != null){
@@ -523,7 +589,12 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 			look_str = this.current_token.lookString(len_match);
 		}
 		if (!is_plain){
-			s = Runtime.rs.trim(s, "\\t\\r\\n");
+			if (is_prev_special_token){
+				s = Runtime.rs.trim(s, "\\t\\r\\n");
+			}
+			else {
+				s = Runtime.rs.trim(s, "\\t\\r\\n");
+			}
 		}
 		if (s != ""){
 			childs.push(new BayrellLang.OpCodes.OpHtmlText(s));
@@ -563,6 +634,7 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 			var res = new BayrellLang.OpCodes.OpHtmlTag();
 			res.tag_name = this.readNextToken().token;
 			this.readHtmlAttributes(res);
+			var childs_function = null;
 			if (this.findNextToken("/>")){
 				this.matchNextToken("/>");
 			}
@@ -573,12 +645,34 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 					res.is_plain = true;
 					res.childs = this.readHtmlBlock("</"+Runtime.rtl.toString(res.tag_name)+">", true);
 				}
+				else if (this.findNextToken("lambda") || this.findNextToken("pure")){
+					this.assignCurrentToken(this.current_token);
+					this.pushToken(new BayrellLang.LangBay.ParserBayToken(this.context(), this));
+					childs_function = this.readDeclareFunction(false);
+					this.popRestoreToken();
+				}
 				else {
 					res.childs = this.readHtmlBlock("</");
 				}
 				this.matchNextToken("</");
 				this.matchNextToken(res.tag_name);
 				this.matchNextToken(">");
+			}
+			if (childs_function != null){
+				res.setAttribute("@lambda", childs_function);
+				if (res.childs){
+					res.childs.clear();
+				}
+			}
+			else {
+				var op_code = res.findAttribute("@lambda");
+				if (op_code != null && op_code.value instanceof BayrellLang.OpCodes.OpFunctionDeclare){
+					op_code.value.is_lambda = true;
+					if (res.childs != null){
+						op_code.value.childs = res.childs.copy();
+						res.childs.clear();
+					}
+				}
 			}
 			return res;
 		}
@@ -610,37 +704,8 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 			this.popRestoreToken();
 			return null;
 		}
-		if (res.childs != null && res.childs.count() == 1){
-			res = res.childs.item(0);
-		}
 		this.popRestoreToken();
 		this.skip_comments = old_skip_comments;
-		return res;
-	}
-	/**
-	 * Retuns css hash 
-	 * @param string component class name
-	 * @return string hash
-	 */
-	getCssHash(s){
-		var arr = "1234567890abcdef";
-		var arr_sz = 16;
-		var arr_mod = 65536;
-		var sz = Runtime.rs.strlen(s);
-		var hash = 0;
-		for (var i = 0; i < sz; i++){
-			var ch = Runtime.rs.ord(s[i]);
-			hash = (hash << 2) + (hash >> 14) + ch & 65535;
-		}
-		var res = "";
-		var pos = 0;
-		var c = 0;
-		while (hash != 0 || pos < 4){
-			c = hash & 15;
-			hash = hash >> 4;
-			res += arr[c];
-			pos++;
-		}
 		return res;
 	}
 	/**
@@ -682,7 +747,7 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 			name = Runtime.rs.substr(s, 0, pos);
 			postfix = Runtime.rs.substr(s, pos, sz - pos);
 		}
-		var hash = "-"+Runtime.rtl.toString(this.getCssHash(class_name));
+		var hash = "-"+Runtime.rtl.toString(Runtime.RuntimeUtils.getCssHash(class_name));
 		return Runtime.rtl.toString(name)+Runtime.rtl.toString(hash)+Runtime.rtl.toString(postfix);
 	}
 	/**
@@ -768,10 +833,7 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 	 * @return BaseOpCode
 	 */
 	readExpressionElement(){
-		if (this.findNextToken("<")){
-			return this.readHtml();
-		}
-		else if (this.findNextToken("@") && this.next_token.lookString(3) == "css"){
+		if (this.findNextToken("@") && this.next_token.lookString(3) == "css"){
 			this.matchNextToken("@");
 			this.matchNextToken("css");
 			return this.readCss();
@@ -790,6 +852,9 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 		}
 		else if (this.findNextToken("method")){
 			return this.readMethod();
+		}
+		else if (this.findNextToken("pipe")){
+			return this.readPipe();
 		}
 		else if (this.findNextToken("[")){
 			return this.readVector();
@@ -1063,10 +1128,20 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 	 * @return BaseOpCode
 	 */
 	readExpression(){
+		if (this.findNextToken("<")){
+			return this.readHtml();
+		}
 		this.pushToken();
-		/* Read function declare */
+		var is_lambda = false;
+		if (this.findNextToken("lambda")){
+			is_lambda = true;
+			this.matchNextToken("lambda");
+		}
+		else if (this.findNextToken("pure")){
+			this.matchNextToken("pure");
+		}
 		var res = null;
-		res = this.readDeclareFunction(false);
+		res = this.readDeclareFunction(false, false, is_lambda);
 		if (res != null){
 			this.popToken();
 			return res;
@@ -1602,16 +1677,36 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 	 * Read declare class function
 	 * @return BaseOpCode
 	 */
+	readDeclareFunctionHeader(res){
+		res.args = this.readFunctionsArguments();
+		/* Read use variables*/
+		if (this.findNextToken("use")){
+			this.matchNextToken("use");
+			this.matchNextToken("(");
+			while (!this.findNextToken(")") && !this.isEOF()){
+				var name = this.readIdentifierName();
+				res.use_variables.push(name);
+				if (this.findNextToken(",")){
+					this.matchNextToken(",");
+				}
+				else {
+					break;
+				}
+			}
+			this.matchNextToken(")");
+		}
+		return res;
+	}
+	/**
+	 * Read declare class function
+	 * @return BaseOpCode
+	 */
 	readDeclareFunction(read_name, is_declare_function, is_lambda){
 		if (read_name == undefined) read_name=true;
 		if (is_declare_function == undefined) is_declare_function=false;
 		if (is_lambda == undefined) is_lambda=false;
 		var res = new BayrellLang.OpCodes.OpFunctionDeclare();
 		this.pushToken();
-		if (this.findNextToken("lambda")){
-			is_lambda = true;
-			this.matchNextToken("lambda");
-		}
 		res.is_lambda = is_lambda;
 		try{
 			res.result_type = this.readTemplateIdentifier();
@@ -1658,6 +1753,9 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 		}
 		if (this.findNextToken("=>")){
 			this.matchNextToken("=>");
+			if (this.findNextToken("return")){
+				this.matchNextToken("return");
+			}
 			this.popToken();
 			if (is_lambda){
 				this.pushToken();
@@ -1701,7 +1799,12 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 				}
 			}
 			else {
+				var flags = null;
+				flags = this.readFlags();
 				res.return_function = this.readDeclareFunction(false, is_declare_function, is_lambda);
+				if (res.return_function != null){
+					res.return_function.flags = flags;
+				}
 			}
 			return res;
 		}
@@ -1765,7 +1868,13 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 				flags.assignValue("public", true);
 			}
 		}
-		op_code = this.readDeclareFunction(true, is_declare_function);
+		var is_lambda = false;
+		if (flags != null){
+			if (flags.isFlag("lambda")){
+				is_lambda = true;
+			}
+		}
+		op_code = this.readDeclareFunction(true, is_declare_function, is_lambda);
 		if (op_code && op_code instanceof BayrellLang.OpCodes.OpFunctionDeclare){
 			op_code.annotations = this.annotations;
 			op_code.flags = flags;
@@ -1996,6 +2105,7 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.LangBay.ParserBay";}
+	static getCurrentClassName(){return "BayrellLang.LangBay.ParserBay";}
 	static getParentClassName(){return "BayrellLang.CommonParser";}
 	_init(){
 		super._init();

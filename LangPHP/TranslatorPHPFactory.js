@@ -27,6 +27,7 @@ BayrellLang.LangPHP.TranslatorPHPFactory = class extends Runtime.ContextObject{
 	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.LangPHP.TranslatorPHPFactory";}
+	static getCurrentClassName(){return "BayrellLang.LangPHP.TranslatorPHPFactory";}
 	static getParentClassName(){return "Runtime.ContextObject";}
 	_init(){
 		super._init();

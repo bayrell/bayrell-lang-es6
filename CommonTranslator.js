@@ -235,6 +235,9 @@ BayrellLang.CommonTranslator = class extends Runtime.ContextObject{
 	OpOr(op_code){
 		return "";
 	}
+	OpPipe(op_code){
+		return "";
+	}
 	OpPostDec(op_code){
 		return "";
 	}
@@ -296,6 +299,9 @@ BayrellLang.CommonTranslator = class extends Runtime.ContextObject{
 		return "";
 	}
 	/* =========================== HTML OP Codes ========================== */
+	OpHtmlEscape(op_code){
+		return "";
+	}
 	OpHtmlJson(op_code){
 		return "";
 	}
@@ -303,6 +309,9 @@ BayrellLang.CommonTranslator = class extends Runtime.ContextObject{
 		return "";
 	}
 	OpHtmlTag(op_code){
+		return "";
+	}
+	OpHtmlText(op_code){
 		return "";
 	}
 	OpHtmlView(op_code){
@@ -465,6 +474,9 @@ BayrellLang.CommonTranslator = class extends Runtime.ContextObject{
 		else if (op_code instanceof BayrellLang.OpCodes.OpOr){
 			return this.OpOr(op_code);
 		}
+		else if (op_code instanceof BayrellLang.OpCodes.OpPipe){
+			return this.OpPipe(op_code);
+		}
 		else if (op_code instanceof BayrellLang.OpCodes.OpPostDec){
 			return this.OpPostDec(op_code);
 		}
@@ -525,6 +537,9 @@ BayrellLang.CommonTranslator = class extends Runtime.ContextObject{
 		else if (op_code instanceof BayrellLang.OpCodes.OpWhile){
 			return this.OpWhile(op_code);
 		}
+		else if (op_code instanceof BayrellLang.OpCodes.OpHtmlEscape){
+			return this.OpHtmlEscape(op_code);
+		}
 		else if (op_code instanceof BayrellLang.OpCodes.OpHtmlJson){
 			return this.OpHtmlJson(op_code);
 		}
@@ -535,7 +550,7 @@ BayrellLang.CommonTranslator = class extends Runtime.ContextObject{
 			return this.OpHtmlTag(op_code);
 		}
 		else if (op_code instanceof BayrellLang.OpCodes.OpHtmlText){
-			return this.OpString(op_code);
+			return this.OpHtmlText(op_code);
 		}
 		else if (op_code instanceof BayrellLang.OpCodes.OpHtmlView){
 			return this.OpHtmlView(op_code);
@@ -575,6 +590,7 @@ BayrellLang.CommonTranslator = class extends Runtime.ContextObject{
 	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.CommonTranslator";}
+	static getCurrentClassName(){return "BayrellLang.CommonTranslator";}
 	static getParentClassName(){return "Runtime.ContextObject";}
 	_init(){
 		super._init();

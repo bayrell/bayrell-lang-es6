@@ -29,6 +29,9 @@ BayrellLang.LangNodeJS.TranslatorNodeJS = class extends BayrellLang.LangES6.Tran
 		else if (name == "self"){
 			return this.current_class_name;
 		}
+		else if (name == "static"){
+			return "this";
+		}
 		return name;
 	}
 	/**
@@ -40,7 +43,7 @@ BayrellLang.LangNodeJS.TranslatorNodeJS = class extends BayrellLang.LangES6.Tran
 		this.current_module_name = arr.item(0);
 		this.modules.clear();
 		if (this.current_module_name != "Runtime"){
-			return "var rtl = require('bayrell-runtime-nodejs').rtl;"+Runtime.rtl.toString(this.s("var Map = require('bayrell-runtime-nodejs').Map;"))+Runtime.rtl.toString(this.s("var Vector = require('bayrell-runtime-nodejs').Vector;"))+Runtime.rtl.toString(this.s("var IntrospectionInfo = require('bayrell-runtime-nodejs').IntrospectionInfo;"));
+			return "var rtl = require('bayrell-runtime-nodejs').rtl;"+Runtime.rtl.toString(this.s("var Map = require('bayrell-runtime-nodejs').Map;"))+Runtime.rtl.toString(this.s("var Dict = require('bayrell-runtime-nodejs').Dict;"))+Runtime.rtl.toString(this.s("var Vector = require('bayrell-runtime-nodejs').Vector;"))+Runtime.rtl.toString(this.s("var Collection = require('bayrell-runtime-nodejs').Collection;"))+Runtime.rtl.toString(this.s("var IntrospectionInfo = require('bayrell-runtime-nodejs').IntrospectionInfo;"));
 		}
 		return "";
 	}
@@ -94,8 +97,8 @@ BayrellLang.LangNodeJS.TranslatorNodeJS = class extends BayrellLang.LangES6.Tran
 			if (module_name == "Runtime"){
 				module_name = "BayrellRuntime";
 			}
-			if (module_name == "RuntimeWeb"){
-				module_name = "BayrellRuntimeWeb";
+			if (module_name == "RuntimeUI"){
+				module_name = "BayrellRuntimeUI";
 			}
 			module_name = Runtime.rtl.convertNodeJSModuleName(module_name);
 			res = "var "+Runtime.rtl.toString(class_name)+" = require('"+Runtime.rtl.toString(module_name)+"')."+Runtime.rtl.toString(module_path)+";";
@@ -207,5 +210,6 @@ BayrellLang.LangNodeJS.TranslatorNodeJS = class extends BayrellLang.LangES6.Tran
 	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.LangNodeJS.TranslatorNodeJS";}
+	static getCurrentClassName(){return "BayrellLang.LangNodeJS.TranslatorNodeJS";}
 	static getParentClassName(){return "BayrellLang.LangES6.TranslatorES6";}
 }

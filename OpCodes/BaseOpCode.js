@@ -21,6 +21,7 @@ if (typeof BayrellLang.OpCodes == 'undefined') BayrellLang.OpCodes = {};
 BayrellLang.OpCodes.BaseOpCode = class extends Runtime.CoreStruct{
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.OpCodes.BaseOpCode";}
+	static getCurrentClassName(){return "BayrellLang.OpCodes.BaseOpCode";}
 	static getParentClassName(){return "Runtime.CoreStruct";}
 	_init(){
 		super._init();
@@ -35,7 +36,7 @@ BayrellLang.OpCodes.BaseOpCode = class extends Runtime.CoreStruct{
 		super.assignObject(obj);
 	}
 	assignValue(variable_name, value, sender){if(sender==undefined)sender=null;
-		if (variable_name == "op")this.op = Runtime.rtl.correct(value,"string","","");
+		if (variable_name == "op")this.op = Runtime.rtl.convert(value,"string","","");
 		else super.assignValue(variable_name, value, sender);
 	}
 	takeValue(variable_name, default_value){

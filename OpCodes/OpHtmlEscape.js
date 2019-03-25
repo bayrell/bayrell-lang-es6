@@ -21,6 +21,7 @@ if (typeof BayrellLang.OpCodes == 'undefined') BayrellLang.OpCodes = {};
 BayrellLang.OpCodes.OpHtmlEscape = class extends BayrellLang.OpCodes.OpValue1{
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.OpCodes.OpHtmlEscape";}
+	static getCurrentClassName(){return "BayrellLang.OpCodes.OpHtmlEscape";}
 	static getParentClassName(){return "BayrellLang.OpCodes.OpValue1";}
 	_init(){
 		super._init();
@@ -33,7 +34,7 @@ BayrellLang.OpCodes.OpHtmlEscape = class extends BayrellLang.OpCodes.OpValue1{
 		super.assignObject(obj);
 	}
 	assignValue(variable_name, value, sender){if(sender==undefined)sender=null;
-		if (variable_name == "op")this.op = Runtime.rtl.correct(value,"string","op_html_escape","");
+		if (variable_name == "op")this.op = Runtime.rtl.convert(value,"string","op_html_escape","");
 		else super.assignValue(variable_name, value, sender);
 	}
 	takeValue(variable_name, default_value){

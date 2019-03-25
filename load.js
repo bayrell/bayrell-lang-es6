@@ -96,6 +96,7 @@ $load.subscribe(["Runtime_loaded", "BayrellParser_loaded"], function(){
 		"/assets/BayrellLang/OpCodes/OpNot.js",
 		"/assets/BayrellLang/OpCodes/OpNumber.js",
 		"/assets/BayrellLang/OpCodes/OpOr.js",
+		"/assets/BayrellLang/OpCodes/OpPipe.js",
 		"/assets/BayrellLang/OpCodes/OpPostDec.js",
 		"/assets/BayrellLang/OpCodes/OpPostInc.js",
 		"/assets/BayrellLang/OpCodes/OpPow.js",

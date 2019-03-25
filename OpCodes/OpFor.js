@@ -41,6 +41,7 @@ BayrellLang.OpCodes.OpFor = class extends BayrellLang.OpCodes.BaseOpCode{
 	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.OpCodes.OpFor";}
+	static getCurrentClassName(){return "BayrellLang.OpCodes.OpFor";}
 	static getParentClassName(){return "BayrellLang.OpCodes.BaseOpCode";}
 	_init(){
 		super._init();
@@ -61,11 +62,11 @@ BayrellLang.OpCodes.OpFor = class extends BayrellLang.OpCodes.BaseOpCode{
 		super.assignObject(obj);
 	}
 	assignValue(variable_name, value, sender){if(sender==undefined)sender=null;
-		if (variable_name == "op")this.op = Runtime.rtl.correct(value,"string","op_for","");
-		else if (variable_name == "loop_condition")this.loop_condition = Runtime.rtl.correct(value,"BayrellLang.OpCodes.BaseOpCode",null,"");
-		else if (variable_name == "loop_init")this.loop_init = Runtime.rtl.correct(value,"BayrellLang.OpCodes.BaseOpCode",null,"");
-		else if (variable_name == "loop_inc")this.loop_inc = Runtime.rtl.correct(value,"BayrellLang.OpCodes.BaseOpCode",null,"");
-		else if (variable_name == "childs")this.childs = Runtime.rtl.correct(value,"Runtime.Vector",null,"BayrellLang.OpCodes.BaseOpCode");
+		if (variable_name == "op")this.op = Runtime.rtl.convert(value,"string","op_for","");
+		else if (variable_name == "loop_condition")this.loop_condition = Runtime.rtl.convert(value,"BayrellLang.OpCodes.BaseOpCode",null,"");
+		else if (variable_name == "loop_init")this.loop_init = Runtime.rtl.convert(value,"BayrellLang.OpCodes.BaseOpCode",null,"");
+		else if (variable_name == "loop_inc")this.loop_inc = Runtime.rtl.convert(value,"BayrellLang.OpCodes.BaseOpCode",null,"");
+		else if (variable_name == "childs")this.childs = Runtime.rtl.convert(value,"Runtime.Vector",null,"BayrellLang.OpCodes.BaseOpCode");
 		else super.assignValue(variable_name, value, sender);
 	}
 	takeValue(variable_name, default_value){

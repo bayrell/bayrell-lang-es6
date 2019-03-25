@@ -572,6 +572,7 @@ BayrellLang.CoreTranslator = class extends Runtime.ContextObject{
 	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.CoreTranslator";}
+	static getCurrentClassName(){return "BayrellLang.CoreTranslator";}
 	static getParentClassName(){return "Runtime.ContextObject";}
 	_init(){
 		super._init();

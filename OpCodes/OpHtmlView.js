@@ -28,6 +28,7 @@ BayrellLang.OpCodes.OpHtmlView = class extends BayrellLang.OpCodes.OpChilds{
 	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.OpCodes.OpHtmlView";}
+	static getCurrentClassName(){return "BayrellLang.OpCodes.OpHtmlView";}
 	static getParentClassName(){return "BayrellLang.OpCodes.OpChilds";}
 	_init(){
 		super._init();
@@ -42,8 +43,8 @@ BayrellLang.OpCodes.OpHtmlView = class extends BayrellLang.OpCodes.OpChilds{
 		super.assignObject(obj);
 	}
 	assignValue(variable_name, value, sender){if(sender==undefined)sender=null;
-		if (variable_name == "op")this.op = Runtime.rtl.correct(value,"string","op_html_view","");
-		else if (variable_name == "variable")this.variable = Runtime.rtl.correct(value,"string","","");
+		if (variable_name == "op")this.op = Runtime.rtl.convert(value,"string","op_html_view","");
+		else if (variable_name == "variable")this.variable = Runtime.rtl.convert(value,"string","","");
 		else super.assignValue(variable_name, value, sender);
 	}
 	takeValue(variable_name, default_value){

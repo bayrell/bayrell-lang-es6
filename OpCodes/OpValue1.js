@@ -35,6 +35,7 @@ BayrellLang.OpCodes.OpValue1 = class extends BayrellLang.OpCodes.BaseOpCode{
 	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.OpCodes.OpValue1";}
+	static getCurrentClassName(){return "BayrellLang.OpCodes.OpValue1";}
 	static getParentClassName(){return "BayrellLang.OpCodes.BaseOpCode";}
 	_init(){
 		super._init();
@@ -49,8 +50,8 @@ BayrellLang.OpCodes.OpValue1 = class extends BayrellLang.OpCodes.BaseOpCode{
 		super.assignObject(obj);
 	}
 	assignValue(variable_name, value, sender){if(sender==undefined)sender=null;
-		if (variable_name == "op")this.op = Runtime.rtl.correct(value,"string","op_value","");
-		else if (variable_name == "value")this.value = Runtime.rtl.correct(value,"BayrellLang.OpCodes.BaseOpCode",null,"");
+		if (variable_name == "op")this.op = Runtime.rtl.convert(value,"string","op_value","");
+		else if (variable_name == "value")this.value = Runtime.rtl.convert(value,"BayrellLang.OpCodes.BaseOpCode",null,"");
 		else super.assignValue(variable_name, value, sender);
 	}
 	takeValue(variable_name, default_value){

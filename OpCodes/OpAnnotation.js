@@ -21,6 +21,7 @@ if (typeof BayrellLang.OpCodes == 'undefined') BayrellLang.OpCodes = {};
 BayrellLang.OpCodes.OpAnnotation = class extends BayrellLang.OpCodes.BaseOpCode{
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.OpCodes.OpAnnotation";}
+	static getCurrentClassName(){return "BayrellLang.OpCodes.OpAnnotation";}
 	static getParentClassName(){return "BayrellLang.OpCodes.BaseOpCode";}
 	_init(){
 		super._init();
@@ -37,9 +38,9 @@ BayrellLang.OpCodes.OpAnnotation = class extends BayrellLang.OpCodes.BaseOpCode{
 		super.assignObject(obj);
 	}
 	assignValue(variable_name, value, sender){if(sender==undefined)sender=null;
-		if (variable_name == "op")this.op = Runtime.rtl.correct(value,"string","op_annotation","");
-		else if (variable_name == "kind")this.kind = Runtime.rtl.correct(value,"BayrellLang.OpCodes.BaseOpCode",null,"");
-		else if (variable_name == "options")this.options = Runtime.rtl.correct(value,"BayrellLang.OpCodes.OpMap",null,"");
+		if (variable_name == "op")this.op = Runtime.rtl.convert(value,"string","op_annotation","");
+		else if (variable_name == "kind")this.kind = Runtime.rtl.convert(value,"BayrellLang.OpCodes.BaseOpCode",null,"");
+		else if (variable_name == "options")this.options = Runtime.rtl.convert(value,"BayrellLang.OpCodes.OpMap",null,"");
 		else super.assignValue(variable_name, value, sender);
 	}
 	takeValue(variable_name, default_value){

@@ -27,6 +27,7 @@ BayrellLang.LangES6.TranslatorES6Factory = class extends Runtime.ContextObject{
 	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.LangES6.TranslatorES6Factory";}
+	static getCurrentClassName(){return "BayrellLang.LangES6.TranslatorES6Factory";}
 	static getParentClassName(){return "Runtime.ContextObject";}
 	_init(){
 		super._init();

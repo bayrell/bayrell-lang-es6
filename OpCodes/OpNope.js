@@ -21,6 +21,7 @@ if (typeof BayrellLang.OpCodes == 'undefined') BayrellLang.OpCodes = {};
 BayrellLang.OpCodes.OpNope = class extends BayrellLang.OpCodes.OpChilds{
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.OpCodes.OpNope";}
+	static getCurrentClassName(){return "BayrellLang.OpCodes.OpNope";}
 	static getParentClassName(){return "BayrellLang.OpCodes.OpChilds";}
 	_init(){
 		super._init();
@@ -33,7 +34,7 @@ BayrellLang.OpCodes.OpNope = class extends BayrellLang.OpCodes.OpChilds{
 		super.assignObject(obj);
 	}
 	assignValue(variable_name, value, sender){if(sender==undefined)sender=null;
-		if (variable_name == "op")this.op = Runtime.rtl.correct(value,"string","op_nope","");
+		if (variable_name == "op")this.op = Runtime.rtl.convert(value,"string","op_nope","");
 		else super.assignValue(variable_name, value, sender);
 	}
 	takeValue(variable_name, default_value){

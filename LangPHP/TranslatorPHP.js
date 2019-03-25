@@ -27,6 +27,22 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 		return Runtime.rtl.toString(this.current_namespace)+"."+Runtime.rtl.toString(this.current_class_name);
 	}
 	/**
+	 * Returns full class name
+	 * @return string
+	 */
+	getCurrentFunctionName(){
+		var c = this.current_function_name.count();
+		var last_function_name = this.current_function_name.get(c - 1);
+		return Runtime.rtl.toString(this.current_namespace)+"."+Runtime.rtl.toString(this.current_class_name)+"::"+Runtime.rtl.toString(last_function_name);
+	}
+	/**
+	 * Returns UI struct class name
+	 * @return string
+	 */
+	getUIStructClassName(){
+		return this.ui_struct_class_name.last();
+	}
+	/**
 	 * Get name
 	 */
 	getName(name){
@@ -141,13 +157,32 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 	 * Static load
 	 */
 	OpStatic(op_code){
+		var is_flag = false;
 		var op_code_last = this.op_code_stack.last(null, -2);
-		if (op_code_last instanceof BayrellLang.OpCodes.OpAssign || op_code_last instanceof BayrellLang.OpCodes.OpAssignDeclare || op_code_last instanceof BayrellLang.OpCodes.OpDynamic){
-			if (op_code.name != Runtime.rs.strtoupper(op_code.name)){
-				return Runtime.rtl.toString(this.translateRun(op_code.value))+"::$"+Runtime.rtl.toString(op_code.name);
+		if (op_code.name == Runtime.rs.strtoupper(op_code.name)){
+			is_flag = true;
+		}
+		if (op_code_last instanceof BayrellLang.OpCodes.OpCall){
+			is_flag = true;
+		}
+		if (op_code.value instanceof BayrellLang.OpCodes.OpIdentifier && op_code_last instanceof BayrellLang.OpCodes.OpCall){
+			if (op_code.value.value == "self"){
+				return "(new \\Runtime\\Callback("+"self::class, "+Runtime.rtl.toString(this.convertString(op_code.name))+"))";
+			}
+			else if (op_code.value.value == "static"){
+				return "static::"+Runtime.rtl.toString(op_code.name);
+			}
+			else if (op_code.value.value == "parent"){
+				return "parent::"+Runtime.rtl.toString(op_code.name);
+			}
+			else if (!this.modules.has(op_code.value.value)){
+				return "(new \\Runtime\\Callback("+"$"+Runtime.rtl.toString(op_code.value.value)+"->getClassName(), "+Runtime.rtl.toString(this.convertString(op_code.name))+"))";
 			}
 		}
-		return Runtime.rtl.toString(this.translateRun(op_code.value))+"::"+Runtime.rtl.toString(op_code.name);
+		if (is_flag){
+			return Runtime.rtl.toString(this.translateRun(op_code.value))+"::"+Runtime.rtl.toString(op_code.name);
+		}
+		return Runtime.rtl.toString(this.translateRun(op_code.value))+"::$"+Runtime.rtl.toString(op_code.name);
 	}
 	/**
 	 * Template Identifier
@@ -418,12 +453,18 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 	 * Copy struct
 	 */
 	copyStruct(op_code, names){
+		var old_is_operation = this.beginOperation();
+		var res = "";
 		if (op_code.item instanceof BayrellLang.OpCodes.OpCopyStruct){
 			names.push(op_code.name);
 			var name = "$"+Runtime.rtl.toString(Runtime.rs.implode("->", names));
-			return Runtime.rtl.toString(name)+"->copy( new Map([ "+Runtime.rtl.toString(this.convertString(op_code.item.name))+" => "+Runtime.rtl.toString(this.copyStruct(op_code.item, names))+" ])  )";
+			res = Runtime.rtl.toString(name)+"->copy( new Map([ "+Runtime.rtl.toString(this.convertString(op_code.item.name))+" => "+Runtime.rtl.toString(this.copyStruct(op_code.item, names))+" ])  )";
 		}
-		return this.translateItem(op_code.item);
+		else {
+			res = this.translateRun(op_code.item);
+		}
+		this.endOperation(old_is_operation);
+		return res;
 	}
 	/**
 	 * Copy struct
@@ -433,6 +474,23 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 			return this.copyStruct(op_code, (new Runtime.Vector()));
 		}
 		return "$"+Runtime.rtl.toString(op_code.name)+" = "+Runtime.rtl.toString(this.copyStruct(op_code, (new Runtime.Vector())))+";";
+	}
+	/**
+	 * Pipe
+	 */
+	OpPipe(op_code){
+		var res = "";
+		res = "RuntimeMaybe::of("+Runtime.rtl.toString(this.translateItem(op_code.value))+")";
+		if (op_code.items != null){
+			for (var i = 0; i < op_code.items.count(); i++){
+				var op_item = op_code.items.item(i);
+				res += this.s("->map("+Runtime.rtl.toString(this.translateItem(op_item))+")");
+			}
+		}
+		if (op_code.is_return_value){
+			res += this.s("->value()");
+		}
+		return res;
 	}
 	/** ========================== Vector and Map ========================= */
 	/**
@@ -476,6 +534,20 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 		}
 		else if (op_code.value instanceof BayrellLang.OpCodes.OpStatic){
 			var name = op_code.value.name;
+			if (op_code.value.value instanceof BayrellLang.OpCodes.OpIdentifier){
+				if (op_code.value.value.value == "self"){
+					return "(new \\Runtime\\Callback("+"self::class, "+Runtime.rtl.toString(this.convertString(name))+"))";
+				}
+				else if (op_code.value.value.value == "static"){
+					return "(new \\Runtime\\Callback("+"static::class, "+Runtime.rtl.toString(this.convertString(name))+"))";
+				}
+				else if (op_code.value.value.value == "parent"){
+					return this.translateRun(op_code.value);
+				}
+				else if (!this.modules.has(op_code.value.value.value)){
+					return "(new \\Runtime\\Callback("+"$"+Runtime.rtl.toString(op_code.value.value.value)+"->getClassName(), "+Runtime.rtl.toString(this.convertString(name))+"))";
+				}
+			}
 			var obj = this.translateRun(op_code.value.value);
 			return "new \\Runtime\\Callback("+Runtime.rtl.toString(obj)+"::class, "+Runtime.rtl.toString(this.convertString(name))+")";
 		}
@@ -531,7 +603,7 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 			ch_var = "";
 		}
 		var var_prefix = "";
-		if (this.is_struct && op_code.isFlag("public") && !op_code.isFlag("static")){
+		if (this.is_struct && op_code.isFlag("public") && !op_code.isFlag("static") && !op_code.isFlag("const")){
 			var_prefix = "__";
 		}
 		if (op_code.value == null || !output_value && !op_code.isFlag("static") && !op_code.isFlag("const")){
@@ -654,14 +726,26 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 	OpReturn(op_code){
 		var old_is_operation = this.beginOperation();
 		/* result */
-		var s = "return ";
+		if (this.current_function_is_memorize){
+			var s = "$__memorize_value = ";
+		}
+		else {
+			var s = "return ";
+		}
 		this.current_opcode_level = 0;
 		this.levelInc();
 		s += this.s(this.translateRun(op_code.value));
 		this.levelDec();
 		s += this.s(";");
 		this.endOperation(old_is_operation);
-		return s;
+		if (this.current_function_is_memorize){
+			s += this.s("rtl::_memorizeSave("+Runtime.rtl.toString(this.convertString(this.getCurrentFunctionName()))+", func_get_args(), $__memorize_value);");
+			s += this.s("return $__memorize_value;");
+			return s;
+		}
+		else {
+			return s;
+		}
 	}
 	/**
 	 * Throw
@@ -753,12 +837,16 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 			res += this.s("use Runtime\\rtl;");
 			res += this.s("use Runtime\\Map;");
 			res += this.s("use Runtime\\Vector;");
+			res += this.s("use Runtime\\Dict;");
+			res += this.s("use Runtime\\Collection;");
 			res += this.s("use Runtime\\IntrospectionInfo;");
 			res += this.s("use Runtime\\UIStruct;");
 			this.modules.set("rs", "Runtime.rs");
 			this.modules.set("rtl", "Runtime.rtl");
 			this.modules.set("Map", "Runtime.Map");
+			this.modules.set("Dict", "Runtime.Dict");
 			this.modules.set("Vector", "Runtime.Vector");
+			this.modules.set("Collection", "Runtime.Collection");
 			this.modules.set("IntrospectionInfo", "Runtime.IntrospectionInfo");
 			this.modules.set("UIStruct", "Runtime.UIStruct");
 		}
@@ -808,6 +896,11 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 			if (this.current_function_name.count() == 0){
 				this.current_function_is_static = false;
 			}
+		}
+		var old_current_function_is_memorize = this.current_function_is_memorize;
+		this.current_function_is_memorize = false;
+		if (op_code.isFlag("memorize") && op_code.isFlag("static") && !op_code.isFlag("async") && this.current_function_name.count() == 0){
+			this.current_function_is_memorize = true;
 		}
 		if (op_code.name == "constructor"){
 			res += "__construct";
@@ -872,13 +965,24 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 			this.setOperation(false);
 			this.pushOneLine(false);
 			this.levelInc();
+			if (this.current_function_is_memorize){
+				res += this.s("$__memorize_value = rtl::_memorizeValue("+Runtime.rtl.toString(this.convertString(this.getCurrentFunctionName()))+", func_get_args());");
+				res += this.s("if ($__memorize_value != rtl::$_memorize_not_found) return $__memorize_value;");
+			}
 			if (op_code.childs != null){
 				if (op_code.is_lambda){
 					if (op_code.childs.count() > 0){
 						var old_is_operation = this.beginOperation(true);
 						var lambda_res = this.translateRun(op_code.childs.item(0));
 						this.endOperation(old_is_operation);
-						res += this.s("return "+Runtime.rtl.toString(lambda_res)+";");
+						if (this.current_function_is_memorize){
+							res += this.s("$__memorize_value = "+Runtime.rtl.toString(lambda_res)+";");
+							res += this.s("rtl::_memorizeSave("+Runtime.rtl.toString(this.convertString(this.getCurrentFunctionName()))+", func_get_args(), $__memorize_value);");
+							res += this.s("return $__memorize_value;");
+						}
+						else {
+							res += this.s("return "+Runtime.rtl.toString(lambda_res)+";");
+						}
 					}
 				}
 				else {
@@ -895,6 +999,7 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 			this.popOneLine();
 		}
 		this.current_function_name.pop();
+		this.current_function_is_memorize = old_current_function_is_memorize;
 		return res;
 	}
 	/**
@@ -1051,6 +1156,7 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 		res += this.s("/* ======================= Class Init Functions ======================= */");
 		if (!this.is_interface){
 			res += this.s("public function getClassName(){"+"return "+Runtime.rtl.toString(this.convertString(Runtime.rtl.toString(this.current_namespace)+"."+Runtime.rtl.toString(this.current_class_name)))+";}");
+			res += this.s("public static function getCurrentClassName(){"+"return "+Runtime.rtl.toString(this.convertString(Runtime.rtl.toString(this.current_namespace)+"."+Runtime.rtl.toString(this.current_class_name)))+";}");
 			res += this.s("public static function getParentClassName(){"+"return "+Runtime.rtl.toString(this.convertString(class_extends))+";}");
 		}
 		if (this.is_struct){
@@ -1097,6 +1203,9 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 						if (!(variable instanceof BayrellLang.OpCodes.OpAssignDeclare)){
 							continue;
 						}
+						if (variable.value == null){
+							continue;
+						}
 						var var_prefix = "";
 						if (this.is_struct && variable.isFlag("public") && !variable.isFlag("static")){
 							var_prefix = "__";
@@ -1130,7 +1239,12 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 					}
 					var is_struct = this.is_struct && !variable.isFlag("static") && !variable.isFlag("const");
 					if (variable.isFlag("public") && (variable.isFlag("cloneable") || variable.isFlag("serializable") || is_struct)){
-						res += this.s("$this->"+Runtime.rtl.toString(var_prefix)+Runtime.rtl.toString(variable.name)+" = "+Runtime.rtl.toString(this.getName("rtl"))+"::_clone("+"$obj->"+Runtime.rtl.toString(var_prefix)+Runtime.rtl.toString(variable.name)+");");
+						if (this.is_struct){
+							res += this.s("$this->"+Runtime.rtl.toString(var_prefix)+Runtime.rtl.toString(variable.name)+" = "+"$obj->"+Runtime.rtl.toString(var_prefix)+Runtime.rtl.toString(variable.name)+";");
+						}
+						else {
+							res += this.s("$this->"+Runtime.rtl.toString(var_prefix)+Runtime.rtl.toString(variable.name)+" = "+Runtime.rtl.toString(this.getName("rtl"))+"::_clone("+"$obj->"+Runtime.rtl.toString(var_prefix)+Runtime.rtl.toString(variable.name)+");");
+						}
 					}
 				}
 				this.levelDec();
@@ -1164,7 +1278,7 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 						}
 						var s = "if ($variable_name == "+Runtime.rtl.toString(this.convertString(variable.name))+")";
 						s += "$this->"+Runtime.rtl.toString(var_prefix)+Runtime.rtl.toString(variable.name)+" = ";
-						s += "rtl::correct($value,\""+Runtime.rtl.toString(type_value)+"\","+Runtime.rtl.toString(def_val)+",\""+Runtime.rtl.toString(type_template)+"\");";
+						s += "rtl::convert($value,\""+Runtime.rtl.toString(type_value)+"\","+Runtime.rtl.toString(def_val)+",\""+Runtime.rtl.toString(type_template)+"\");";
 						if (class_variables_serializable_count == 0){
 							res += this.s(s);
 						}
@@ -1398,6 +1512,7 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 		/* Set current class name */
 		this.current_class_name = op_code.class_name;
 		this.modules.set(this.current_class_name, Runtime.rtl.toString(this.current_namespace)+"."+Runtime.rtl.toString(this.current_class_name));
+		this.ui_struct_class_name.push(Runtime.rtl.toString(this.current_namespace)+"."+Runtime.rtl.toString(this.current_class_name));
 		/*this.is_interface = false;*/
 		/* Skip if declare class */
 		if (op_code.isFlag("declare")){
@@ -1433,6 +1548,7 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 		/* Footer class */
 		this.levelDec();
 		res += this.s("}");
+		this.ui_struct_class_name.pop();
 		return res;
 	}
 	/**
@@ -1464,17 +1580,23 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 		return Runtime.rs.strtoupper(ch) == ch && ch != "";
 	}
 	/**
+	 * Html escape
+	 */
+	OpHtmlEscape(op_code){
+		var value = this.translateRun(op_code.value);
+		return "rs::htmlEscape("+Runtime.rtl.toString(value)+")";
+	}
+	/**
 	 * OpHtmlJson
 	 */
 	OpHtmlJson(op_code){
-		var value = "rs::json_encode("+Runtime.rtl.toString(this.translateRun(op_code.value))+")";
+		return "rtl::json_encode("+Runtime.rtl.toString(this.translateRun(op_code.value))+")";
 		var res = "";
-		res = "new UIStruct(";
-		res += this.s("(new "+Runtime.rtl.toString(this.getName("Map"))+"())");
-		res += this.s("->set(\"name\", \"span\")");
-		res += this.s("->set(\"props\", (new "+Runtime.rtl.toString(this.getName("Map"))+"())");
-		res += this.s("->set("+Runtime.rtl.toString(this.convertString("dangerouslySetInnerHTML"))+", "+Runtime.rtl.toString(value)+")");
-		res += this.s(")");
+		res = "new UIStruct(new "+Runtime.rtl.toString(this.getName("Map"))+"([";
+		res += this.s("\"name\"=>\"span\",");
+		res += this.s("\"props\"=>new "+Runtime.rtl.toString(this.getName("Map"))+"(");
+		res += this.s("\"rawHTML\"=>"+Runtime.rtl.toString(value));
+		res += this.s("])]))");
 		return res;
 	}
 	/**
@@ -1482,14 +1604,29 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 	 */
 	OpHtmlRaw(op_code){
 		var value = this.translateRun(op_code.value);
+		return this.translateRun(op_code.value);
 		var res = "";
-		res = "new UIStruct(";
-		res += this.s("(new "+Runtime.rtl.toString(this.getName("Map"))+"())");
-		res += this.s("->set(\"name\", \"span\")");
-		res += this.s("->set(\"props\", (new "+Runtime.rtl.toString(this.getName("Map"))+"())");
-		res += this.s("->set("+Runtime.rtl.toString(this.convertString("dangerouslySetInnerHTML"))+", "+Runtime.rtl.toString(value)+")");
-		res += this.s(")");
+		res = "new UIStruct(new "+Runtime.rtl.toString(this.getName("Map"))+"([";
+		res += this.s("\"name\"=>\"span\",");
+		res += this.s("\"props\"=>new "+Runtime.rtl.toString(this.getName("Map"))+"(");
+		res += this.s("\"rawHTML\"=>"+Runtime.rtl.toString(value));
+		res += this.s("])]))");
 		return res;
+	}
+	/**
+	 * Html Text
+	 */
+	OpHtmlText(op_code){
+		return this.convertString(op_code.value);
+	}
+	/**
+	 * Returns true if key is props
+	 */
+	isOpHtmlTagProps(key){
+		if (key == "@key" || key == "@control"){
+			return false;
+		}
+		return true;
 	}
 	/**
 	 * Html tag
@@ -1498,67 +1635,85 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 		var is_component = false;
 		var res = "";
 		this.pushOneLine(false);
-		this.levelInc();
 		/* isComponent */
 		if (this.modules.has(op_code.tag_name)){
-			res = "new UIStruct(";
-			res += this.s("(new "+Runtime.rtl.toString(this.getName("Map"))+"())");
-			res += this.s("->set(\"kind\", \"component\")");
-			res += this.s("->set(\"name\", "+Runtime.rtl.toString(this.convertString(this.modules.item(op_code.tag_name)))+")");
+			res = "new UIStruct(new "+Runtime.rtl.toString(this.getName("Map"))+"([";
+			res += this.s("\"kind\"=>\"component\",");
+			res += this.s("\"name\"=>"+Runtime.rtl.toString(this.convertString(this.modules.item(op_code.tag_name)))+",");
 			is_component = true;
 		}
 		else {
-			res = "new UIStruct(";
-			res += this.s("(new "+Runtime.rtl.toString(this.getName("Map"))+"())");
-			res += this.s("->set(\"name\", "+Runtime.rtl.toString(this.convertString(op_code.tag_name))+")");
+			res = "new UIStruct(new "+Runtime.rtl.toString(this.getName("Map"))+"([";
+			res += this.s("\"space\"=>"+Runtime.rtl.toString(this.convertString(Runtime.RuntimeUtils.getCssHash(this.getUIStructClassName())))+",");
+			res += this.s("\"class_name\"=>static::getCurrentClassName(),");
+			res += this.s("\"name\"=>"+Runtime.rtl.toString(this.convertString(op_code.tag_name))+",");
 		}
-		var raw_item = null;
-		if (!op_code.is_plain && op_code.childs != null && op_code.childs.count() == 1){
-			var item = op_code.childs.item(0);
-			if (item instanceof BayrellLang.OpCodes.OpHtmlJson){
-				raw_item = item;
-			}
-			else if (item instanceof BayrellLang.OpCodes.OpHtmlRaw){
-				raw_item = item;
-			}
-		}
-		if (is_component){
-			res += this.s("->set(\"props\", $this->getElementAttrs()");
-		}
-		else {
-			res += this.s("->set(\"props\", (new "+Runtime.rtl.toString(this.getName("Map"))+"())");
-		}
+		var is_props = false;
+		var is_spreads = op_code.spreads != null && op_code.spreads.count() > 0;
 		if (op_code.attributes != null && op_code.attributes.count() > 0){
 			op_code.attributes.each((item) => {
-				this.pushOneLine(true);
-				var value = this.translateRun(item.value);
-				this.popOneLine();
-				res += this.s("->set("+Runtime.rtl.toString(this.convertString(item.key))+", "+Runtime.rtl.toString(value)+")");
+				var key = item.key;
+				if (this.isOpHtmlTagProps(key)){
+					is_props = true;
+				}
+				else if (key == "@key"){
+					var value = this.translateRun(item.value);
+					res += this.s("\"key\"=>"+Runtime.rtl.toString(value)+",");
+				}
+				else if (key == "@control"){
+					var value = this.translateRun(item.value);
+					res += this.s("\"controller\"=>"+Runtime.rtl.toString(value)+",");
+				}
 			});
 		}
-		if (op_code.spreads != null && op_code.spreads.count() > 0){
-			op_code.spreads.each((item) => {
-				res += this.s("->addMap($"+Runtime.rtl.toString(item)+")");
-			});
+		if (is_props || is_spreads){
+			res += this.s("\"props\"=>(new "+Runtime.rtl.toString(this.getName("Map"))+"())");
+			this.levelInc();
+			if (is_props){
+				op_code.attributes.each((item) => {
+					if (this.isOpHtmlTagProps(item.key)){
+						var old_operation = this.beginOperation(true);
+						this.pushOneLine(true);
+						var key = item.key;
+						var value = this.translateRun(item.value);
+						if (key == "@lambda"){
+							key = "callback";
+						}
+						this.popOneLine();
+						this.endOperation(old_operation);
+						res += this.s("->set("+Runtime.rtl.toString(this.convertString(key))+", "+Runtime.rtl.toString(value)+")");
+					}
+				});
+			}
+			if (is_spreads){
+				op_code.spreads.each((item) => {
+					res += this.s("->addMap($"+Runtime.rtl.toString(item)+")");
+				});
+			}
+			this.levelDec();
+			res += this.s(",");
 		}
 		if (op_code.is_plain){
 			if (op_code.childs != null){
 				var value = op_code.childs.reduce((res, item) => {
 					var value = "";
 					if (item instanceof BayrellLang.OpCodes.OpHtmlJson){
-						value = "rs::json_encode("+Runtime.rtl.toString(this.translateRun(item.value))+")";
+						value = "rtl::json_encode("+Runtime.rtl.toString(this.translateRun(item.value))+")";
 						value = "rtl::toString("+Runtime.rtl.toString(value)+")";
 					}
 					else if (item instanceof BayrellLang.OpCodes.OpHtmlRaw){
 						value = this.translateRun(item.value);
 						value = "rtl::toString("+Runtime.rtl.toString(value)+")";
 					}
-					else if (item instanceof BayrellLang.OpCodes.OpConcat || item instanceof BayrellLang.OpCodes.OpString || item instanceof BayrellLang.OpCodes.OpHtmlText){
+					else if (item instanceof BayrellLang.OpCodes.OpConcat || item instanceof BayrellLang.OpCodes.OpString){
 						value = this.translateRun(item);
 					}
 					else if (item instanceof BayrellLang.OpCodes.OpHtmlEscape){
 						value = this.translateRun(item);
 						value = "rs::htmlEscape("+Runtime.rtl.toString(value)+")";
+					}
+					else if (item instanceof BayrellLang.OpCodes.OpHtmlText){
+						value = this.convertString(item.value);
 					}
 					else {
 						value = this.translateRun(item);
@@ -1569,48 +1724,55 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 					}
 					return Runtime.rtl.toString(res)+"."+Runtime.rtl.toString(value);
 				}, "");
-				res += this.s("->set("+Runtime.rtl.toString(this.convertString("dangerouslySetInnerHTML"))+", "+Runtime.rtl.toString(value)+")");
+				var old_operation = this.beginOperation(true);
+				this.pushOneLine(true);
+				res += this.s("\"children\" => new "+Runtime.rtl.toString(this.getName("Vector"))+"([");
+				this.levelInc();
+				res += this.s("rtl::normalizeUI("+Runtime.rtl.toString(value)+")");
+				this.levelDec();
+				res += this.s("])");
+				this.popOneLine();
+				this.endOperation(old_operation);
 			}
 		}
-		else if (raw_item != null){
-			if (raw_item instanceof BayrellLang.OpCodes.OpHtmlJson){
-				var value = "rs::json_encode("+Runtime.rtl.toString(this.translateRun(raw_item.value))+")";
-				res += this.s("->set("+Runtime.rtl.toString(this.convertString("dangerouslySetInnerHTML"))+", "+Runtime.rtl.toString(value)+")");
-			}
-			else if (raw_item instanceof BayrellLang.OpCodes.OpHtmlRaw){
-				var value = this.translateRun(raw_item.value);
-				res += this.s("->set("+Runtime.rtl.toString(this.convertString("dangerouslySetInnerHTML"))+", "+Runtime.rtl.toString(value)+")");
-			}
-		}
-		res += this.s(")");
-		/* Childs */
-		if (raw_item == null && !op_code.is_plain){
+		else {
 			if (op_code.childs != null && op_code.childs.count() > 0){
-				res += this.s("->set(\"children\", (new "+Runtime.rtl.toString(this.getName("Vector"))+"())");
-				op_code.childs.each((item) => {
+				res += this.s("\"children\" => rtl::normalizeUIVector(new "+Runtime.rtl.toString(this.getName("Vector"))+"([");
+				this.levelInc();
+				var childs_sz = op_code.childs.count();
+				for (var i = 0; i < childs_sz; i++){
+					var item = op_code.childs.item(i);
 					if (item instanceof BayrellLang.OpCodes.OpComment){
-						return ;
+						continue;
 					}
-					res += this.s("->push("+Runtime.rtl.toString(this.translateRun(item))+")");
-				});
-				res += this.s(")");
+					res += this.s(Runtime.rtl.toString(this.translateRun(item))+Runtime.rtl.toString((i + 1 == childs_sz) ? ("") : (",")));
+				}
+				this.levelDec();
+				res += this.s("]))");
 			}
 		}
-		this.levelDec();
-		res += this.s(")");
+		res += this.s("]))");
 		this.popOneLine();
+		if (is_component){
+		}
 		return res;
 	}
 	/**
 	 * Html tag
 	 */
 	OpHtmlView(op_code){
+		var res = "rtl::normalizeUIVector(new Vector([";
 		this.pushOneLine(false);
-		var res = "(new Vector())";
-		op_code.childs.each((item) => {
-			res += this.s("->push("+Runtime.rtl.toString(this.translateRun(item))+")");
-		});
+		var childs_sz = op_code.childs.count();
+		for (var i = 0; i < childs_sz; i++){
+			if (item instanceof BayrellLang.OpCodes.OpComment){
+				continue;
+			}
+			var item = op_code.childs.item(i);
+			res += this.s(Runtime.rtl.toString(this.translateRun(item))+Runtime.rtl.toString((i + 1 == childs_sz) ? ("") : (",")));
+		}
 		this.popOneLine();
+		res += this.s("]))");
 		return res;
 	}
 	/** =========================== Preprocessor ========================== */
@@ -1644,6 +1806,7 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 	resetTranslator(){
 		super.resetTranslator();
 		this.current_function_name = new Runtime.Vector();
+		this.ui_struct_class_name = new Runtime.Vector();
 	}
 	/**
 	 * Translate to language
@@ -1658,14 +1821,17 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.LangPHP.TranslatorPHP";}
+	static getCurrentClassName(){return "BayrellLang.LangPHP.TranslatorPHP";}
 	static getParentClassName(){return "BayrellLang.CommonTranslator";}
 	_init(){
 		super._init();
+		this.ui_struct_class_name = null;
 		this.modules = null;
 		this.current_namespace = "";
 		this.current_class_name = "";
 		this.current_function_name = null;
 		this.current_function_is_static = false;
+		this.current_function_is_memorize = false;
 		this.current_module_name = "";
 		this.is_static = false;
 		this.is_interface = false;

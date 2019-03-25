@@ -31,5 +31,6 @@ BayrellLang.Exceptions.EndOfStringExpected = class extends BayrellParser.Excepti
 	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.Exceptions.EndOfStringExpected";}
+	static getCurrentClassName(){return "BayrellLang.Exceptions.EndOfStringExpected";}
 	static getParentClassName(){return "BayrellParser.Exceptions.ParserError";}
 }

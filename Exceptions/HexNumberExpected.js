@@ -31,5 +31,6 @@ BayrellLang.Exceptions.HexNumberExpected = class extends BayrellParser.Exception
 	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.Exceptions.HexNumberExpected";}
+	static getCurrentClassName(){return "BayrellLang.Exceptions.HexNumberExpected";}
 	static getParentClassName(){return "BayrellParser.Exceptions.ParserError";}
 }

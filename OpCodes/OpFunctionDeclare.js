@@ -53,6 +53,7 @@ BayrellLang.OpCodes.OpFunctionDeclare = class extends BayrellLang.OpCodes.BaseOp
 	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.OpCodes.OpFunctionDeclare";}
+	static getCurrentClassName(){return "BayrellLang.OpCodes.OpFunctionDeclare";}
 	static getParentClassName(){return "BayrellLang.OpCodes.BaseOpCode";}
 	_init(){
 		super._init();
@@ -83,16 +84,16 @@ BayrellLang.OpCodes.OpFunctionDeclare = class extends BayrellLang.OpCodes.BaseOp
 		super.assignObject(obj);
 	}
 	assignValue(variable_name, value, sender){if(sender==undefined)sender=null;
-		if (variable_name == "op")this.op = Runtime.rtl.correct(value,"string","op_function","");
-		else if (variable_name == "name")this.name = Runtime.rtl.correct(value,"string","","");
-		else if (variable_name == "is_lambda")this.is_lambda = Runtime.rtl.correct(value,"bool",false,"");
-		else if (variable_name == "result_type")this.result_type = Runtime.rtl.correct(value,"BayrellLang.OpCodes.BaseOpCode",null,"");
-		else if (variable_name == "args")this.args = Runtime.rtl.correct(value,"Runtime.Vector",null,"OpAssignDeclare");
-		else if (variable_name == "childs")this.childs = Runtime.rtl.correct(value,"Runtime.Vector",null,"BayrellLang.OpCodes.BaseOpCode");
-		else if (variable_name == "use_variables")this.use_variables = Runtime.rtl.correct(value,"Runtime.Vector",null,"string");
-		else if (variable_name == "flags")this.flags = Runtime.rtl.correct(value,"BayrellLang.OpCodes.OpFlags",null,"");
-		else if (variable_name == "annotations")this.annotations = Runtime.rtl.correct(value,"Runtime.Vector",null,"BayrellLang.OpCodes.OpAnnotation");
-		else if (variable_name == "return_function")this.return_function = Runtime.rtl.correct(value,"BayrellLang.OpCodes.OpFunctionDeclare",null,"");
+		if (variable_name == "op")this.op = Runtime.rtl.convert(value,"string","op_function","");
+		else if (variable_name == "name")this.name = Runtime.rtl.convert(value,"string","","");
+		else if (variable_name == "is_lambda")this.is_lambda = Runtime.rtl.convert(value,"bool",false,"");
+		else if (variable_name == "result_type")this.result_type = Runtime.rtl.convert(value,"BayrellLang.OpCodes.BaseOpCode",null,"");
+		else if (variable_name == "args")this.args = Runtime.rtl.convert(value,"Runtime.Vector",null,"OpAssignDeclare");
+		else if (variable_name == "childs")this.childs = Runtime.rtl.convert(value,"Runtime.Vector",null,"BayrellLang.OpCodes.BaseOpCode");
+		else if (variable_name == "use_variables")this.use_variables = Runtime.rtl.convert(value,"Runtime.Vector",null,"string");
+		else if (variable_name == "flags")this.flags = Runtime.rtl.convert(value,"BayrellLang.OpCodes.OpFlags",null,"");
+		else if (variable_name == "annotations")this.annotations = Runtime.rtl.convert(value,"Runtime.Vector",null,"BayrellLang.OpCodes.OpAnnotation");
+		else if (variable_name == "return_function")this.return_function = Runtime.rtl.convert(value,"BayrellLang.OpCodes.OpFunctionDeclare",null,"");
 		else super.assignValue(variable_name, value, sender);
 	}
 	takeValue(variable_name, default_value){
