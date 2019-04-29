@@ -106,12 +106,24 @@ BayrellLang.LangBay.HtmlToken = class extends BayrellParser.ParserToken{
 	static getParentClassName(){return "BayrellParser.ParserToken";}
 	_init(){
 		super._init();
+		var names = Object.getOwnPropertyNames(this);
 		this.TOKEN_NONE = "none";
 		this.TOKEN_BASE = "base";
 		this.TOKEN_HTML = "html";
 		this.TOKEN_STRING = "string";
 		this.TOKEN_COMMENT = "comment";
 		this._special_tokens = null;
+	}
+	static getFieldsList(names, flag){
+		if (flag==undefined)flag=0;
+	}
+	static getFieldInfoByName(field_name){
+		return null;
+	}
+	static getMethodsList(names){
+	}
+	static getMethodInfoByName(method_name){
+		return null;
 	}
 }
 BayrellLang.LangBay.HtmlToken.TOKEN_NONE = "none";

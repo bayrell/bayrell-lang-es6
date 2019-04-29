@@ -25,14 +25,15 @@ BayrellLang.OpCodes.OpPipe = class extends BayrellLang.OpCodes.BaseOpCode{
 	static getParentClassName(){return "BayrellLang.OpCodes.BaseOpCode";}
 	_init(){
 		super._init();
+		var names = Object.getOwnPropertyNames(this);
 		this.__op = "op_pipe";
-		Object.defineProperty(this, "op", { get: function() { return this.__op; }, set: function(value) { throw new Runtime.Exceptions.AssignStructValueError("op") }});
+		if (names.indexOf("op") == -1)Object.defineProperty(this, "op", { get: function() { return this.__op; }, set: function(value) { throw new Runtime.Exceptions.AssignStructValueError("op") }});
 		this.__value = null;
-		Object.defineProperty(this, "value", { get: function() { return this.__value; }, set: function(value) { throw new Runtime.Exceptions.AssignStructValueError("value") }});
+		if (names.indexOf("value") == -1)Object.defineProperty(this, "value", { get: function() { return this.__value; }, set: function(value) { throw new Runtime.Exceptions.AssignStructValueError("value") }});
 		this.__items = null;
-		Object.defineProperty(this, "items", { get: function() { return this.__items; }, set: function(value) { throw new Runtime.Exceptions.AssignStructValueError("items") }});
+		if (names.indexOf("items") == -1)Object.defineProperty(this, "items", { get: function() { return this.__items; }, set: function(value) { throw new Runtime.Exceptions.AssignStructValueError("items") }});
 		this.__is_return_value = false;
-		Object.defineProperty(this, "is_return_value", { get: function() { return this.__is_return_value; }, set: function(value) { throw new Runtime.Exceptions.AssignStructValueError("is_return_value") }});
+		if (names.indexOf("is_return_value") == -1)Object.defineProperty(this, "is_return_value", { get: function() { return this.__is_return_value; }, set: function(value) { throw new Runtime.Exceptions.AssignStructValueError("is_return_value") }});
 	}
 	assignObject(obj){
 		if (obj instanceof BayrellLang.OpCodes.OpPipe){
@@ -68,6 +69,11 @@ BayrellLang.OpCodes.OpPipe = class extends BayrellLang.OpCodes.BaseOpCode{
 		}
 	}
 	static getFieldInfoByName(field_name){
+		return null;
+	}
+	static getMethodsList(names){
+	}
+	static getMethodInfoByName(method_name){
 		return null;
 	}
 }

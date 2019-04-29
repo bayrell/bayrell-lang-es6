@@ -31,6 +31,17 @@ BayrellLang.LangBay.ParserBayNameToken = class extends BayrellParser.ParserToken
 	getClassName(){return "BayrellLang.LangBay.ParserBayNameToken";}
 	static getCurrentClassName(){return "BayrellLang.LangBay.ParserBayNameToken";}
 	static getParentClassName(){return "BayrellParser.ParserToken";}
+	static getFieldsList(names, flag){
+		if (flag==undefined)flag=0;
+	}
+	static getFieldInfoByName(field_name){
+		return null;
+	}
+	static getMethodsList(names){
+	}
+	static getMethodInfoByName(method_name){
+		return null;
+	}
 }
 BayrellLang.LangBay.ParserBayNameToken.TOKEN_NONE = "none";
 BayrellLang.LangBay.ParserBayNameToken.TOKEN_BASE = "base";

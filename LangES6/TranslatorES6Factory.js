@@ -31,8 +31,20 @@ BayrellLang.LangES6.TranslatorES6Factory = class extends Runtime.ContextObject{
 	static getParentClassName(){return "Runtime.ContextObject";}
 	_init(){
 		super._init();
+		var names = Object.getOwnPropertyNames(this);
 		if (this.__implements__ == undefined){this.__implements__ = [];}
 		this.__implements__.push(Runtime.Interfaces.FactoryInterface);
+	}
+	static getFieldsList(names, flag){
+		if (flag==undefined)flag=0;
+	}
+	static getFieldInfoByName(field_name){
+		return null;
+	}
+	static getMethodsList(names){
+	}
+	static getMethodInfoByName(method_name){
+		return null;
 	}
 }
 BayrellLang.LangES6.TranslatorES6Factory.__static_implements__ = [];

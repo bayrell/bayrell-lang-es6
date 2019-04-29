@@ -843,11 +843,23 @@ BayrellLang.LangBay.TranslatorBay = class extends BayrellLang.CoreTranslator{
 	static getParentClassName(){return "BayrellLang.CoreTranslator";}
 	_init(){
 		super._init();
+		var names = Object.getOwnPropertyNames(this);
 		this.is_interface = false;
 		this.is_struct = false;
 		this.struct_read_only = false;
 		this.current_function_name = null;
 		this.current_class_name = "";
 		this.current_namespace = "";
+	}
+	static getFieldsList(names, flag){
+		if (flag==undefined)flag=0;
+	}
+	static getFieldInfoByName(field_name){
+		return null;
+	}
+	static getMethodsList(names){
+	}
+	static getMethodInfoByName(method_name){
+		return null;
 	}
 }

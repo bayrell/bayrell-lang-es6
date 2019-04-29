@@ -25,6 +25,7 @@ BayrellLang.OpCodes.OpPreDec = class extends BayrellLang.OpCodes.OpValue1{
 	static getParentClassName(){return "BayrellLang.OpCodes.OpValue1";}
 	_init(){
 		super._init();
+		var names = Object.getOwnPropertyNames(this);
 		this.op = "op_pre_dec";
 	}
 	assignObject(obj){
@@ -49,6 +50,11 @@ BayrellLang.OpCodes.OpPreDec = class extends BayrellLang.OpCodes.OpValue1{
 		}
 	}
 	static getFieldInfoByName(field_name){
+		return null;
+	}
+	static getMethodsList(names){
+	}
+	static getMethodInfoByName(method_name){
 		return null;
 	}
 }

@@ -33,4 +33,15 @@ BayrellLang.Exceptions.TwiceDeclareElseError = class extends BayrellParser.Excep
 	getClassName(){return "BayrellLang.Exceptions.TwiceDeclareElseError";}
 	static getCurrentClassName(){return "BayrellLang.Exceptions.TwiceDeclareElseError";}
 	static getParentClassName(){return "BayrellParser.Exceptions.ParserError";}
+	static getFieldsList(names, flag){
+		if (flag==undefined)flag=0;
+	}
+	static getFieldInfoByName(field_name){
+		return null;
+	}
+	static getMethodsList(names){
+	}
+	static getMethodInfoByName(method_name){
+		return null;
+	}
 }

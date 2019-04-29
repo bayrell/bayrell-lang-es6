@@ -81,8 +81,20 @@ BayrellLang.OpCodes.OpTemplateIdentifier = class extends BayrellLang.OpCodes.Bas
 	static getParentClassName(){return "BayrellLang.OpCodes.BaseOpCode";}
 	_init(){
 		super._init();
+		var names = Object.getOwnPropertyNames(this);
 		this.op = "op_template_identifier";
 		this.t = null;
 		this.childs = null;
+	}
+	static getFieldsList(names, flag){
+		if (flag==undefined)flag=0;
+	}
+	static getFieldInfoByName(field_name){
+		return null;
+	}
+	static getMethodsList(names){
+	}
+	static getMethodInfoByName(method_name){
+		return null;
 	}
 }

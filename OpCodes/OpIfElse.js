@@ -41,6 +41,7 @@ BayrellLang.OpCodes.OpIfElse = class extends BayrellLang.OpCodes.BaseOpCode{
 	static getParentClassName(){return "BayrellLang.OpCodes.BaseOpCode";}
 	_init(){
 		super._init();
+		var names = Object.getOwnPropertyNames(this);
 		this.op = "op_if_else";
 		this.condition = null;
 		this.if_true = null;
@@ -75,6 +76,11 @@ BayrellLang.OpCodes.OpIfElse = class extends BayrellLang.OpCodes.BaseOpCode{
 		}
 	}
 	static getFieldInfoByName(field_name){
+		return null;
+	}
+	static getMethodsList(names){
+	}
+	static getMethodInfoByName(method_name){
 		return null;
 	}
 }

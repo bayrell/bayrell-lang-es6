@@ -1141,7 +1141,7 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 			this.matchNextToken("pure");
 		}
 		var res = null;
-		res = this.readDeclareFunction(false, false, is_lambda);
+		res = this.readDeclareFunction(false, false);
 		if (res != null){
 			this.popToken();
 			return res;
@@ -1701,13 +1701,12 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 	 * Read declare class function
 	 * @return BaseOpCode
 	 */
-	readDeclareFunction(read_name, is_declare_function, is_lambda){
+	readDeclareFunction(read_name, is_declare_function){
 		if (read_name == undefined) read_name=true;
 		if (is_declare_function == undefined) is_declare_function=false;
-		if (is_lambda == undefined) is_lambda=false;
 		var res = new BayrellLang.OpCodes.OpFunctionDeclare();
+		res.is_lambda = false;
 		this.pushToken();
-		res.is_lambda = is_lambda;
 		try{
 			res.result_type = this.readTemplateIdentifier();
 		}catch(_the_exception){
@@ -1752,59 +1751,50 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 			this.matchNextToken(")");
 		}
 		if (this.findNextToken("=>")){
+			res.is_lambda = true;
 			this.matchNextToken("=>");
 			if (this.findNextToken("return")){
 				this.matchNextToken("return");
 			}
 			this.popToken();
-			if (is_lambda){
-				this.pushToken();
-				try{
-					var flags = null;
-					flags = this.readFlags();
-					res.return_function = this.readDeclareFunction(false, is_declare_function, is_lambda);
-					if (res.return_function != null){
-						res.return_function.flags = flags;
-					}
-				}catch(_the_exception){
-					if (_the_exception instanceof BayrellParser.Exceptions.ParserError){
-						var ex = _the_exception;
-						res.return_function = null;
-					}
-					else { throw _the_exception; }
-				}
-				if (res.return_function == null){
-					this.popRollbackToken();
-				}
-				else {
-					this.popToken();
-				}
-				if (res.return_function == null){
-					var op_item;
-					try{
-						op_item = this.readExpression();
-					}catch(_the_exception){
-						if (_the_exception instanceof BayrellParser.Exceptions.ParserError){
-							var ex = _the_exception;
-							op_item = null;
-						}
-						else { throw _the_exception; }
-					}
-					if (op_item != null){
-						res.childs = (new Runtime.Vector()).push(op_item);
-					}
-				}
-				if (res.return_function == null && res.childs == null){
-					this.matchNextToken(";");
-				}
-			}
-			else {
+			this.pushToken();
+			try{
 				var flags = null;
 				flags = this.readFlags();
-				res.return_function = this.readDeclareFunction(false, is_declare_function, is_lambda);
+				res.return_function = this.readDeclareFunction(false, is_declare_function);
 				if (res.return_function != null){
 					res.return_function.flags = flags;
 				}
+			}catch(_the_exception){
+				if (_the_exception instanceof BayrellParser.Exceptions.ParserError){
+					var ex = _the_exception;
+					res.return_function = null;
+				}
+				else { throw _the_exception; }
+			}
+			if (res.return_function == null){
+				this.popRollbackToken();
+			}
+			else {
+				this.popToken();
+			}
+			if (res.return_function == null){
+				var op_item;
+				try{
+					op_item = this.readExpression();
+				}catch(_the_exception){
+					if (_the_exception instanceof BayrellParser.Exceptions.ParserError){
+						var ex = _the_exception;
+						op_item = null;
+					}
+					else { throw _the_exception; }
+				}
+				if (op_item != null){
+					res.childs = (new Runtime.Vector()).push(op_item);
+				}
+			}
+			if (res.return_function == null && res.childs == null){
+				this.matchNextToken(";");
 			}
 			return res;
 		}
@@ -1874,11 +1864,11 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 				is_lambda = true;
 			}
 		}
-		op_code = this.readDeclareFunction(true, is_declare_function, is_lambda);
+		op_code = this.readDeclareFunction(true, is_declare_function);
 		if (op_code && op_code instanceof BayrellLang.OpCodes.OpFunctionDeclare){
 			op_code.annotations = this.annotations;
 			op_code.flags = flags;
-			if (op_code.is_lambda){
+			if (is_lambda){
 				flags.assignValue("static", true);
 			}
 			if (op_code.isFlag("pure")){
@@ -2109,10 +2099,22 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 	static getParentClassName(){return "BayrellLang.CommonParser";}
 	_init(){
 		super._init();
+		var names = Object.getOwnPropertyNames(this);
 		this.current_namespace = "";
 		this.current_class_name = "";
 		this.is_interface = false;
 		this.modules = null;
 		this.annotations = null;
+	}
+	static getFieldsList(names, flag){
+		if (flag==undefined)flag=0;
+	}
+	static getFieldInfoByName(field_name){
+		return null;
+	}
+	static getMethodsList(names){
+	}
+	static getMethodInfoByName(method_name){
+		return null;
 	}
 }

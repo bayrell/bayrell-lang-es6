@@ -108,4 +108,15 @@ BayrellLang.Utils = class extends Runtime.ContextObject{
 	getClassName(){return "BayrellLang.Utils";}
 	static getCurrentClassName(){return "BayrellLang.Utils";}
 	static getParentClassName(){return "Runtime.ContextObject";}
+	static getFieldsList(names, flag){
+		if (flag==undefined)flag=0;
+	}
+	static getFieldInfoByName(field_name){
+		return null;
+	}
+	static getMethodsList(names){
+	}
+	static getMethodInfoByName(method_name){
+		return null;
+	}
 }

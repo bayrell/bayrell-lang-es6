@@ -30,7 +30,7 @@ BayrellLang.ModuleDescription = class{
 	 * @return string
 	 */
 	static getModuleVersion(){
-		return "0.7.1";
+		return "0.7.2";
 	}
 	/**
 	 * Init context
@@ -65,6 +65,17 @@ BayrellLang.ModuleDescription = class{
 	_init(){
 		if (this.__implements__ == undefined){this.__implements__ = [];}
 		this.__implements__.push(Runtime.Interfaces.ModuleDescriptionInterface);
+	}
+	static getFieldsList(names, flag){
+		if (flag==undefined)flag=0;
+	}
+	static getFieldInfoByName(field_name){
+		return null;
+	}
+	static getMethodsList(names){
+	}
+	static getMethodInfoByName(method_name){
+		return null;
 	}
 }
 BayrellLang.ModuleDescription.__static_implements__ = [];

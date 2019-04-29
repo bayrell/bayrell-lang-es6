@@ -57,6 +57,7 @@ BayrellLang.OpCodes.OpFunctionDeclare = class extends BayrellLang.OpCodes.BaseOp
 	static getParentClassName(){return "BayrellLang.OpCodes.BaseOpCode";}
 	_init(){
 		super._init();
+		var names = Object.getOwnPropertyNames(this);
 		this.op = "op_function";
 		this.name = "";
 		this.is_lambda = false;
@@ -126,6 +127,11 @@ BayrellLang.OpCodes.OpFunctionDeclare = class extends BayrellLang.OpCodes.BaseOp
 		}
 	}
 	static getFieldInfoByName(field_name){
+		return null;
+	}
+	static getMethodsList(names){
+	}
+	static getMethodInfoByName(method_name){
 		return null;
 	}
 }

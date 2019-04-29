@@ -25,6 +25,7 @@ BayrellLang.OpCodes.OpStructDeclare = class extends BayrellLang.OpCodes.OpClassD
 	static getParentClassName(){return "BayrellLang.OpCodes.OpClassDeclare";}
 	_init(){
 		super._init();
+		var names = Object.getOwnPropertyNames(this);
 		this.op = "op_struct";
 	}
 	assignObject(obj){
@@ -49,6 +50,11 @@ BayrellLang.OpCodes.OpStructDeclare = class extends BayrellLang.OpCodes.OpClassD
 		}
 	}
 	static getFieldInfoByName(field_name){
+		return null;
+	}
+	static getMethodsList(names){
+	}
+	static getMethodInfoByName(method_name){
 		return null;
 	}
 }

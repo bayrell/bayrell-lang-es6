@@ -212,7 +212,19 @@ BayrellLang.CommonParser = class extends BayrellParser.CoreParser{
 	static getParentClassName(){return "BayrellParser.CoreParser";}
 	_init(){
 		super._init();
+		var names = Object.getOwnPropertyNames(this);
 		this._result = null;
 		this.skip_comments = false;
+	}
+	static getFieldsList(names, flag){
+		if (flag==undefined)flag=0;
+	}
+	static getFieldInfoByName(field_name){
+		return null;
+	}
+	static getMethodsList(names){
+	}
+	static getMethodInfoByName(method_name){
+		return null;
 	}
 }

@@ -110,7 +110,6 @@ $load.subscribe(["Runtime_loaded", "BayrellParser_loaded"], function(){
 		"/assets/BayrellLang/OpCodes/OpStatic.js",
 		"/assets/BayrellLang/OpCodes/OpString.js",
 		"/assets/BayrellLang/OpCodes/OpStringItem.js",
-		"/assets/BayrellLang/OpCodes/OpStructDeclare.js",
 		"/assets/BayrellLang/OpCodes/OpSub.js",
 		"/assets/BayrellLang/OpCodes/OpTemplateIdentifier.js",
 		"/assets/BayrellLang/OpCodes/OpTernary.js",
@@ -124,6 +123,7 @@ $load.subscribe(["Runtime_loaded", "BayrellParser_loaded"], function(){
 	.load([
 		"/assets/BayrellLang/OpCodes/OpFunctionArrowDeclare.js",
 		"/assets/BayrellLang/OpCodes/OpInterfaceDeclare.js",
+		"/assets/BayrellLang/OpCodes/OpStructDeclare.js",
 		"/assets/BayrellLang/LangNodeJS/TranslatorNodeJS.js",
 		"/assets/BayrellLang/LangNodeJS/TranslatorNodeJSFactory.js",
 		"/assets/BayrellLang/LangPHP/TranslatorPHP.js",

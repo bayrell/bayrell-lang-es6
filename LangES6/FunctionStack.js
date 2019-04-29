@@ -113,11 +113,23 @@ BayrellLang.LangES6.FunctionStack = class extends Runtime.CoreObject{
 	static getParentClassName(){return "Runtime.CoreObject";}
 	_init(){
 		super._init();
+		var names = Object.getOwnPropertyNames(this);
 		this.name = "";
 		this.is_async = false;
 		this.async_ctx = "";
 		this.async_jump = "";
 		this.async_jump_pos = new Runtime.Vector();
 		this.async_stop_pos = new Runtime.Vector();
+	}
+	static getFieldsList(names, flag){
+		if (flag==undefined)flag=0;
+	}
+	static getFieldInfoByName(field_name){
+		return null;
+	}
+	static getMethodsList(names){
+	}
+	static getMethodInfoByName(method_name){
+		return null;
 	}
 }
