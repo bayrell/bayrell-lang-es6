@@ -22,11 +22,14 @@ BayrellLang.LangES6.TranslatorES6Factory = class extends Runtime.ContextObject{
 	/**
 	 * Returns new Instance
 	 */
-	newInstance(context){
+	newInstance(context, params){
+		if (context == undefined) context=null;
+		if (params == undefined) params=null;
 		return new BayrellLang.LangES6.TranslatorES6(context);
 	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.LangES6.TranslatorES6Factory";}
+	static getCurrentNamespace(){return "BayrellLang.LangES6";}
 	static getCurrentClassName(){return "BayrellLang.LangES6.TranslatorES6Factory";}
 	static getParentClassName(){return "Runtime.ContextObject";}
 	_init(){

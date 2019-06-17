@@ -109,6 +109,7 @@ BayrellLang.LangES6.FunctionStack = class extends Runtime.CoreObject{
 	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.LangES6.FunctionStack";}
+	static getCurrentNamespace(){return "BayrellLang.LangES6";}
 	static getCurrentClassName(){return "BayrellLang.LangES6.FunctionStack";}
 	static getParentClassName(){return "Runtime.CoreObject";}
 	_init(){

@@ -53,6 +53,7 @@ BayrellLang.OpCodes.OpFunctionDeclare = class extends BayrellLang.OpCodes.BaseOp
 	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.OpCodes.OpFunctionDeclare";}
+	static getCurrentNamespace(){return "BayrellLang.OpCodes";}
 	static getCurrentClassName(){return "BayrellLang.OpCodes.OpFunctionDeclare";}
 	static getParentClassName(){return "BayrellLang.OpCodes.BaseOpCode";}
 	_init(){

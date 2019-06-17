@@ -23,7 +23,7 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 	 * Returns full class name
 	 * @return string
 	 */
-	getCurrentClassName(){
+	currentClassName(){
 		return Runtime.rtl.toString(this.current_namespace)+"."+Runtime.rtl.toString(this.current_class_name);
 	}
 	/**
@@ -1832,6 +1832,7 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 		if (!this.is_interface){
 			res += this.s("/* ======================= Class Init Functions ======================= */");
 			res += this.s("getClassName(){"+"return "+Runtime.rtl.toString(this.convertString(Runtime.rtl.toString(this.current_namespace)+"."+Runtime.rtl.toString(this.current_class_name)))+";}");
+			res += this.s("static getCurrentNamespace(){"+"return "+Runtime.rtl.toString(this.convertString(this.current_namespace))+";}");
 			res += this.s("static getCurrentClassName(){"+"return "+Runtime.rtl.toString(this.convertString(Runtime.rtl.toString(this.current_namespace)+"."+Runtime.rtl.toString(this.current_class_name)))+";}");
 			res += this.s("static getParentClassName(){"+"return "+Runtime.rtl.toString(this.convertString(class_extends))+";}");
 		}
@@ -2065,7 +2066,7 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 						this.levelInc();
 						res += this.s("(new "+Runtime.rtl.toString(this.getName("Map"))+"())");
 						res += this.s(".set(\"kind\", \"field\")");
-						res += this.s(".set(\"class_name\", "+Runtime.rtl.toString(this.convertString(this.getCurrentClassName()))+")");
+						res += this.s(".set(\"class_name\", "+Runtime.rtl.toString(this.convertString(this.currentClassName()))+")");
 						res += this.s(".set(\"name\", "+Runtime.rtl.toString(this.convertString(variable.name))+")");
 						res += this.s(".set(\"annotations\", ");
 						this.levelInc();
@@ -2122,7 +2123,7 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 						this.levelInc();
 						res += this.s("(new "+Runtime.rtl.toString(this.getName("Map"))+"())");
 						res += this.s(".set(\"kind\", \"method\")");
-						res += this.s(".set(\"class_name\", "+Runtime.rtl.toString(this.convertString(this.getCurrentClassName()))+")");
+						res += this.s(".set(\"class_name\", "+Runtime.rtl.toString(this.convertString(this.currentClassName()))+")");
 						res += this.s(".set(\"name\", "+Runtime.rtl.toString(this.convertString(variable.name))+")");
 						res += this.s(".set(\"annotations\", ");
 						this.levelInc();
@@ -2159,7 +2160,7 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 			this.levelInc();
 			res += this.s("(new "+Runtime.rtl.toString(this.getName("Map"))+"())");
 			res += this.s(".set(\"kind\", \"class\")");
-			res += this.s(".set(\"class_name\", "+Runtime.rtl.toString(this.convertString(this.getCurrentClassName()))+")");
+			res += this.s(".set(\"class_name\", "+Runtime.rtl.toString(this.convertString(this.currentClassName()))+")");
 			res += this.s(".set(\"annotations\", ");
 			this.levelInc();
 			res += this.s("(new "+Runtime.rtl.toString(this.getName("Vector"))+"())");
@@ -2309,7 +2310,7 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 	 * Returns true if key is props
 	 */
 	isOpHtmlTagProps(key){
-		if (key == "@key" || key == "@control" || key == "@model"){
+		if (key == "@key" || key == "@control" || key == "@model" || key == "@bind" || key == "@events"){
 			return false;
 		}
 		return true;
@@ -2354,6 +2355,14 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 				else if (key == "@model"){
 					var value = this.translateRun(item.value);
 					res += this.s("\"model\": "+Runtime.rtl.toString(value)+",");
+				}
+				else if (key == "@bind"){
+					var value = this.translateRun(item.value);
+					res += this.s("\"bind\": "+Runtime.rtl.toString(value)+",");
+				}
+				else if (key == "@events"){
+					var value = this.translateRun(item.value);
+					res += this.s("\"events\": "+Runtime.rtl.toString(value)+",");
 				}
 			});
 		}
@@ -2496,7 +2505,7 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 	 * @param BaseOpCode op_code - Abstract syntax tree
 	 * @returns string - The result
 	 */
-	translate(op_code){
+	translateOpCode(op_code){
 		this.resetTranslator();
 		var s = "\"use strict;\""+Runtime.rtl.toString(this.crlf);
 		s += this.translateRun(op_code);
@@ -2504,6 +2513,7 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.LangES6.TranslatorES6";}
+	static getCurrentNamespace(){return "BayrellLang.LangES6";}
 	static getCurrentClassName(){return "BayrellLang.LangES6.TranslatorES6";}
 	static getParentClassName(){return "BayrellLang.CommonTranslator";}
 	_init(){

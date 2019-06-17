@@ -22,11 +22,14 @@ BayrellLang.LangPHP.TranslatorPHPFactory = class extends Runtime.ContextObject{
 	/**
 	 * Returns new Instance
 	 */
-	newInstance(context){
+	newInstance(context, params){
+		if (context == undefined) context=null;
+		if (params == undefined) params=null;
 		return new BayrellLang.LangPHP.TranslatorPHP(context);
 	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.LangPHP.TranslatorPHPFactory";}
+	static getCurrentNamespace(){return "BayrellLang.LangPHP";}
 	static getCurrentClassName(){return "BayrellLang.LangPHP.TranslatorPHPFactory";}
 	static getParentClassName(){return "Runtime.ContextObject";}
 	_init(){

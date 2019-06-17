@@ -39,6 +39,7 @@ BayrellLang.OpCodes.OpTryCatchChilds = class extends BayrellLang.OpCodes.BaseOpC
 	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.OpCodes.OpTryCatchChilds";}
+	static getCurrentNamespace(){return "BayrellLang.OpCodes";}
 	static getCurrentClassName(){return "BayrellLang.OpCodes.OpTryCatchChilds";}
 	static getParentClassName(){return "BayrellLang.OpCodes.BaseOpCode";}
 	_init(){

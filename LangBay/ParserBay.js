@@ -21,7 +21,7 @@ if (typeof BayrellLang.LangBay == 'undefined') BayrellLang.LangBay = {};
 BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 	/**
 	 * Tokens Fabric
-	 * @return BayrellParserToken
+	 * @return BayrellLang.ParserToken
 	 */
 	createToken(){
 		return new BayrellLang.LangBay.ParserBayToken(this.context(), this);
@@ -51,7 +51,7 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 				if (ex instanceof BayrellLang.Exceptions.HexNumberExpected){
 					throw ex;
 				}
-				else if (ex instanceof BayrellParser.Exceptions.ParserError){
+				else if (ex instanceof BayrellLang.Parser.Exceptions.ParserError){
 					res = null;
 				}
 				else {
@@ -73,7 +73,7 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 		}catch(_the_exception){
 			if (_the_exception instanceof Error){
 				var ex = _the_exception;
-				if (ex instanceof BayrellParser.Exceptions.ParserError){
+				if (ex instanceof BayrellLang.Parser.Exceptions.ParserError){
 					res = null;
 				}
 				else {
@@ -465,6 +465,11 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 					this.popRestoreToken();
 					this.matchNextToken("}");
 				}
+				else if (this.findNextToken("[")){
+					this.pushToken(new BayrellLang.LangBay.ParserBayToken(this.context(), this));
+					attr.value = this.readVector();
+					this.popRestoreToken();
+				}
 				else {
 					throw this.parserError("Unknown token "+Runtime.rtl.toString(this.next_token.token));
 				}
@@ -509,10 +514,10 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 			if (!is_plain){
 				if (is_next_special_token || is_next_html_token){
 					if (is_next_special_token || is_prev_special_token){
-						s = Runtime.rs.trim(s, "\\t\\r\\n");
+						s = Runtime.rs.trim(s, "\t\r\n");
 					}
 					else {
-						s = Runtime.rs.trim(s, "\\t\\r\\n");
+						s = Runtime.rs.trim(s, "\t\r\n");
 					}
 					if (s != ""){
 						childs.push(new BayrellLang.OpCodes.OpHtmlText(s));
@@ -526,7 +531,7 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 			if (res == null){
 				if (this.current_token.findString("{") || this.current_token.findString("@{") || this.current_token.findString("@raw{") || this.current_token.findString("@json{")){
 					if (!is_plain){
-						s = Runtime.rs.trim(s, "\\t\\r\\n");
+						s = Runtime.rs.trim(s, "\t\r\n");
 					}
 					if (s != ""){
 						childs.push(new BayrellLang.OpCodes.OpHtmlText(s));
@@ -590,10 +595,10 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 		}
 		if (!is_plain){
 			if (is_prev_special_token){
-				s = Runtime.rs.trim(s, "\\t\\r\\n");
+				s = Runtime.rs.trim(s, "\t\r\n");
 			}
 			else {
-				s = Runtime.rs.trim(s, "\\t\\r\\n");
+				s = Runtime.rs.trim(s, "\t\r\n");
 			}
 		}
 		if (s != ""){
@@ -645,7 +650,7 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 					res.is_plain = true;
 					res.childs = this.readHtmlBlock("</"+Runtime.rtl.toString(res.tag_name)+">", true);
 				}
-				else if (this.findNextToken("lambda") || this.findNextToken("pure")){
+				else if (this.findNextToken("lambda")){
 					this.assignCurrentToken(this.current_token);
 					this.pushToken(new BayrellLang.LangBay.ParserBayToken(this.context(), this));
 					childs_function = this.readDeclareFunction(false);
@@ -1132,13 +1137,8 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 			return this.readHtml();
 		}
 		this.pushToken();
-		var is_lambda = false;
 		if (this.findNextToken("lambda")){
-			is_lambda = true;
 			this.matchNextToken("lambda");
-		}
-		else if (this.findNextToken("pure")){
-			this.matchNextToken("pure");
 		}
 		var res = null;
 		res = this.readDeclareFunction(false, false);
@@ -1149,7 +1149,7 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 		try{
 			res = this.readOpCopyStruct();
 		}catch(_the_exception){
-			if (_the_exception instanceof BayrellParser.Exceptions.ParserError){
+			if (_the_exception instanceof BayrellLang.Parser.Exceptions.ParserError){
 				var ex = _the_exception;
 				res = null;
 			}
@@ -1199,7 +1199,7 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 		}catch(_the_exception){
 			if (_the_exception instanceof Error){
 				var ex = _the_exception;
-				if (ex instanceof BayrellParser.Exceptions.ParserError){
+				if (ex instanceof BayrellLang.Parser.Exceptions.ParserError){
 					success = false;
 				}
 				else {
@@ -1235,7 +1235,7 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 		}catch(_the_exception){
 			if (_the_exception instanceof Error){
 				var ex = _the_exception;
-				if (ex instanceof BayrellParser.Exceptions.ParserError){
+				if (ex instanceof BayrellLang.Parser.Exceptions.ParserError){
 					success = false;
 				}
 				else {
@@ -1451,7 +1451,7 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 		try{
 			var op_code = this.readExpressionElement();
 		}catch(_the_exception){
-			if (_the_exception instanceof BayrellParser.Exceptions.ParserError){
+			if (_the_exception instanceof BayrellLang.Parser.Exceptions.ParserError){
 				var ex = _the_exception;
 				this.popRollbackToken();
 				return null;
@@ -1710,7 +1710,7 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 		try{
 			res.result_type = this.readTemplateIdentifier();
 		}catch(_the_exception){
-			if (_the_exception instanceof BayrellParser.Exceptions.ParserError){
+			if (_the_exception instanceof BayrellLang.Parser.Exceptions.ParserError){
 				var ex = _the_exception;
 				this.popRollbackToken();
 				return null;
@@ -1727,7 +1727,7 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 		try{
 			res.args = this.readFunctionsArguments();
 		}catch(_the_exception){
-			if (_the_exception instanceof BayrellParser.Exceptions.ParserError){
+			if (_the_exception instanceof BayrellLang.Parser.Exceptions.ParserError){
 				var ex = _the_exception;
 				this.popRollbackToken();
 				return null;
@@ -1766,7 +1766,7 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 					res.return_function.flags = flags;
 				}
 			}catch(_the_exception){
-				if (_the_exception instanceof BayrellParser.Exceptions.ParserError){
+				if (_the_exception instanceof BayrellLang.Parser.Exceptions.ParserError){
 					var ex = _the_exception;
 					res.return_function = null;
 				}
@@ -1783,7 +1783,7 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 				try{
 					op_item = this.readExpression();
 				}catch(_the_exception){
-					if (_the_exception instanceof BayrellParser.Exceptions.ParserError){
+					if (_the_exception instanceof BayrellLang.Parser.Exceptions.ParserError){
 						var ex = _the_exception;
 						op_item = null;
 					}
@@ -1858,20 +1858,11 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 				flags.assignValue("public", true);
 			}
 		}
-		var is_lambda = false;
-		if (flags != null){
-			if (flags.isFlag("lambda")){
-				is_lambda = true;
-			}
-		}
 		op_code = this.readDeclareFunction(true, is_declare_function);
 		if (op_code && op_code instanceof BayrellLang.OpCodes.OpFunctionDeclare){
 			op_code.annotations = this.annotations;
 			op_code.flags = flags;
-			if (is_lambda){
-				flags.assignValue("static", true);
-			}
-			if (op_code.isFlag("pure")){
+			if (op_code.isFlag("lambda")){
 				flags.assignValue("static", true);
 			}
 			res.childs.push(op_code);
@@ -2095,6 +2086,7 @@ BayrellLang.LangBay.ParserBay = class extends BayrellLang.CommonParser{
 	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.LangBay.ParserBay";}
+	static getCurrentNamespace(){return "BayrellLang.LangBay";}
 	static getCurrentClassName(){return "BayrellLang.LangBay.ParserBay";}
 	static getParentClassName(){return "BayrellLang.CommonParser";}
 	_init(){

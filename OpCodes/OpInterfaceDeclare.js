@@ -21,6 +21,7 @@ if (typeof BayrellLang.OpCodes == 'undefined') BayrellLang.OpCodes = {};
 BayrellLang.OpCodes.OpInterfaceDeclare = class extends BayrellLang.OpCodes.OpClassDeclare{
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.OpCodes.OpInterfaceDeclare";}
+	static getCurrentNamespace(){return "BayrellLang.OpCodes";}
 	static getCurrentClassName(){return "BayrellLang.OpCodes.OpInterfaceDeclare";}
 	static getParentClassName(){return "BayrellLang.OpCodes.OpClassDeclare";}
 	_init(){

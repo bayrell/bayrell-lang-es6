@@ -77,6 +77,7 @@ BayrellLang.OpCodes.OpTemplateIdentifier = class extends BayrellLang.OpCodes.Bas
 	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.OpCodes.OpTemplateIdentifier";}
+	static getCurrentNamespace(){return "BayrellLang.OpCodes";}
 	static getCurrentClassName(){return "BayrellLang.OpCodes.OpTemplateIdentifier";}
 	static getParentClassName(){return "BayrellLang.OpCodes.BaseOpCode";}
 	_init(){

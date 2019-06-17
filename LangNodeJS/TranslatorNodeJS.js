@@ -43,7 +43,15 @@ BayrellLang.LangNodeJS.TranslatorNodeJS = class extends BayrellLang.LangES6.Tran
 		this.current_module_name = arr.item(0);
 		this.modules.clear();
 		if (this.current_module_name != "Runtime"){
-			return "var rtl = require('bayrell-runtime-nodejs').rtl;"+Runtime.rtl.toString(this.s("var Map = require('bayrell-runtime-nodejs').Map;"))+Runtime.rtl.toString(this.s("var Dict = require('bayrell-runtime-nodejs').Dict;"))+Runtime.rtl.toString(this.s("var Vector = require('bayrell-runtime-nodejs').Vector;"))+Runtime.rtl.toString(this.s("var Collection = require('bayrell-runtime-nodejs').Collection;"))+Runtime.rtl.toString(this.s("var IntrospectionInfo = require('bayrell-runtime-nodejs').IntrospectionInfo;"));
+			this.modules.set("rtl", "Runtime.rtl");
+			this.modules.set("rs", "Runtime.rs");
+			this.modules.set("Map", "Runtime.Map");
+			this.modules.set("Dict", "Runtime.Dict");
+			this.modules.set("Vector", "Runtime.Vector");
+			this.modules.set("Collection", "Runtime.Collection");
+			this.modules.set("IntrospectionInfo", "Runtime.IntrospectionInfo");
+			this.modules.set("UIStruct", "Runtime.UIStruct");
+			return "var rtl = require('bayrell-runtime-nodejs').rtl;"+Runtime.rtl.toString(this.s("var rs = require('bayrell-runtime-nodejs').rs;"))+Runtime.rtl.toString(this.s("var Map = require('bayrell-runtime-nodejs').Map;"))+Runtime.rtl.toString(this.s("var Dict = require('bayrell-runtime-nodejs').Dict;"))+Runtime.rtl.toString(this.s("var Vector = require('bayrell-runtime-nodejs').Vector;"))+Runtime.rtl.toString(this.s("var Collection = require('bayrell-runtime-nodejs').Collection;"))+Runtime.rtl.toString(this.s("var IntrospectionInfo = require('bayrell-runtime-nodejs').IntrospectionInfo;"))+Runtime.rtl.toString(this.s("var UIStruct = require('bayrell-runtime-nodejs').UIStruct;"));
 		}
 		return "";
 	}
@@ -211,6 +219,7 @@ BayrellLang.LangNodeJS.TranslatorNodeJS = class extends BayrellLang.LangES6.Tran
 	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.LangNodeJS.TranslatorNodeJS";}
+	static getCurrentNamespace(){return "BayrellLang.LangNodeJS";}
 	static getCurrentClassName(){return "BayrellLang.LangNodeJS.TranslatorNodeJS";}
 	static getParentClassName(){return "BayrellLang.LangES6.TranslatorES6";}
 	static getFieldsList(names, flag){

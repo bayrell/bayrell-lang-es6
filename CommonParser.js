@@ -17,7 +17,7 @@
  *  limitations under the License.
  */
 if (typeof BayrellLang == 'undefined') BayrellLang = {};
-BayrellLang.CommonParser = class extends BayrellParser.CoreParser{
+BayrellLang.CommonParser = class extends BayrellLang.Parser.CoreParser{
 	/**
 	 * Return true if char is alfa symbol
 	 * @param char ch
@@ -124,21 +124,21 @@ BayrellLang.CommonParser = class extends BayrellParser.CoreParser{
 	 * @return boolean
 	 */
 	isNextTokenNumber(){
-		return this.isNumString(this.next_token.token) && this.next_token.tp == BayrellParser.ParserToken.TOKEN_BASE;
+		return this.isNumString(this.next_token.token) && this.next_token.tp == BayrellLang.Parser.ParserToken.TOKEN_BASE;
 	}
 	/**
 	 * Return if next token is number
 	 * @return boolean
 	 */
 	isNextTokenHexNumber(){
-		return this.isHexString(this.next_token.token) && this.next_token.tp == BayrellParser.ParserToken.TOKEN_BASE;
+		return this.isHexString(this.next_token.token) && this.next_token.tp == BayrellLang.Parser.ParserToken.TOKEN_BASE;
 	}
 	/**
 	 * Return if next token is alfa string
 	 * @return boolean
 	 */
 	isNextTokenLetters(){
-		return this.isLetterString(this.next_token.token) && this.next_token.tp == BayrellParser.ParserToken.TOKEN_BASE;
+		return this.isLetterString(this.next_token.token) && this.next_token.tp == BayrellLang.Parser.ParserToken.TOKEN_BASE;
 	}
 	/**
 	 * Check next string is number
@@ -183,7 +183,7 @@ BayrellLang.CommonParser = class extends BayrellParser.CoreParser{
 			sign = "-";
 		}
 		if (!this.isNextTokenHexNumber()){
-			if (this.lookNextTokenType() == BayrellParser.ParserToken.TOKEN_BASE && this.isHexStringBegin(this.lookNextToken())){
+			if (this.lookNextTokenType() == BayrellLang.Parser.ParserToken.TOKEN_BASE && this.isHexStringBegin(this.lookNextToken())){
 				var start_line = this.next_token.start_line;
 				var start_col = this.next_token.start_col;
 				throw new BayrellLang.Exceptions.HexNumberExpected(start_line, start_col, this.context());
@@ -208,8 +208,9 @@ BayrellLang.CommonParser = class extends BayrellParser.CoreParser{
 	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.CommonParser";}
+	static getCurrentNamespace(){return "BayrellLang";}
 	static getCurrentClassName(){return "BayrellLang.CommonParser";}
-	static getParentClassName(){return "BayrellParser.CoreParser";}
+	static getParentClassName(){return "BayrellLang.Parser.CoreParser";}
 	_init(){
 		super._init();
 		var names = Object.getOwnPropertyNames(this);

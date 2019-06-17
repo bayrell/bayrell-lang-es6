@@ -18,7 +18,7 @@
  */
 if (typeof BayrellLang == 'undefined') BayrellLang = {};
 if (typeof BayrellLang.LangBay == 'undefined') BayrellLang.LangBay = {};
-BayrellLang.LangBay.ParserBayNameToken = class extends BayrellParser.ParserToken{
+BayrellLang.LangBay.ParserBayNameToken = class extends BayrellLang.Parser.ParserToken{
 	/**
 	 * Return true if char is token char
 	 * @param {char} ch
@@ -29,8 +29,9 @@ BayrellLang.LangBay.ParserBayNameToken = class extends BayrellParser.ParserToken
 	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.LangBay.ParserBayNameToken";}
+	static getCurrentNamespace(){return "BayrellLang.LangBay";}
 	static getCurrentClassName(){return "BayrellLang.LangBay.ParserBayNameToken";}
-	static getParentClassName(){return "BayrellParser.ParserToken";}
+	static getParentClassName(){return "BayrellLang.Parser.ParserToken";}
 	static getFieldsList(names, flag){
 		if (flag==undefined)flag=0;
 	}

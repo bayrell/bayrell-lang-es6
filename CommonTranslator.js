@@ -24,6 +24,13 @@ BayrellLang.CommonTranslator = class extends Runtime.ContextObject{
 	constructor(context){
 		if (context == undefined) context=null;
 		super(context);
+		this.is_operation = false;
+		this.current_opcode_level = 0;
+		this.max_opcode_level = 100;
+		this.indent_level = 0;
+		this.indent = "\t";
+		this.space = " ";
+		this.crlf = "\n";
 	}
 	/**
 	 * Push new level
@@ -584,12 +591,13 @@ BayrellLang.CommonTranslator = class extends Runtime.ContextObject{
 	 * @param BaseOpCode op_code - Abstract syntax tree
 	 * @returns string - The result
 	 */
-	translate(op_code){
+	translateOpCode(op_code){
 		this.resetTranslator();
 		return this.translateRun(op_code);
 	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.CommonTranslator";}
+	static getCurrentNamespace(){return "BayrellLang";}
 	static getCurrentClassName(){return "BayrellLang.CommonTranslator";}
 	static getParentClassName(){return "Runtime.ContextObject";}
 	_init(){

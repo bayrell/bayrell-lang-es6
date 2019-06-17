@@ -21,6 +21,7 @@ if (typeof BayrellLang.OpCodes == 'undefined') BayrellLang.OpCodes = {};
 BayrellLang.OpCodes.OpPreprocessorSwitch = class extends BayrellLang.OpCodes.OpChilds{
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.OpCodes.OpPreprocessorSwitch";}
+	static getCurrentNamespace(){return "BayrellLang.OpCodes";}
 	static getCurrentClassName(){return "BayrellLang.OpCodes.OpPreprocessorSwitch";}
 	static getParentClassName(){return "BayrellLang.OpCodes.OpChilds";}
 	_init(){

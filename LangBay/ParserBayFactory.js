@@ -29,6 +29,7 @@ BayrellLang.LangBay.ParserBayFactory = class extends Runtime.ContextObject{
 	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.LangBay.ParserBayFactory";}
+	static getCurrentNamespace(){return "BayrellLang.LangBay";}
 	static getCurrentClassName(){return "BayrellLang.LangBay.ParserBayFactory";}
 	static getParentClassName(){return "Runtime.ContextObject";}
 	_init(){

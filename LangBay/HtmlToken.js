@@ -18,7 +18,7 @@
  */
 if (typeof BayrellLang == 'undefined') BayrellLang = {};
 if (typeof BayrellLang.LangBay == 'undefined') BayrellLang.LangBay = {};
-BayrellLang.LangBay.HtmlToken = class extends BayrellParser.ParserToken{
+BayrellLang.LangBay.HtmlToken = class extends BayrellLang.Parser.ParserToken{
 	/**
 	 * Returns new Instance
 	 */
@@ -69,13 +69,13 @@ BayrellLang.LangBay.HtmlToken = class extends BayrellParser.ParserToken{
 			this.moveString(look);
 		}
 		else {
-			throw new BayrellParser.Exceptions.ParserEOF(this.context(), start_line, start_col);
+			throw new BayrellLang.Parser.Exceptions.ParserEOF(this.context(), start_line, start_col);
 		}
 		return res;
 	}
 	/**
 	 * Get next token without move cursor pos. Throws error if EOF.
-	 * @param {BayrellParserToken} token
+	 * @param {BayrellLang.ParserToken} token
 	 */
 	readNextToken(){
 		/* Init next token function */
@@ -102,8 +102,9 @@ BayrellLang.LangBay.HtmlToken = class extends BayrellParser.ParserToken{
 	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.LangBay.HtmlToken";}
+	static getCurrentNamespace(){return "BayrellLang.LangBay";}
 	static getCurrentClassName(){return "BayrellLang.LangBay.HtmlToken";}
-	static getParentClassName(){return "BayrellParser.ParserToken";}
+	static getParentClassName(){return "BayrellLang.Parser.ParserToken";}
 	_init(){
 		super._init();
 		var names = Object.getOwnPropertyNames(this);

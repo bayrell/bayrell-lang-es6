@@ -18,10 +18,11 @@
  */
 if (typeof BayrellLang == 'undefined') BayrellLang = {};
 if (typeof BayrellLang.LangES6 == 'undefined') BayrellLang.LangES6 = {};
-BayrellLang.LangES6.BayrellParserES6 = class{
+BayrellLang.LangES6.ParserES6 = class{
 	/* ======================= Class Init Functions ======================= */
-	getClassName(){return "BayrellLang.LangES6.BayrellParserES6";}
-	static getCurrentClassName(){return "BayrellLang.LangES6.BayrellParserES6";}
+	getClassName(){return "BayrellLang.LangES6.ParserES6";}
+	static getCurrentNamespace(){return "BayrellLang.LangES6";}
+	static getCurrentClassName(){return "BayrellLang.LangES6.ParserES6";}
 	static getParentClassName(){return "";}
 	static getFieldsList(names, flag){
 		if (flag==undefined)flag=0;

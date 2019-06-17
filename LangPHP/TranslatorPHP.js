@@ -23,14 +23,14 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 	 * Returns full class name
 	 * @return string
 	 */
-	getCurrentClassName(){
+	currentClassName(){
 		return Runtime.rtl.toString(this.current_namespace)+"."+Runtime.rtl.toString(this.current_class_name);
 	}
 	/**
 	 * Returns full class name
 	 * @return string
 	 */
-	getCurrentFunctionName(){
+	currentFunctionName(){
 		var c = this.current_function_name.count();
 		var last_function_name = this.current_function_name.get(c - 1);
 		return Runtime.rtl.toString(this.current_namespace)+"."+Runtime.rtl.toString(this.current_class_name)+"::"+Runtime.rtl.toString(last_function_name);
@@ -424,7 +424,7 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 			var ch = "";
 			for (var i = 0; i < op_code.args.count(); i++){
 				var op = op_code.args.item(i);
-				s += ch + this.s(this.translateRun(op));
+				s += Runtime.rtl.toString(ch)+Runtime.rtl.toString(this.s(this.translateRun(op)));
 				ch = ", ";
 			}
 		}
@@ -748,7 +748,7 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 		s += this.s(";");
 		this.endOperation(old_is_operation);
 		if (this.current_function_is_memorize){
-			s += this.s("rtl::_memorizeSave("+Runtime.rtl.toString(this.convertString(this.getCurrentFunctionName()))+", func_get_args(), $__memorize_value);");
+			s += this.s("rtl::_memorizeSave("+Runtime.rtl.toString(this.convertString(this.currentFunctionName()))+", func_get_args(), $__memorize_value);");
 			s += this.s("return $__memorize_value;");
 			return s;
 		}
@@ -884,9 +884,8 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 	/**
 	 * Function declare
 	 */
-	OpFunctionDeclare(op_code, end_semicolon, use_vars){
-		if (end_semicolon == undefined) end_semicolon=false;
-		if (use_vars == undefined) use_vars=null;
+	OpFunctionDeclare(op_code){
+		var use_vars = null;
 		var res = "";
 		var ch = "";
 		var s = "";
@@ -975,7 +974,7 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 			this.pushOneLine(false);
 			this.levelInc();
 			if (this.current_function_is_memorize){
-				res += this.s("$__memorize_value = rtl::_memorizeValue("+Runtime.rtl.toString(this.convertString(this.getCurrentFunctionName()))+", func_get_args());");
+				res += this.s("$__memorize_value = rtl::_memorizeValue("+Runtime.rtl.toString(this.convertString(this.currentFunctionName()))+", func_get_args());");
 				res += this.s("if ($__memorize_value != rtl::$_memorize_not_found) return $__memorize_value;");
 			}
 			if (op_code.childs != null){
@@ -986,7 +985,7 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 						this.endOperation(old_is_operation);
 						if (this.current_function_is_memorize){
 							res += this.s("$__memorize_value = "+Runtime.rtl.toString(lambda_res)+";");
-							res += this.s("rtl::_memorizeSave("+Runtime.rtl.toString(this.convertString(this.getCurrentFunctionName()))+", func_get_args(), $__memorize_value);");
+							res += this.s("rtl::_memorizeSave("+Runtime.rtl.toString(this.convertString(this.currentFunctionName()))+", func_get_args(), $__memorize_value);");
 							res += this.s("return $__memorize_value;");
 						}
 						else {
@@ -1001,10 +1000,10 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 				}
 			}
 			else if (op_code.return_function != null){
-				res += this.s("return "+Runtime.rtl.toString(this.translateItem(op_code.return_function)));
+				res += this.s("return "+Runtime.rtl.toString(this.translateItem(op_code.return_function))+";");
 			}
 			this.levelDec();
-			res += this.s("}"+Runtime.rtl.toString((end_semicolon) ? (";") : ("")));
+			res += this.s("}");
 			this.popOneLine();
 		}
 		this.current_function_name.pop();
@@ -1165,6 +1164,7 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 		if (!this.is_interface){
 			res += this.s("/* ======================= Class Init Functions ======================= */");
 			res += this.s("public function getClassName(){"+"return "+Runtime.rtl.toString(this.convertString(Runtime.rtl.toString(this.current_namespace)+"."+Runtime.rtl.toString(this.current_class_name)))+";}");
+			res += this.s("public static function getCurrentNamespace(){"+"return "+Runtime.rtl.toString(this.convertString(this.current_namespace))+";}");
 			res += this.s("public static function getCurrentClassName(){"+"return "+Runtime.rtl.toString(this.convertString(Runtime.rtl.toString(this.current_namespace)+"."+Runtime.rtl.toString(this.current_class_name)))+";}");
 			res += this.s("public static function getParentClassName(){"+"return "+Runtime.rtl.toString(this.convertString(class_extends))+";}");
 		}
@@ -1401,7 +1401,7 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 						this.levelInc();
 						res += this.s("(new "+Runtime.rtl.toString(this.getName("Map"))+"())");
 						res += this.s("->set(\"kind\", \"field\")");
-						res += this.s("->set(\"class_name\", "+Runtime.rtl.toString(this.convertString(this.getCurrentClassName()))+")");
+						res += this.s("->set(\"class_name\", "+Runtime.rtl.toString(this.convertString(this.currentClassName()))+")");
 						res += this.s("->set(\"name\", "+Runtime.rtl.toString(this.convertString(variable.name))+")");
 						res += this.s("->set(\"annotations\", ");
 						this.levelInc();
@@ -1452,7 +1452,7 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 						this.levelInc();
 						res += this.s("(new "+Runtime.rtl.toString(this.getName("Map"))+"())");
 						res += this.s("->set(\"kind\", \"method\")");
-						res += this.s("->set(\"class_name\", "+Runtime.rtl.toString(this.convertString(this.getCurrentClassName()))+")");
+						res += this.s("->set(\"class_name\", "+Runtime.rtl.toString(this.convertString(this.currentClassName()))+")");
 						res += this.s("->set(\"name\", "+Runtime.rtl.toString(this.convertString(variable.name))+")");
 						res += this.s("->set(\"annotations\", ");
 						this.levelInc();
@@ -1489,7 +1489,7 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 			this.levelInc();
 			res += this.s("(new "+Runtime.rtl.toString(this.getName("Map"))+"())");
 			res += this.s("->set(\"kind\", \"class\")");
-			res += this.s("->set(\"class_name\", "+Runtime.rtl.toString(this.convertString(this.getCurrentClassName()))+")");
+			res += this.s("->set(\"class_name\", "+Runtime.rtl.toString(this.convertString(this.currentClassName()))+")");
 			res += this.s("->set(\"annotations\", ");
 			this.levelInc();
 			res += this.s("(new "+Runtime.rtl.toString(this.getName("Vector"))+"())");
@@ -1630,7 +1630,7 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 	 * Returns true if key is props
 	 */
 	isOpHtmlTagProps(key){
-		if (key == "@key" || key == "@control" || key == "@model"){
+		if (key == "@key" || key == "@control" || key == "@model" || key == "@bind" || key == "@events"){
 			return false;
 		}
 		return true;
@@ -1675,6 +1675,14 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 				else if (key == "@model"){
 					var value = this.translateRun(item.value);
 					res += this.s("\"model\"=>"+Runtime.rtl.toString(value)+",");
+				}
+				else if (key == "@bind"){
+					var value = this.translateRun(item.value);
+					res += this.s("\"bind\"=> "+Runtime.rtl.toString(value)+",");
+				}
+				else if (key == "@events"){
+					var value = this.translateRun(item.value);
+					res += this.s("\"events\"=> "+Runtime.rtl.toString(value)+",");
 				}
 			});
 		}
@@ -1774,10 +1782,10 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 		this.pushOneLine(false);
 		var childs_sz = op_code.childs.count();
 		for (var i = 0; i < childs_sz; i++){
+			var item = op_code.childs.item(i);
 			if (item instanceof BayrellLang.OpCodes.OpComment){
 				continue;
 			}
-			var item = op_code.childs.item(i);
 			res += this.s(Runtime.rtl.toString(this.translateRun(item))+Runtime.rtl.toString((i + 1 == childs_sz) ? ("") : (",")));
 		}
 		this.popOneLine();
@@ -1822,7 +1830,7 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 	 * @param BaseOpCode op_code - Abstract syntax tree
 	 * @returns string - The result
 	 */
-	translate(op_code){
+	translateOpCode(op_code){
 		this.resetTranslator();
 		var s = "<?php"+Runtime.rtl.toString(this.crlf);
 		s += this.translateRun(op_code);
@@ -1830,6 +1838,7 @@ BayrellLang.LangPHP.TranslatorPHP = class extends BayrellLang.CommonTranslator{
 	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.LangPHP.TranslatorPHP";}
+	static getCurrentNamespace(){return "BayrellLang.LangPHP";}
 	static getCurrentClassName(){return "BayrellLang.LangPHP.TranslatorPHP";}
 	static getParentClassName(){return "BayrellLang.CommonTranslator";}
 	_init(){

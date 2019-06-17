@@ -37,6 +37,7 @@ BayrellLang.OpCodes.OpPreprocessorCase = class extends BayrellLang.OpCodes.BaseO
 	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.OpCodes.OpPreprocessorCase";}
+	static getCurrentNamespace(){return "BayrellLang.OpCodes";}
 	static getCurrentClassName(){return "BayrellLang.OpCodes.OpPreprocessorCase";}
 	static getParentClassName(){return "BayrellLang.OpCodes.BaseOpCode";}
 	_init(){

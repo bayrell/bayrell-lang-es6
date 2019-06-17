@@ -40,7 +40,7 @@ BayrellLang.Utils = class extends Runtime.ContextObject{
 	 */
 	static translateAST(context, translator_factory, code_tree){
 		var translator = translator_factory.newInstance(context);
-		var res = translator.translate(code_tree);
+		var res = translator.translateOpCode(code_tree);
 		return res;
 	}
 	/**
@@ -55,7 +55,7 @@ BayrellLang.Utils = class extends Runtime.ContextObject{
 		var translator = translator_factory.newInstance(context);
 		parser.parseString(source);
 		var code_tree = parser.getAST();
-		var res = translator.translate(code_tree);
+		var res = translator.translateOpCode(code_tree);
 		return res;
 	}
 	/**
@@ -69,7 +69,7 @@ BayrellLang.Utils = class extends Runtime.ContextObject{
 		var parser = new BayrellLang.LangBay.ParserBay(context);
 		parser.parseString(source);
 		var code_tree = parser.getAST();
-		var res = translator.translate(code_tree);
+		var res = translator.translateOpCode(code_tree);
 		return res;
 	}
 	/**
@@ -106,6 +106,7 @@ BayrellLang.Utils = class extends Runtime.ContextObject{
 	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.Utils";}
+	static getCurrentNamespace(){return "BayrellLang";}
 	static getCurrentClassName(){return "BayrellLang.Utils";}
 	static getParentClassName(){return "Runtime.ContextObject";}
 	static getFieldsList(names, flag){

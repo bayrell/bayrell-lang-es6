@@ -18,7 +18,7 @@
  */
 if (typeof BayrellLang == 'undefined') BayrellLang = {};
 if (typeof BayrellLang.Exceptions == 'undefined') BayrellLang.Exceptions = {};
-BayrellLang.Exceptions.TwiceDeclareElseError = class extends BayrellParser.Exceptions.ParserError{
+BayrellLang.Exceptions.TwiceDeclareElseError = class extends BayrellLang.Parser.Exceptions.ParserError{
 	constructor(line, col, context, prev){
 		if (prev == undefined) prev=null;
 		if (context == null){
@@ -31,8 +31,9 @@ BayrellLang.Exceptions.TwiceDeclareElseError = class extends BayrellParser.Excep
 	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.Exceptions.TwiceDeclareElseError";}
+	static getCurrentNamespace(){return "BayrellLang.Exceptions";}
 	static getCurrentClassName(){return "BayrellLang.Exceptions.TwiceDeclareElseError";}
-	static getParentClassName(){return "BayrellParser.Exceptions.ParserError";}
+	static getParentClassName(){return "BayrellLang.Parser.Exceptions.ParserError";}
 	static getFieldsList(names, flag){
 		if (flag==undefined)flag=0;
 	}

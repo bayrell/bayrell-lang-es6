@@ -36,6 +36,7 @@ BayrellLang.OpCodes.OpUse = class extends BayrellLang.OpCodes.OpValueString{
 	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.OpCodes.OpUse";}
+	static getCurrentNamespace(){return "BayrellLang.OpCodes";}
 	static getCurrentClassName(){return "BayrellLang.OpCodes.OpUse";}
 	static getParentClassName(){return "BayrellLang.OpCodes.OpValueString";}
 	_init(){

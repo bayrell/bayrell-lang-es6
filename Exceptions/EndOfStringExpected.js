@@ -18,7 +18,7 @@
  */
 if (typeof BayrellLang == 'undefined') BayrellLang = {};
 if (typeof BayrellLang.Exceptions == 'undefined') BayrellLang.Exceptions = {};
-BayrellLang.Exceptions.EndOfStringExpected = class extends BayrellParser.Exceptions.ParserError{
+BayrellLang.Exceptions.EndOfStringExpected = class extends BayrellLang.Parser.Exceptions.ParserError{
 	constructor(line, col, context, prev){
 		if (prev == undefined) prev=null;
 		if (context == null){
@@ -31,8 +31,9 @@ BayrellLang.Exceptions.EndOfStringExpected = class extends BayrellParser.Excepti
 	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.Exceptions.EndOfStringExpected";}
+	static getCurrentNamespace(){return "BayrellLang.Exceptions";}
 	static getCurrentClassName(){return "BayrellLang.Exceptions.EndOfStringExpected";}
-	static getParentClassName(){return "BayrellParser.Exceptions.ParserError";}
+	static getParentClassName(){return "BayrellLang.Parser.Exceptions.ParserError";}
 	static getFieldsList(names, flag){
 		if (flag==undefined)flag=0;
 	}

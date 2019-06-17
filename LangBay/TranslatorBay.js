@@ -839,6 +839,7 @@ BayrellLang.LangBay.TranslatorBay = class extends BayrellLang.CoreTranslator{
 	}
 	/* ======================= Class Init Functions ======================= */
 	getClassName(){return "BayrellLang.LangBay.TranslatorBay";}
+	static getCurrentNamespace(){return "BayrellLang.LangBay";}
 	static getCurrentClassName(){return "BayrellLang.LangBay.TranslatorBay";}
 	static getParentClassName(){return "BayrellLang.CoreTranslator";}
 	_init(){
