@@ -2310,7 +2310,7 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 	 * Returns true if key is props
 	 */
 	isOpHtmlTagProps(key){
-		if (key == "@key" || key == "@control" || key == "@model" || key == "@bind" || key == "@events"){
+		if (key == "@key" || key == "@control" || key == "@model" || key == "@ref" || key == "@bind" || key == "@annotations"){
 			return false;
 		}
 		return true;
@@ -2348,6 +2348,10 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 					var value = this.translateRun(item.value);
 					res += this.s("\"key\": "+Runtime.rtl.toString(value)+",");
 				}
+				else if (key == "@ref"){
+					var value = this.translateRun(item.value);
+					res += this.s("\"reference\": "+Runtime.rtl.toString(value)+",");
+				}
 				else if (key == "@control"){
 					var value = this.translateRun(item.value);
 					res += this.s("\"controller\": "+Runtime.rtl.toString(value)+",");
@@ -2360,9 +2364,9 @@ BayrellLang.LangES6.TranslatorES6 = class extends BayrellLang.CommonTranslator{
 					var value = this.translateRun(item.value);
 					res += this.s("\"bind\": "+Runtime.rtl.toString(value)+",");
 				}
-				else if (key == "@events"){
+				else if (key == "@annotations"){
 					var value = this.translateRun(item.value);
-					res += this.s("\"events\": "+Runtime.rtl.toString(value)+",");
+					res += this.s("\"annotations\": "+Runtime.rtl.toString(value)+",");
 				}
 			});
 		}
