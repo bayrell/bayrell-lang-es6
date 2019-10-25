@@ -1,8 +1,9 @@
 "use strict;"
+var use = (typeof Runtime != 'undefined' && typeof Runtime.rtl != 'undefined') ? Runtime.rtl.find_class : null;
 /*!
- *  Bayrell Common Languages Transcompiler
+ *  Bayrell Language
  *
- *  (c) Copyright 2016-2018 "Ildar Bikmamatov" <support@bayrell.org>
+ *  (c) Copyright 2016-2019 "Ildar Bikmamatov" <support@bayrell.org>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,65 +17,145 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-if (typeof BayrellLang == 'undefined') BayrellLang = {};
-if (typeof BayrellLang.OpCodes == 'undefined') BayrellLang.OpCodes = {};
-BayrellLang.OpCodes.OpPipe = class extends BayrellLang.OpCodes.BaseOpCode{
-	/* ======================= Class Init Functions ======================= */
-	getClassName(){return "BayrellLang.OpCodes.OpPipe";}
-	static getCurrentNamespace(){return "BayrellLang.OpCodes";}
-	static getCurrentClassName(){return "BayrellLang.OpCodes.OpPipe";}
-	static getParentClassName(){return "BayrellLang.OpCodes.BaseOpCode";}
-	_init(){
-		super._init();
-		var names = Object.getOwnPropertyNames(this);
+if (typeof Bayrell == 'undefined') Bayrell = {};
+if (typeof Bayrell.Lang == 'undefined') Bayrell.Lang = {};
+if (typeof Bayrell.Lang.OpCodes == 'undefined') Bayrell.Lang.OpCodes = {};
+Bayrell.Lang.OpCodes.OpPipe = function(__ctx)
+{
+	Bayrell.Lang.OpCodes.BaseOpCode.apply(this, arguments);
+};
+Bayrell.Lang.OpCodes.OpPipe.prototype = Object.create(Bayrell.Lang.OpCodes.BaseOpCode.prototype);
+Bayrell.Lang.OpCodes.OpPipe.prototype.constructor = Bayrell.Lang.OpCodes.OpPipe;
+Object.assign(Bayrell.Lang.OpCodes.OpPipe.prototype,
+{
+	_init: function(__ctx)
+	{
+		var defProp = use('Runtime.rtl').defProp;
+		var a = Object.getOwnPropertyNames(this);
 		this.__op = "op_pipe";
-		if (names.indexOf("op") == -1)Object.defineProperty(this, "op", { get: function() { return this.__op; }, set: function(value) { throw new Runtime.Exceptions.AssignStructValueError("op") }});
-		this.__value = null;
-		if (names.indexOf("value") == -1)Object.defineProperty(this, "value", { get: function() { return this.__value; }, set: function(value) { throw new Runtime.Exceptions.AssignStructValueError("value") }});
-		this.__items = null;
-		if (names.indexOf("items") == -1)Object.defineProperty(this, "items", { get: function() { return this.__items; }, set: function(value) { throw new Runtime.Exceptions.AssignStructValueError("items") }});
-		this.__is_return_value = false;
-		if (names.indexOf("is_return_value") == -1)Object.defineProperty(this, "is_return_value", { get: function() { return this.__is_return_value; }, set: function(value) { throw new Runtime.Exceptions.AssignStructValueError("is_return_value") }});
-	}
-	assignObject(obj){
-		if (obj instanceof BayrellLang.OpCodes.OpPipe){
-			this.__op = obj.__op;
-			this.__value = obj.__value;
-			this.__items = obj.__items;
-			this.__is_return_value = obj.__is_return_value;
+		if (a.indexOf("op") == -1) defProp(this, "op");
+		this.__kind = "";
+		if (a.indexOf("kind") == -1) defProp(this, "kind");
+		this.__class_name = "";
+		if (a.indexOf("class_name") == -1) defProp(this, "class_name");
+		this.__method_name = "";
+		if (a.indexOf("method_name") == -1) defProp(this, "method_name");
+		this.__obj = null;
+		if (a.indexOf("obj") == -1) defProp(this, "obj");
+		this.__args = null;
+		if (a.indexOf("args") == -1) defProp(this, "args");
+		this.__is_await = false;
+		if (a.indexOf("is_await") == -1) defProp(this, "is_await");
+		this.__is_context = true;
+		if (a.indexOf("is_context") == -1) defProp(this, "is_context");
+		Bayrell.Lang.OpCodes.BaseOpCode.prototype._init.call(this,__ctx);
+	},
+	assignObject: function(__ctx,o)
+	{
+		if (o instanceof Bayrell.Lang.OpCodes.OpPipe)
+		{
+			this.__op = o.__op;
+			this.__kind = o.__kind;
+			this.__class_name = o.__class_name;
+			this.__method_name = o.__method_name;
+			this.__obj = o.__obj;
+			this.__args = o.__args;
+			this.__is_await = o.__is_await;
+			this.__is_context = o.__is_context;
 		}
-		super.assignObject(obj);
-	}
-	assignValue(variable_name, value, sender){if(sender==undefined)sender=null;
-		if (variable_name == "op")this.__op = Runtime.rtl.convert(value,"string","op_pipe","");
-		else if (variable_name == "value")this.__value = Runtime.rtl.convert(value,"BayrellLang.OpCodes.BaseOpCode",null,"");
-		else if (variable_name == "items")this.__items = Runtime.rtl.convert(value,"Runtime.Vector",null,"BayrellLang.OpCodes.BaseOpCode");
-		else if (variable_name == "is_return_value")this.__is_return_value = Runtime.rtl.convert(value,"bool",false,"");
-		else super.assignValue(variable_name, value, sender);
-	}
-	takeValue(variable_name, default_value){
-		if (default_value == undefined) default_value = null;
-		if (variable_name == "op") return this.__op;
-		else if (variable_name == "value") return this.__value;
-		else if (variable_name == "items") return this.__items;
-		else if (variable_name == "is_return_value") return this.__is_return_value;
-		return super.takeValue(variable_name, default_value);
-	}
-	static getFieldsList(names, flag){
-		if (flag==undefined)flag=0;
-		if ((flag | 3)==3){
-			names.push("op");
-			names.push("value");
-			names.push("items");
-			names.push("is_return_value");
+		Bayrell.Lang.OpCodes.BaseOpCode.prototype.assignObject.call(this,__ctx,o);
+	},
+	assignValue: function(__ctx,k,v)
+	{
+		if (k == "op")this.__op = v;
+		else if (k == "kind")this.__kind = v;
+		else if (k == "class_name")this.__class_name = v;
+		else if (k == "method_name")this.__method_name = v;
+		else if (k == "obj")this.__obj = v;
+		else if (k == "args")this.__args = v;
+		else if (k == "is_await")this.__is_await = v;
+		else if (k == "is_context")this.__is_context = v;
+		else Bayrell.Lang.OpCodes.BaseOpCode.prototype.assignValue.call(this,__ctx,k,v);
+	},
+	takeValue: function(__ctx,k,d)
+	{
+		if (d == undefined) d = null;
+		if (k == "op")return this.__op;
+		else if (k == "kind")return this.__kind;
+		else if (k == "class_name")return this.__class_name;
+		else if (k == "method_name")return this.__method_name;
+		else if (k == "obj")return this.__obj;
+		else if (k == "args")return this.__args;
+		else if (k == "is_await")return this.__is_await;
+		else if (k == "is_context")return this.__is_context;
+		return Bayrell.Lang.OpCodes.BaseOpCode.prototype.takeValue.call(this,__ctx,k,d);
+	},
+	getClassName: function(__ctx)
+	{
+		return "Bayrell.Lang.OpCodes.OpPipe";
+	},
+});
+Object.assign(Bayrell.Lang.OpCodes.OpPipe, Bayrell.Lang.OpCodes.BaseOpCode);
+Object.assign(Bayrell.Lang.OpCodes.OpPipe,
+{
+	KIND_METHOD: "method",
+	KIND_LAMBDA: "lambda",
+	/* ======================= Class Init Functions ======================= */
+	getCurrentNamespace: function()
+	{
+		return "Bayrell.Lang.OpCodes";
+	},
+	getCurrentClassName: function()
+	{
+		return "Bayrell.Lang.OpCodes.OpPipe";
+	},
+	getParentClassName: function()
+	{
+		return "Bayrell.Lang.OpCodes.BaseOpCode";
+	},
+	getClassInfo: function(__ctx)
+	{
+		var Collection = Runtime.Collection;
+		var Dict = Runtime.Dict;
+		var IntrospectionInfo = Runtime.Annotations.IntrospectionInfo;
+		return new IntrospectionInfo(__ctx, {
+			"kind": IntrospectionInfo.ITEM_CLASS,
+			"class_name": "Bayrell.Lang.OpCodes.OpPipe",
+			"name": "Bayrell.Lang.OpCodes.OpPipe",
+			"annotations": Collection.from([
+			]),
+		});
+	},
+	getFieldsList: function(__ctx, f)
+	{
+		var a = [];
+		if (f==undefined) f=0;
+		if ((f|3)==3)
+		{
+			a.push("op");
+			a.push("kind");
+			a.push("class_name");
+			a.push("method_name");
+			a.push("obj");
+			a.push("args");
+			a.push("is_await");
+			a.push("is_context");
 		}
-	}
-	static getFieldInfoByName(field_name){
+		return Runtime.Collection.from(a);
+	},
+	getFieldInfoByName: function(__ctx,field_name)
+	{
 		return null;
-	}
-	static getMethodsList(names){
-	}
-	static getMethodInfoByName(method_name){
+	},
+	getMethodsList: function(__ctx)
+	{
+		var a = [
+		];
+		return Runtime.Collection.from(a);
+	},
+	getMethodInfoByName: function(__ctx,field_name)
+	{
 		return null;
-	}
-}
+	},
+});
+Runtime.rtl.defClass(Bayrell.Lang.OpCodes.OpPipe);

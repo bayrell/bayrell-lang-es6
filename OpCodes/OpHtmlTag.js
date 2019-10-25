@@ -1,6 +1,7 @@
 "use strict;"
+var use = (typeof Runtime != 'undefined' && typeof Runtime.rtl != 'undefined') ? Runtime.rtl.find_class : null;
 /*!
- *  Bayrell Common Languages Transcompiler
+ *  Bayrell Language
  *
  *  (c) Copyright 2016-2018 "Ildar Bikmamatov" <support@bayrell.org>
  *
@@ -16,115 +17,131 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-if (typeof BayrellLang == 'undefined') BayrellLang = {};
-if (typeof BayrellLang.OpCodes == 'undefined') BayrellLang.OpCodes = {};
-BayrellLang.OpCodes.OpHtmlTag = class extends BayrellLang.OpCodes.BaseOpCode{
-	/**
-	 * Find attribute by attr_name
-	 * @param string attr_name
-	 * @return OpHtmlAttribute
-	 */
-	findAttribute(attr_name){
-		if (this.attributes == null){
-			return null;
+if (typeof Bayrell == 'undefined') Bayrell = {};
+if (typeof Bayrell.Lang == 'undefined') Bayrell.Lang = {};
+if (typeof Bayrell.Lang.OpCodes == 'undefined') Bayrell.Lang.OpCodes = {};
+Bayrell.Lang.OpCodes.OpHtmlTag = function(__ctx)
+{
+	Bayrell.Lang.OpCodes.BaseOpCode.apply(this, arguments);
+};
+Bayrell.Lang.OpCodes.OpHtmlTag.prototype = Object.create(Bayrell.Lang.OpCodes.BaseOpCode.prototype);
+Bayrell.Lang.OpCodes.OpHtmlTag.prototype.constructor = Bayrell.Lang.OpCodes.OpHtmlTag;
+Object.assign(Bayrell.Lang.OpCodes.OpHtmlTag.prototype,
+{
+	_init: function(__ctx)
+	{
+		var defProp = use('Runtime.rtl').defProp;
+		var a = Object.getOwnPropertyNames(this);
+		this.__op = "op_html_tag";
+		if (a.indexOf("op") == -1) defProp(this, "op");
+		this.__tag_name = "";
+		if (a.indexOf("tag_name") == -1) defProp(this, "tag_name");
+		this.__op_code_name = null;
+		if (a.indexOf("op_code_name") == -1) defProp(this, "op_code_name");
+		this.__attrs = null;
+		if (a.indexOf("attrs") == -1) defProp(this, "attrs");
+		this.__spreads = null;
+		if (a.indexOf("spreads") == -1) defProp(this, "spreads");
+		this.__items = null;
+		if (a.indexOf("items") == -1) defProp(this, "items");
+		Bayrell.Lang.OpCodes.BaseOpCode.prototype._init.call(this,__ctx);
+	},
+	assignObject: function(__ctx,o)
+	{
+		if (o instanceof Bayrell.Lang.OpCodes.OpHtmlTag)
+		{
+			this.__op = o.__op;
+			this.__tag_name = o.__tag_name;
+			this.__op_code_name = o.__op_code_name;
+			this.__attrs = o.__attrs;
+			this.__spreads = o.__spreads;
+			this.__items = o.__items;
 		}
-		for (var i = 0; i < this.attributes.count(); i++){
-			var item = this.attributes.item(i);
-			if (item.key == attr_name){
-				return item;
-			}
-		}
-		return null;
-	}
-	/**
-	 * Remove attribute by attr_name
-	 * @param string attr_name
-	 */
-	removeAttribute(attr_name){
-		this.attributes = this.attributes.filter((item) => {
-			return item.key != attr_name;
-		});
-	}
-	/**
-	 * Set attribute by attr_name
-	 * @param string attr_name
-	 * @param mixed value
-	 */
-	setAttribute(attr_name, value){
-		if (this.attributes == null){
-			return ;
-		}
-		for (var i = 0; i < this.attributes.count(); i++){
-			var item = this.attributes.item(i);
-			if (item.key == attr_name){
-				item.value = value;
-				return ;
-			}
-		}
-		this.attributes.push(new BayrellLang.OpCodes.OpHtmlAttribute((new Runtime.Map()).set("key", attr_name).set("value", value)));
-	}
+		Bayrell.Lang.OpCodes.BaseOpCode.prototype.assignObject.call(this,__ctx,o);
+	},
+	assignValue: function(__ctx,k,v)
+	{
+		if (k == "op")this.__op = v;
+		else if (k == "tag_name")this.__tag_name = v;
+		else if (k == "op_code_name")this.__op_code_name = v;
+		else if (k == "attrs")this.__attrs = v;
+		else if (k == "spreads")this.__spreads = v;
+		else if (k == "items")this.__items = v;
+		else Bayrell.Lang.OpCodes.BaseOpCode.prototype.assignValue.call(this,__ctx,k,v);
+	},
+	takeValue: function(__ctx,k,d)
+	{
+		if (d == undefined) d = null;
+		if (k == "op")return this.__op;
+		else if (k == "tag_name")return this.__tag_name;
+		else if (k == "op_code_name")return this.__op_code_name;
+		else if (k == "attrs")return this.__attrs;
+		else if (k == "spreads")return this.__spreads;
+		else if (k == "items")return this.__items;
+		return Bayrell.Lang.OpCodes.BaseOpCode.prototype.takeValue.call(this,__ctx,k,d);
+	},
+	getClassName: function(__ctx)
+	{
+		return "Bayrell.Lang.OpCodes.OpHtmlTag";
+	},
+});
+Object.assign(Bayrell.Lang.OpCodes.OpHtmlTag, Bayrell.Lang.OpCodes.BaseOpCode);
+Object.assign(Bayrell.Lang.OpCodes.OpHtmlTag,
+{
 	/* ======================= Class Init Functions ======================= */
-	getClassName(){return "BayrellLang.OpCodes.OpHtmlTag";}
-	static getCurrentNamespace(){return "BayrellLang.OpCodes";}
-	static getCurrentClassName(){return "BayrellLang.OpCodes.OpHtmlTag";}
-	static getParentClassName(){return "BayrellLang.OpCodes.BaseOpCode";}
-	_init(){
-		super._init();
-		var names = Object.getOwnPropertyNames(this);
-		this.op = "op_html_tag";
-		this.tag_name = "";
-		this.attributes = null;
-		this.spreads = null;
-		this.childs = null;
-		this.is_plain = false;
-	}
-	assignObject(obj){
-		if (obj instanceof BayrellLang.OpCodes.OpHtmlTag){
-			this.op = Runtime.rtl._clone(obj.op);
-			this.tag_name = Runtime.rtl._clone(obj.tag_name);
-			this.attributes = Runtime.rtl._clone(obj.attributes);
-			this.spreads = Runtime.rtl._clone(obj.spreads);
-			this.childs = Runtime.rtl._clone(obj.childs);
-			this.is_plain = Runtime.rtl._clone(obj.is_plain);
+	getCurrentNamespace: function()
+	{
+		return "Bayrell.Lang.OpCodes";
+	},
+	getCurrentClassName: function()
+	{
+		return "Bayrell.Lang.OpCodes.OpHtmlTag";
+	},
+	getParentClassName: function()
+	{
+		return "Bayrell.Lang.OpCodes.BaseOpCode";
+	},
+	getClassInfo: function(__ctx)
+	{
+		var Collection = Runtime.Collection;
+		var Dict = Runtime.Dict;
+		var IntrospectionInfo = Runtime.Annotations.IntrospectionInfo;
+		return new IntrospectionInfo(__ctx, {
+			"kind": IntrospectionInfo.ITEM_CLASS,
+			"class_name": "Bayrell.Lang.OpCodes.OpHtmlTag",
+			"name": "Bayrell.Lang.OpCodes.OpHtmlTag",
+			"annotations": Collection.from([
+			]),
+		});
+	},
+	getFieldsList: function(__ctx, f)
+	{
+		var a = [];
+		if (f==undefined) f=0;
+		if ((f|3)==3)
+		{
+			a.push("op");
+			a.push("tag_name");
+			a.push("op_code_name");
+			a.push("attrs");
+			a.push("spreads");
+			a.push("items");
 		}
-		super.assignObject(obj);
-	}
-	assignValue(variable_name, value, sender){if(sender==undefined)sender=null;
-		if (variable_name == "op")this.op = Runtime.rtl.convert(value,"string","op_html_tag","");
-		else if (variable_name == "tag_name")this.tag_name = Runtime.rtl.convert(value,"string","","");
-		else if (variable_name == "attributes")this.attributes = Runtime.rtl.convert(value,"Runtime.Vector",null,"BayrellLang.OpCodes.OpHtmlAttribute");
-		else if (variable_name == "spreads")this.spreads = Runtime.rtl.convert(value,"Runtime.Vector",null,"mixed");
-		else if (variable_name == "childs")this.childs = Runtime.rtl.convert(value,"Runtime.Vector",null,"BayrellLang.OpCodes.BaseOpCode");
-		else if (variable_name == "is_plain")this.is_plain = Runtime.rtl.convert(value,"bool",false,"");
-		else super.assignValue(variable_name, value, sender);
-	}
-	takeValue(variable_name, default_value){
-		if (default_value == undefined) default_value = null;
-		if (variable_name == "op") return this.op;
-		else if (variable_name == "tag_name") return this.tag_name;
-		else if (variable_name == "attributes") return this.attributes;
-		else if (variable_name == "spreads") return this.spreads;
-		else if (variable_name == "childs") return this.childs;
-		else if (variable_name == "is_plain") return this.is_plain;
-		return super.takeValue(variable_name, default_value);
-	}
-	static getFieldsList(names, flag){
-		if (flag==undefined)flag=0;
-		if ((flag | 3)==3){
-			names.push("op");
-			names.push("tag_name");
-			names.push("attributes");
-			names.push("spreads");
-			names.push("childs");
-			names.push("is_plain");
-		}
-	}
-	static getFieldInfoByName(field_name){
+		return Runtime.Collection.from(a);
+	},
+	getFieldInfoByName: function(__ctx,field_name)
+	{
 		return null;
-	}
-	static getMethodsList(names){
-	}
-	static getMethodInfoByName(method_name){
+	},
+	getMethodsList: function(__ctx)
+	{
+		var a = [
+		];
+		return Runtime.Collection.from(a);
+	},
+	getMethodInfoByName: function(__ctx,field_name)
+	{
 		return null;
-	}
-}
+	},
+});
+Runtime.rtl.defClass(Bayrell.Lang.OpCodes.OpHtmlTag);

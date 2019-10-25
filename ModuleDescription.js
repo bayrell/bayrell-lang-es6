@@ -1,4 +1,5 @@
 "use strict;"
+var use = (typeof Runtime != 'undefined' && typeof Runtime.rtl != 'undefined') ? Runtime.rtl.find_class : null;
 /*!
  *  Bayrell Language
  *
@@ -16,86 +17,133 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-if (typeof BayrellLang == 'undefined') BayrellLang = {};
-BayrellLang.ModuleDescription = class{
+if (typeof Bayrell == 'undefined') Bayrell = {};
+if (typeof Bayrell.Lang == 'undefined') Bayrell.Lang = {};
+Bayrell.Lang.ModuleDescription = function(__ctx)
+{
+};
+Object.assign(Bayrell.Lang.ModuleDescription.prototype,
+{
+	assignObject: function(__ctx,o)
+	{
+		if (o instanceof Bayrell.Lang.ModuleDescription)
+		{
+		}
+	},
+	assignValue: function(__ctx,k,v)
+	{
+	},
+	takeValue: function(__ctx,k,d)
+	{
+		if (d == undefined) d = null;
+	},
+	getClassName: function(__ctx)
+	{
+		return "Bayrell.Lang.ModuleDescription";
+	},
+});
+Object.assign(Bayrell.Lang.ModuleDescription,
+{
 	/**
 	 * Returns module name
 	 * @return string
 	 */
-	static getModuleName(){
-		return "BayrellLang";
-	}
+	getModuleName: function(__ctx)
+	{
+		return "Bayrell.Lang";
+	},
 	/**
 	 * Returns module name
 	 * @return string
 	 */
-	static getModuleVersion(){
-		return "0.7.3";
-	}
+	getModuleVersion: function(__ctx)
+	{
+		return "0.8.0-alpha.9";
+	},
 	/**
 	 * Returns required modules
 	 * @return Map<string>
 	 */
-	static requiredModules(){
-		return (new Runtime.Map()).set("Runtime", ">=0.2 <1.0").set("BayrellLang.Parser", ">=0.1 <1.0");
-	}
-	/**
-	 * Compatibility with older versions
-	 */
-	static getRequiredModules(){
-		return this.requiredModules();
-	}
+	requiredModules: function(__ctx)
+	{
+		return Runtime.Dict.from({"Runtime":">=0.2 <1.0"});
+	},
 	/**
 	 * Returns module files load order
 	 * @return Collection<string>
 	 */
-	static getModuleFiles(){
-		return (new Runtime.Vector()).push("BayrellLang.CommonParser").push("BayrellLang.CommonTranslator").push("BayrellLang.CoreTranslator").push("BayrellLang.LangConstant").push("BayrellLang.ModuleDescription").push("BayrellLang.Utils").push("BayrellLang.OpCodes.BaseOpCode").push("BayrellLang.Exceptions.EndOfStringExpected").push("BayrellLang.Exceptions.HexNumberExpected").push("BayrellLang.Exceptions.TwiceDeclareElseError").push("BayrellLang.OpCodes.OpValue1").push("BayrellLang.OpCodes.OpValue2").push("BayrellLang.OpCodes.OpValueString").push("BayrellLang.OpCodes.OpChilds").push("BayrellLang.LangBay.HtmlToken").push("BayrellLang.LangBay.ParserBay").push("BayrellLang.LangBay.ParserBayFactory").push("BayrellLang.LangBay.ParserBayNameToken").push("BayrellLang.LangBay.ParserBayToken").push("BayrellLang.LangBay.TranslatorBay").push("BayrellLang.LangBay.TranslatorBayFactory").push("BayrellLang.LangES6.FunctionStack").push("BayrellLang.LangES6.TranslatorES6").push("BayrellLang.LangES6.TranslatorES6Factory").push("BayrellLang.OpCodes.OpAdd").push("BayrellLang.OpCodes.OpAnd").push("BayrellLang.OpCodes.OpAnnotation").push("BayrellLang.OpCodes.OpAssign").push("BayrellLang.OpCodes.OpAssignDeclare").push("BayrellLang.OpCodes.OpBitAnd").push("BayrellLang.OpCodes.OpBitNot").push("BayrellLang.OpCodes.OpBitOr").push("BayrellLang.OpCodes.OpBitXor").push("BayrellLang.OpCodes.OpBreak").push("BayrellLang.OpCodes.OpCall").push("BayrellLang.OpCodes.OpCallAwait").push("BayrellLang.OpCodes.OpClassDeclare").push("BayrellLang.OpCodes.OpClassName").push("BayrellLang.OpCodes.OpClone").push("BayrellLang.OpCodes.OpComponent").push("BayrellLang.OpCodes.OpComment").push("BayrellLang.OpCodes.OpCompare").push("BayrellLang.OpCodes.OpConcat").push("BayrellLang.OpCodes.OpContinue").push("BayrellLang.OpCodes.OpCopyStruct").push("BayrellLang.OpCodes.OpDelete").push("BayrellLang.OpCodes.OpDiv").push("BayrellLang.OpCodes.OpDynamic").push("BayrellLang.OpCodes.OpFlags").push("BayrellLang.OpCodes.OpFor").push("BayrellLang.OpCodes.OpFunctionDeclare").push("BayrellLang.OpCodes.OpHexNumber").push("BayrellLang.OpCodes.OpHtmlAttribute").push("BayrellLang.OpCodes.OpHtmlComment").push("BayrellLang.OpCodes.OpHtmlEscape").push("BayrellLang.OpCodes.OpHtmlJson").push("BayrellLang.OpCodes.OpHtmlRaw").push("BayrellLang.OpCodes.OpHtmlTag").push("BayrellLang.OpCodes.OpHtmlText").push("BayrellLang.OpCodes.OpHtmlView").push("BayrellLang.OpCodes.OpIdentifier").push("BayrellLang.OpCodes.OpIf").push("BayrellLang.OpCodes.OpIfElse").push("BayrellLang.OpCodes.OpMap").push("BayrellLang.OpCodes.OpMethod").push("BayrellLang.OpCodes.OpMod").push("BayrellLang.OpCodes.OpMult").push("BayrellLang.OpCodes.OpNamespace").push("BayrellLang.OpCodes.OpNew").push("BayrellLang.OpCodes.OpNope").push("BayrellLang.OpCodes.OpNot").push("BayrellLang.OpCodes.OpNumber").push("BayrellLang.OpCodes.OpOr").push("BayrellLang.OpCodes.OpPipe").push("BayrellLang.OpCodes.OpPostDec").push("BayrellLang.OpCodes.OpPostInc").push("BayrellLang.OpCodes.OpPow").push("BayrellLang.OpCodes.OpPreDec").push("BayrellLang.OpCodes.OpPreInc").push("BayrellLang.OpCodes.OpPreprocessorCase").push("BayrellLang.OpCodes.OpPreprocessorSwitch").push("BayrellLang.OpCodes.OpReturn").push("BayrellLang.OpCodes.OpShiftLeft").push("BayrellLang.OpCodes.OpShiftRight").push("BayrellLang.OpCodes.OpStatic").push("BayrellLang.OpCodes.OpString").push("BayrellLang.OpCodes.OpStringItem").push("BayrellLang.OpCodes.OpSub").push("BayrellLang.OpCodes.OpTemplateIdentifier").push("BayrellLang.OpCodes.OpTernary").push("BayrellLang.OpCodes.OpThrow").push("BayrellLang.OpCodes.OpTryCatch").push("BayrellLang.OpCodes.OpTryCatchChilds").push("BayrellLang.OpCodes.OpUse").push("BayrellLang.OpCodes.OpVector").push("BayrellLang.OpCodes.OpWhile").push("BayrellLang.OpCodes.OpFunctionArrowDeclare").push("BayrellLang.OpCodes.OpInterfaceDeclare").push("BayrellLang.OpCodes.OpStructDeclare").push("BayrellLang.LangNodeJS.TranslatorNodeJS").push("BayrellLang.LangNodeJS.TranslatorNodeJSFactory").push("BayrellLang.LangPHP.TranslatorPHP").push("BayrellLang.LangPHP.TranslatorPHPFactory");
-	}
+	assets: function(__ctx)
+	{
+		return Runtime.Collection.from(["Bayrell.Lang/Caret","Bayrell.Lang/CoreParser","Bayrell.Lang/CoreToken","Bayrell.Lang/CoreTranslator","Bayrell.Lang/LangConstant","Bayrell.Lang/LangUtils","Bayrell.Lang/SaveOpCode","Bayrell.Lang/ModuleDescription","Bayrell.Lang/Exceptions/ParserUnknownError","Bayrell.Lang/Exceptions/ParserError","Bayrell.Lang/Exceptions/ParserEOF","Bayrell.Lang/Exceptions/ParserExpected","Bayrell.Lang/LangBay/ParserBay","Bayrell.Lang/LangBay/ParserBayBase","Bayrell.Lang/LangBay/ParserBayExpression","Bayrell.Lang/LangBay/ParserBayOperator","Bayrell.Lang/LangBay/ParserBayPreprocessor","Bayrell.Lang/LangBay/ParserBayProgram","Bayrell.Lang/LangES6/TranslatorES6","Bayrell.Lang/LangES6/TranslatorES6Expression","Bayrell.Lang/LangES6/TranslatorES6Operator","Bayrell.Lang/LangES6/TranslatorES6Program","Bayrell.Lang/OpCodes/BaseOpCode","Bayrell.Lang/OpCodes/OpAnnotation","Bayrell.Lang/OpCodes/OpAssign","Bayrell.Lang/OpCodes/OpAssignValue","Bayrell.Lang/OpCodes/OpAttr","Bayrell.Lang/OpCodes/OpBreak","Bayrell.Lang/OpCodes/OpCall","Bayrell.Lang/OpCodes/OpClassOf","Bayrell.Lang/OpCodes/OpClassRef","Bayrell.Lang/OpCodes/OpCollection","Bayrell.Lang/OpCodes/OpComment","Bayrell.Lang/OpCodes/OpContinue","Bayrell.Lang/OpCodes/OpDeclareClass","Bayrell.Lang/OpCodes/OpDeclareFunction","Bayrell.Lang/OpCodes/OpDeclareFunctionArg","Bayrell.Lang/OpCodes/OpDict","Bayrell.Lang/OpCodes/OpEntityName","Bayrell.Lang/OpCodes/OpFlags","Bayrell.Lang/OpCodes/OpFor","Bayrell.Lang/OpCodes/OpIdentifier","Bayrell.Lang/OpCodes/OpIf","Bayrell.Lang/OpCodes/OpIfElse","Bayrell.Lang/OpCodes/OpInc","Bayrell.Lang/OpCodes/OpItems","Bayrell.Lang/OpCodes/OpMath","Bayrell.Lang/OpCodes/OpMethod","Bayrell.Lang/OpCodes/OpModule","Bayrell.Lang/OpCodes/OpNamespace","Bayrell.Lang/OpCodes/OpNew","Bayrell.Lang/OpCodes/OpNumber","Bayrell.Lang/OpCodes/OpPreprocessorIfCode","Bayrell.Lang/OpCodes/OpPreprocessorSwitch","Bayrell.Lang/OpCodes/OpReturn","Bayrell.Lang/OpCodes/OpString","Bayrell.Lang/OpCodes/OpTernary","Bayrell.Lang/OpCodes/OpThrow","Bayrell.Lang/OpCodes/OpTypeConvert","Bayrell.Lang/OpCodes/OpTypeIdentifier","Bayrell.Lang/OpCodes/OpUse","Bayrell.Lang/OpCodes/OpWhile"]);
+	},
+	getAssetsFiles: function(__ctx)
+	{
+		return this.assets(__ctx);
+	},
 	/**
 	 * Returns enities
 	 */
-	static entities(){
+	entities: function(__ctx)
+	{
 		return null;
-	}
+	},
 	/**
-	 * Called then module registed in context
-	 * @param ContextInterface context
+	 * Returns enities
 	 */
-	static onRegister(context){
-	}
-	/**
-	 * Called then context read config
-	 * @param Map<mixed> config
-	 */
-	static onReadConfig(context, config){
-	}
-	/**
-	 * Init context
-	 * @param ContextInterface context
-	 */
-	static onInitContext(context){
-	}
+	resources: function(__ctx)
+	{
+		return null;
+	},
 	/* ======================= Class Init Functions ======================= */
-	getClassName(){return "BayrellLang.ModuleDescription";}
-	static getCurrentNamespace(){return "BayrellLang";}
-	static getCurrentClassName(){return "BayrellLang.ModuleDescription";}
-	static getParentClassName(){return "";}
-	_init(){
-		if (this.__implements__ == undefined){this.__implements__ = [];}
-		this.__implements__.push(Runtime.Interfaces.ModuleDescriptionInterface);
-	}
-	static getFieldsList(names, flag){
-		if (flag==undefined)flag=0;
-	}
-	static getFieldInfoByName(field_name){
+	getCurrentNamespace: function()
+	{
+		return "Bayrell.Lang";
+	},
+	getCurrentClassName: function()
+	{
+		return "Bayrell.Lang.ModuleDescription";
+	},
+	getParentClassName: function()
+	{
+		return "";
+	},
+	getClassInfo: function(__ctx)
+	{
+		var Collection = Runtime.Collection;
+		var Dict = Runtime.Dict;
+		var IntrospectionInfo = Runtime.Annotations.IntrospectionInfo;
+		return new IntrospectionInfo(__ctx, {
+			"kind": IntrospectionInfo.ITEM_CLASS,
+			"class_name": "Bayrell.Lang.ModuleDescription",
+			"name": "Bayrell.Lang.ModuleDescription",
+			"annotations": Collection.from([
+			]),
+		});
+	},
+	getFieldsList: function(__ctx, f)
+	{
+		var a = [];
+		if (f==undefined) f=0;
+		return Runtime.Collection.from(a);
+	},
+	getFieldInfoByName: function(__ctx,field_name)
+	{
 		return null;
-	}
-	static getMethodsList(names){
-	}
-	static getMethodInfoByName(method_name){
+	},
+	getMethodsList: function(__ctx)
+	{
+		var a = [
+		];
+		return Runtime.Collection.from(a);
+	},
+	getMethodInfoByName: function(__ctx,field_name)
+	{
 		return null;
-	}
-}
-BayrellLang.ModuleDescription.__static_implements__ = [];
-BayrellLang.ModuleDescription.__static_implements__.push(Runtime.Interfaces.ModuleDescriptionInterface)
+	},
+	__implements__:
+	[
+		Runtime.Interfaces.ModuleDescriptionInterface,
+		Runtime.Interfaces.AssetsInterface,
+	],
+});
+Runtime.rtl.defClass(Bayrell.Lang.ModuleDescription);

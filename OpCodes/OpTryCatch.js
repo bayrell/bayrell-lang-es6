@@ -1,6 +1,7 @@
 "use strict;"
+var use = (typeof Runtime != 'undefined' && typeof Runtime.rtl != 'undefined') ? Runtime.rtl.find_class : null;
 /*!
- *  Bayrell Common Languages Transcompiler
+ *  Bayrell Language
  *
  *  (c) Copyright 2016-2018 "Ildar Bikmamatov" <support@bayrell.org>
  *
@@ -16,72 +17,113 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-if (typeof BayrellLang == 'undefined') BayrellLang = {};
-if (typeof BayrellLang.OpCodes == 'undefined') BayrellLang.OpCodes = {};
-BayrellLang.OpCodes.OpTryCatch = class extends BayrellLang.OpCodes.BaseOpCode{
-	/**
-	 * Constructor
-	 */
-	constructor(op_try, childs){
-		if (op_try == undefined) op_try=null;
-		if (childs == undefined) childs=null;
-		super();
-		this.op_try = op_try;
-		this.childs = childs;
-	}
-	/**
-	 * Destructor
-	 */
-	destructor(){
-		super.destructor();
-	}
+if (typeof Bayrell == 'undefined') Bayrell = {};
+if (typeof Bayrell.Lang == 'undefined') Bayrell.Lang = {};
+if (typeof Bayrell.Lang.OpCodes == 'undefined') Bayrell.Lang.OpCodes = {};
+Bayrell.Lang.OpCodes.OpTryCatch = function(__ctx)
+{
+	Bayrell.Lang.OpCodes.BaseOpCode.apply(this, arguments);
+};
+Bayrell.Lang.OpCodes.OpTryCatch.prototype = Object.create(Bayrell.Lang.OpCodes.BaseOpCode.prototype);
+Bayrell.Lang.OpCodes.OpTryCatch.prototype.constructor = Bayrell.Lang.OpCodes.OpTryCatch;
+Object.assign(Bayrell.Lang.OpCodes.OpTryCatch.prototype,
+{
+	_init: function(__ctx)
+	{
+		var defProp = use('Runtime.rtl').defProp;
+		var a = Object.getOwnPropertyNames(this);
+		this.__op = "op_try_catch";
+		if (a.indexOf("op") == -1) defProp(this, "op");
+		this.__op_try = null;
+		if (a.indexOf("op_try") == -1) defProp(this, "op_try");
+		this.__items = null;
+		if (a.indexOf("items") == -1) defProp(this, "items");
+		Bayrell.Lang.OpCodes.BaseOpCode.prototype._init.call(this,__ctx);
+	},
+	assignObject: function(__ctx,o)
+	{
+		if (o instanceof Bayrell.Lang.OpCodes.OpTryCatch)
+		{
+			this.__op = o.__op;
+			this.__op_try = o.__op_try;
+			this.__items = o.__items;
+		}
+		Bayrell.Lang.OpCodes.BaseOpCode.prototype.assignObject.call(this,__ctx,o);
+	},
+	assignValue: function(__ctx,k,v)
+	{
+		if (k == "op")this.__op = v;
+		else if (k == "op_try")this.__op_try = v;
+		else if (k == "items")this.__items = v;
+		else Bayrell.Lang.OpCodes.BaseOpCode.prototype.assignValue.call(this,__ctx,k,v);
+	},
+	takeValue: function(__ctx,k,d)
+	{
+		if (d == undefined) d = null;
+		if (k == "op")return this.__op;
+		else if (k == "op_try")return this.__op_try;
+		else if (k == "items")return this.__items;
+		return Bayrell.Lang.OpCodes.BaseOpCode.prototype.takeValue.call(this,__ctx,k,d);
+	},
+	getClassName: function(__ctx)
+	{
+		return "Bayrell.Lang.OpCodes.OpTryCatch";
+	},
+});
+Object.assign(Bayrell.Lang.OpCodes.OpTryCatch, Bayrell.Lang.OpCodes.BaseOpCode);
+Object.assign(Bayrell.Lang.OpCodes.OpTryCatch,
+{
 	/* ======================= Class Init Functions ======================= */
-	getClassName(){return "BayrellLang.OpCodes.OpTryCatch";}
-	static getCurrentNamespace(){return "BayrellLang.OpCodes";}
-	static getCurrentClassName(){return "BayrellLang.OpCodes.OpTryCatch";}
-	static getParentClassName(){return "BayrellLang.OpCodes.BaseOpCode";}
-	_init(){
-		super._init();
-		var names = Object.getOwnPropertyNames(this);
-		this.op = "op_try_catch";
-		this.op_try = null;
-		this.childs = null;
-	}
-	assignObject(obj){
-		if (obj instanceof BayrellLang.OpCodes.OpTryCatch){
-			this.op = Runtime.rtl._clone(obj.op);
-			this.op_try = Runtime.rtl._clone(obj.op_try);
-			this.childs = Runtime.rtl._clone(obj.childs);
+	getCurrentNamespace: function()
+	{
+		return "Bayrell.Lang.OpCodes";
+	},
+	getCurrentClassName: function()
+	{
+		return "Bayrell.Lang.OpCodes.OpTryCatch";
+	},
+	getParentClassName: function()
+	{
+		return "Bayrell.Lang.OpCodes.BaseOpCode";
+	},
+	getClassInfo: function(__ctx)
+	{
+		var Collection = Runtime.Collection;
+		var Dict = Runtime.Dict;
+		var IntrospectionInfo = Runtime.Annotations.IntrospectionInfo;
+		return new IntrospectionInfo(__ctx, {
+			"kind": IntrospectionInfo.ITEM_CLASS,
+			"class_name": "Bayrell.Lang.OpCodes.OpTryCatch",
+			"name": "Bayrell.Lang.OpCodes.OpTryCatch",
+			"annotations": Collection.from([
+			]),
+		});
+	},
+	getFieldsList: function(__ctx, f)
+	{
+		var a = [];
+		if (f==undefined) f=0;
+		if ((f|3)==3)
+		{
+			a.push("op");
+			a.push("op_try");
+			a.push("items");
 		}
-		super.assignObject(obj);
-	}
-	assignValue(variable_name, value, sender){if(sender==undefined)sender=null;
-		if (variable_name == "op")this.op = Runtime.rtl.convert(value,"string","op_try_catch","");
-		else if (variable_name == "op_try")this.op_try = Runtime.rtl.convert(value,"Runtime.Vector",null,"BayrellLang.OpCodes.BaseOpCode");
-		else if (variable_name == "childs")this.childs = Runtime.rtl.convert(value,"Runtime.Vector",null,"BayrellLang.OpCodes.OpTryCatchChilds");
-		else super.assignValue(variable_name, value, sender);
-	}
-	takeValue(variable_name, default_value){
-		if (default_value == undefined) default_value = null;
-		if (variable_name == "op") return this.op;
-		else if (variable_name == "op_try") return this.op_try;
-		else if (variable_name == "childs") return this.childs;
-		return super.takeValue(variable_name, default_value);
-	}
-	static getFieldsList(names, flag){
-		if (flag==undefined)flag=0;
-		if ((flag | 3)==3){
-			names.push("op");
-			names.push("op_try");
-			names.push("childs");
-		}
-	}
-	static getFieldInfoByName(field_name){
+		return Runtime.Collection.from(a);
+	},
+	getFieldInfoByName: function(__ctx,field_name)
+	{
 		return null;
-	}
-	static getMethodsList(names){
-	}
-	static getMethodInfoByName(method_name){
+	},
+	getMethodsList: function(__ctx)
+	{
+		var a = [
+		];
+		return Runtime.Collection.from(a);
+	},
+	getMethodInfoByName: function(__ctx,field_name)
+	{
 		return null;
-	}
-}
+	},
+});
+Runtime.rtl.defClass(Bayrell.Lang.OpCodes.OpTryCatch);

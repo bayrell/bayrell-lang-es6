@@ -1,8 +1,9 @@
 "use strict;"
+var use = (typeof Runtime != 'undefined' && typeof Runtime.rtl != 'undefined') ? Runtime.rtl.find_class : null;
 /*!
- *  Bayrell Common Languages Transcompiler
+ *  Bayrell Language
  *
- *  (c) Copyright 2016-2018 "Ildar Bikmamatov" <support@bayrell.org>
+ *  (c) Copyright 2016-2019 "Ildar Bikmamatov" <support@bayrell.org>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,86 +17,125 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-if (typeof BayrellLang == 'undefined') BayrellLang = {};
-if (typeof BayrellLang.OpCodes == 'undefined') BayrellLang.OpCodes = {};
-BayrellLang.OpCodes.OpFor = class extends BayrellLang.OpCodes.BaseOpCode{
-	/**
-	 * Constructor
-	 */
-	constructor(loop_condition, loop_init, loop_inc, childs){
-		if (loop_condition == undefined) loop_condition=null;
-		if (loop_init == undefined) loop_init=null;
-		if (loop_inc == undefined) loop_inc=null;
-		if (childs == undefined) childs=null;
-		super();
-		this.loop_condition = loop_condition;
-		this.loop_init = loop_init;
-		this.loop_inc = loop_inc;
-		this.childs = childs;
-	}
-	/**
-	 * Destructor
-	 */
-	destructor(){
-		super.destructor();
-	}
+if (typeof Bayrell == 'undefined') Bayrell = {};
+if (typeof Bayrell.Lang == 'undefined') Bayrell.Lang = {};
+if (typeof Bayrell.Lang.OpCodes == 'undefined') Bayrell.Lang.OpCodes = {};
+Bayrell.Lang.OpCodes.OpFor = function(__ctx)
+{
+	Bayrell.Lang.OpCodes.BaseOpCode.apply(this, arguments);
+};
+Bayrell.Lang.OpCodes.OpFor.prototype = Object.create(Bayrell.Lang.OpCodes.BaseOpCode.prototype);
+Bayrell.Lang.OpCodes.OpFor.prototype.constructor = Bayrell.Lang.OpCodes.OpFor;
+Object.assign(Bayrell.Lang.OpCodes.OpFor.prototype,
+{
+	_init: function(__ctx)
+	{
+		var defProp = use('Runtime.rtl').defProp;
+		var a = Object.getOwnPropertyNames(this);
+		this.__op = "op_for";
+		if (a.indexOf("op") == -1) defProp(this, "op");
+		this.__expr1 = null;
+		if (a.indexOf("expr1") == -1) defProp(this, "expr1");
+		this.__expr2 = null;
+		if (a.indexOf("expr2") == -1) defProp(this, "expr2");
+		this.__expr3 = null;
+		if (a.indexOf("expr3") == -1) defProp(this, "expr3");
+		this.__value = null;
+		if (a.indexOf("value") == -1) defProp(this, "value");
+		Bayrell.Lang.OpCodes.BaseOpCode.prototype._init.call(this,__ctx);
+	},
+	assignObject: function(__ctx,o)
+	{
+		if (o instanceof Bayrell.Lang.OpCodes.OpFor)
+		{
+			this.__op = o.__op;
+			this.__expr1 = o.__expr1;
+			this.__expr2 = o.__expr2;
+			this.__expr3 = o.__expr3;
+			this.__value = o.__value;
+		}
+		Bayrell.Lang.OpCodes.BaseOpCode.prototype.assignObject.call(this,__ctx,o);
+	},
+	assignValue: function(__ctx,k,v)
+	{
+		if (k == "op")this.__op = v;
+		else if (k == "expr1")this.__expr1 = v;
+		else if (k == "expr2")this.__expr2 = v;
+		else if (k == "expr3")this.__expr3 = v;
+		else if (k == "value")this.__value = v;
+		else Bayrell.Lang.OpCodes.BaseOpCode.prototype.assignValue.call(this,__ctx,k,v);
+	},
+	takeValue: function(__ctx,k,d)
+	{
+		if (d == undefined) d = null;
+		if (k == "op")return this.__op;
+		else if (k == "expr1")return this.__expr1;
+		else if (k == "expr2")return this.__expr2;
+		else if (k == "expr3")return this.__expr3;
+		else if (k == "value")return this.__value;
+		return Bayrell.Lang.OpCodes.BaseOpCode.prototype.takeValue.call(this,__ctx,k,d);
+	},
+	getClassName: function(__ctx)
+	{
+		return "Bayrell.Lang.OpCodes.OpFor";
+	},
+});
+Object.assign(Bayrell.Lang.OpCodes.OpFor, Bayrell.Lang.OpCodes.BaseOpCode);
+Object.assign(Bayrell.Lang.OpCodes.OpFor,
+{
 	/* ======================= Class Init Functions ======================= */
-	getClassName(){return "BayrellLang.OpCodes.OpFor";}
-	static getCurrentNamespace(){return "BayrellLang.OpCodes";}
-	static getCurrentClassName(){return "BayrellLang.OpCodes.OpFor";}
-	static getParentClassName(){return "BayrellLang.OpCodes.BaseOpCode";}
-	_init(){
-		super._init();
-		var names = Object.getOwnPropertyNames(this);
-		this.op = "op_for";
-		this.loop_condition = null;
-		this.loop_init = null;
-		this.loop_inc = null;
-		this.childs = null;
-	}
-	assignObject(obj){
-		if (obj instanceof BayrellLang.OpCodes.OpFor){
-			this.op = Runtime.rtl._clone(obj.op);
-			this.loop_condition = Runtime.rtl._clone(obj.loop_condition);
-			this.loop_init = Runtime.rtl._clone(obj.loop_init);
-			this.loop_inc = Runtime.rtl._clone(obj.loop_inc);
-			this.childs = Runtime.rtl._clone(obj.childs);
+	getCurrentNamespace: function()
+	{
+		return "Bayrell.Lang.OpCodes";
+	},
+	getCurrentClassName: function()
+	{
+		return "Bayrell.Lang.OpCodes.OpFor";
+	},
+	getParentClassName: function()
+	{
+		return "Bayrell.Lang.OpCodes.BaseOpCode";
+	},
+	getClassInfo: function(__ctx)
+	{
+		var Collection = Runtime.Collection;
+		var Dict = Runtime.Dict;
+		var IntrospectionInfo = Runtime.Annotations.IntrospectionInfo;
+		return new IntrospectionInfo(__ctx, {
+			"kind": IntrospectionInfo.ITEM_CLASS,
+			"class_name": "Bayrell.Lang.OpCodes.OpFor",
+			"name": "Bayrell.Lang.OpCodes.OpFor",
+			"annotations": Collection.from([
+			]),
+		});
+	},
+	getFieldsList: function(__ctx, f)
+	{
+		var a = [];
+		if (f==undefined) f=0;
+		if ((f|3)==3)
+		{
+			a.push("op");
+			a.push("expr1");
+			a.push("expr2");
+			a.push("expr3");
+			a.push("value");
 		}
-		super.assignObject(obj);
-	}
-	assignValue(variable_name, value, sender){if(sender==undefined)sender=null;
-		if (variable_name == "op")this.op = Runtime.rtl.convert(value,"string","op_for","");
-		else if (variable_name == "loop_condition")this.loop_condition = Runtime.rtl.convert(value,"BayrellLang.OpCodes.BaseOpCode",null,"");
-		else if (variable_name == "loop_init")this.loop_init = Runtime.rtl.convert(value,"BayrellLang.OpCodes.BaseOpCode",null,"");
-		else if (variable_name == "loop_inc")this.loop_inc = Runtime.rtl.convert(value,"BayrellLang.OpCodes.BaseOpCode",null,"");
-		else if (variable_name == "childs")this.childs = Runtime.rtl.convert(value,"Runtime.Vector",null,"BayrellLang.OpCodes.BaseOpCode");
-		else super.assignValue(variable_name, value, sender);
-	}
-	takeValue(variable_name, default_value){
-		if (default_value == undefined) default_value = null;
-		if (variable_name == "op") return this.op;
-		else if (variable_name == "loop_condition") return this.loop_condition;
-		else if (variable_name == "loop_init") return this.loop_init;
-		else if (variable_name == "loop_inc") return this.loop_inc;
-		else if (variable_name == "childs") return this.childs;
-		return super.takeValue(variable_name, default_value);
-	}
-	static getFieldsList(names, flag){
-		if (flag==undefined)flag=0;
-		if ((flag | 3)==3){
-			names.push("op");
-			names.push("loop_condition");
-			names.push("loop_init");
-			names.push("loop_inc");
-			names.push("childs");
-		}
-	}
-	static getFieldInfoByName(field_name){
+		return Runtime.Collection.from(a);
+	},
+	getFieldInfoByName: function(__ctx,field_name)
+	{
 		return null;
-	}
-	static getMethodsList(names){
-	}
-	static getMethodInfoByName(method_name){
+	},
+	getMethodsList: function(__ctx)
+	{
+		var a = [
+		];
+		return Runtime.Collection.from(a);
+	},
+	getMethodInfoByName: function(__ctx,field_name)
+	{
 		return null;
-	}
-}
+	},
+});
+Runtime.rtl.defClass(Bayrell.Lang.OpCodes.OpFor);

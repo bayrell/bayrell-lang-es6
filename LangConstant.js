@@ -1,4 +1,5 @@
 "use strict;"
+var use = (typeof Runtime != 'undefined' && typeof Runtime.rtl != 'undefined') ? Runtime.rtl.find_class : null;
 /*!
  *  Bayrell Parser Library.  
  *
@@ -16,25 +17,81 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-if (typeof BayrellLang == 'undefined') BayrellLang = {};
-BayrellLang.LangConstant = class{
+if (typeof Bayrell == 'undefined') Bayrell = {};
+if (typeof Bayrell.Lang == 'undefined') Bayrell.Lang = {};
+Bayrell.Lang.LangConstant = function(__ctx)
+{
+};
+Object.assign(Bayrell.Lang.LangConstant.prototype,
+{
+	assignObject: function(__ctx,o)
+	{
+		if (o instanceof Bayrell.Lang.LangConstant)
+		{
+		}
+	},
+	assignValue: function(__ctx,k,v)
+	{
+	},
+	takeValue: function(__ctx,k,d)
+	{
+		if (d == undefined) d = null;
+	},
+	getClassName: function(__ctx)
+	{
+		return "Bayrell.Lang.LangConstant";
+	},
+});
+Object.assign(Bayrell.Lang.LangConstant,
+{
+	ERROR_PARSER: -1000,
+	ERROR_PARSER_EOF: -1001,
+	ERROR_PARSER_EXPECTED: -1002,
 	/* ======================= Class Init Functions ======================= */
-	getClassName(){return "BayrellLang.LangConstant";}
-	static getCurrentNamespace(){return "BayrellLang";}
-	static getCurrentClassName(){return "BayrellLang.LangConstant";}
-	static getParentClassName(){return "";}
-	static getFieldsList(names, flag){
-		if (flag==undefined)flag=0;
-	}
-	static getFieldInfoByName(field_name){
+	getCurrentNamespace: function()
+	{
+		return "Bayrell.Lang";
+	},
+	getCurrentClassName: function()
+	{
+		return "Bayrell.Lang.LangConstant";
+	},
+	getParentClassName: function()
+	{
+		return "";
+	},
+	getClassInfo: function(__ctx)
+	{
+		var Collection = Runtime.Collection;
+		var Dict = Runtime.Dict;
+		var IntrospectionInfo = Runtime.Annotations.IntrospectionInfo;
+		return new IntrospectionInfo(__ctx, {
+			"kind": IntrospectionInfo.ITEM_CLASS,
+			"class_name": "Bayrell.Lang.LangConstant",
+			"name": "Bayrell.Lang.LangConstant",
+			"annotations": Collection.from([
+			]),
+		});
+	},
+	getFieldsList: function(__ctx, f)
+	{
+		var a = [];
+		if (f==undefined) f=0;
+		return Runtime.Collection.from(a);
+	},
+	getFieldInfoByName: function(__ctx,field_name)
+	{
 		return null;
-	}
-	static getMethodsList(names){
-	}
-	static getMethodInfoByName(method_name){
+	},
+	getMethodsList: function(__ctx)
+	{
+		var a = [
+		];
+		return Runtime.Collection.from(a);
+	},
+	getMethodInfoByName: function(__ctx,field_name)
+	{
 		return null;
-	}
-}
-BayrellLang.LangConstant.ERROR_END_OF_THE_STRING_EXPECTED = Runtime.RuntimeConstant.ERROR_MODULE_PARSER - 501;
-BayrellLang.LangConstant.ERROR_PARSER_HEX_NUMBER_EXPECTED = Runtime.RuntimeConstant.ERROR_MODULE_PARSER - 502;
-BayrellLang.LangConstant.ERROR_TWICE_DECLARE_ERROR = Runtime.RuntimeConstant.ERROR_MODULE_PARSER - 503;
+	},
+});
+Runtime.rtl.defClass(Bayrell.Lang.LangConstant);
