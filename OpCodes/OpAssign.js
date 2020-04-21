@@ -20,7 +20,7 @@ var use = (typeof Runtime != 'undefined' && typeof Runtime.rtl != 'undefined') ?
 if (typeof Bayrell == 'undefined') Bayrell = {};
 if (typeof Bayrell.Lang == 'undefined') Bayrell.Lang = {};
 if (typeof Bayrell.Lang.OpCodes == 'undefined') Bayrell.Lang.OpCodes = {};
-Bayrell.Lang.OpCodes.OpAssign = function(__ctx)
+Bayrell.Lang.OpCodes.OpAssign = function(ctx)
 {
 	Bayrell.Lang.OpCodes.BaseOpCode.apply(this, arguments);
 };
@@ -28,74 +28,65 @@ Bayrell.Lang.OpCodes.OpAssign.prototype = Object.create(Bayrell.Lang.OpCodes.Bas
 Bayrell.Lang.OpCodes.OpAssign.prototype.constructor = Bayrell.Lang.OpCodes.OpAssign;
 Object.assign(Bayrell.Lang.OpCodes.OpAssign.prototype,
 {
-	_init: function(__ctx)
+	_init: function(ctx)
 	{
 		var defProp = use('Runtime.rtl').defProp;
 		var a = Object.getOwnPropertyNames(this);
-		this.__kind = "";
-		if (a.indexOf("kind") == -1) defProp(this, "kind");
-		this.__var_name = "";
-		if (a.indexOf("var_name") == -1) defProp(this, "var_name");
-		this.__flags = null;
-		if (a.indexOf("flags") == -1) defProp(this, "flags");
-		this.__pattern = null;
-		if (a.indexOf("pattern") == -1) defProp(this, "pattern");
-		this.__annotations = null;
-		if (a.indexOf("annotations") == -1) defProp(this, "annotations");
-		this.__comments = null;
-		if (a.indexOf("comments") == -1) defProp(this, "comments");
-		this.__values = null;
-		if (a.indexOf("values") == -1) defProp(this, "values");
-		this.__names = null;
-		if (a.indexOf("names") == -1) defProp(this, "names");
-		this.__expression = null;
-		if (a.indexOf("expression") == -1) defProp(this, "expression");
-		Bayrell.Lang.OpCodes.BaseOpCode.prototype._init.call(this,__ctx);
+		this.kind = "";
+		this.var_name = "";
+		this.flags = null;
+		this.pattern = null;
+		this.annotations = null;
+		this.comments = null;
+		this.values = null;
+		this.names = null;
+		this.expression = null;
+		Bayrell.Lang.OpCodes.BaseOpCode.prototype._init.call(this,ctx);
 	},
-	assignObject: function(__ctx,o)
+	assignObject: function(ctx,o)
 	{
 		if (o instanceof Bayrell.Lang.OpCodes.OpAssign)
 		{
-			this.__kind = o.__kind;
-			this.__var_name = o.__var_name;
-			this.__flags = o.__flags;
-			this.__pattern = o.__pattern;
-			this.__annotations = o.__annotations;
-			this.__comments = o.__comments;
-			this.__values = o.__values;
-			this.__names = o.__names;
-			this.__expression = o.__expression;
+			this.kind = o.kind;
+			this.var_name = o.var_name;
+			this.flags = o.flags;
+			this.pattern = o.pattern;
+			this.annotations = o.annotations;
+			this.comments = o.comments;
+			this.values = o.values;
+			this.names = o.names;
+			this.expression = o.expression;
 		}
-		Bayrell.Lang.OpCodes.BaseOpCode.prototype.assignObject.call(this,__ctx,o);
+		Bayrell.Lang.OpCodes.BaseOpCode.prototype.assignObject.call(this,ctx,o);
 	},
-	assignValue: function(__ctx,k,v)
+	assignValue: function(ctx,k,v)
 	{
-		if (k == "kind")this.__kind = v;
-		else if (k == "var_name")this.__var_name = v;
-		else if (k == "flags")this.__flags = v;
-		else if (k == "pattern")this.__pattern = v;
-		else if (k == "annotations")this.__annotations = v;
-		else if (k == "comments")this.__comments = v;
-		else if (k == "values")this.__values = v;
-		else if (k == "names")this.__names = v;
-		else if (k == "expression")this.__expression = v;
-		else Bayrell.Lang.OpCodes.BaseOpCode.prototype.assignValue.call(this,__ctx,k,v);
+		if (k == "kind")this.kind = v;
+		else if (k == "var_name")this.var_name = v;
+		else if (k == "flags")this.flags = v;
+		else if (k == "pattern")this.pattern = v;
+		else if (k == "annotations")this.annotations = v;
+		else if (k == "comments")this.comments = v;
+		else if (k == "values")this.values = v;
+		else if (k == "names")this.names = v;
+		else if (k == "expression")this.expression = v;
+		else Bayrell.Lang.OpCodes.BaseOpCode.prototype.assignValue.call(this,ctx,k,v);
 	},
-	takeValue: function(__ctx,k,d)
+	takeValue: function(ctx,k,d)
 	{
 		if (d == undefined) d = null;
-		if (k == "kind")return this.__kind;
-		else if (k == "var_name")return this.__var_name;
-		else if (k == "flags")return this.__flags;
-		else if (k == "pattern")return this.__pattern;
-		else if (k == "annotations")return this.__annotations;
-		else if (k == "comments")return this.__comments;
-		else if (k == "values")return this.__values;
-		else if (k == "names")return this.__names;
-		else if (k == "expression")return this.__expression;
-		return Bayrell.Lang.OpCodes.BaseOpCode.prototype.takeValue.call(this,__ctx,k,d);
+		if (k == "kind")return this.kind;
+		else if (k == "var_name")return this.var_name;
+		else if (k == "flags")return this.flags;
+		else if (k == "pattern")return this.pattern;
+		else if (k == "annotations")return this.annotations;
+		else if (k == "comments")return this.comments;
+		else if (k == "values")return this.values;
+		else if (k == "names")return this.names;
+		else if (k == "expression")return this.expression;
+		return Bayrell.Lang.OpCodes.BaseOpCode.prototype.takeValue.call(this,ctx,k,d);
 	},
-	getClassName: function(__ctx)
+	getClassName: function(ctx)
 	{
 		return "Bayrell.Lang.OpCodes.OpAssign";
 	},
@@ -119,12 +110,12 @@ Object.assign(Bayrell.Lang.OpCodes.OpAssign,
 	{
 		return "Bayrell.Lang.OpCodes.BaseOpCode";
 	},
-	getClassInfo: function(__ctx)
+	getClassInfo: function(ctx)
 	{
 		var Collection = Runtime.Collection;
 		var Dict = Runtime.Dict;
 		var IntrospectionInfo = Runtime.Annotations.IntrospectionInfo;
-		return new IntrospectionInfo(__ctx, {
+		return new IntrospectionInfo(ctx, {
 			"kind": IntrospectionInfo.ITEM_CLASS,
 			"class_name": "Bayrell.Lang.OpCodes.OpAssign",
 			"name": "Bayrell.Lang.OpCodes.OpAssign",
@@ -132,7 +123,7 @@ Object.assign(Bayrell.Lang.OpCodes.OpAssign,
 			]),
 		});
 	},
-	getFieldsList: function(__ctx, f)
+	getFieldsList: function(ctx, f)
 	{
 		var a = [];
 		if (f==undefined) f=0;
@@ -150,17 +141,104 @@ Object.assign(Bayrell.Lang.OpCodes.OpAssign,
 		}
 		return Runtime.Collection.from(a);
 	},
-	getFieldInfoByName: function(__ctx,field_name)
+	getFieldInfoByName: function(ctx,field_name)
 	{
+		var Collection = Runtime.Collection;
+		var Dict = Runtime.Dict;
+		var IntrospectionInfo = Runtime.Annotations.IntrospectionInfo;
+		if (field_name == "KIND_ASSIGN") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.OpCodes.OpAssign",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "KIND_DECLARE") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.OpCodes.OpAssign",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "KIND_STRUCT") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.OpCodes.OpAssign",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "kind") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.OpCodes.OpAssign",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "var_name") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.OpCodes.OpAssign",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "flags") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.OpCodes.OpAssign",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "pattern") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.OpCodes.OpAssign",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "annotations") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.OpCodes.OpAssign",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "comments") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.OpCodes.OpAssign",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "values") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.OpCodes.OpAssign",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "names") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.OpCodes.OpAssign",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "expression") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.OpCodes.OpAssign",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
 		return null;
 	},
-	getMethodsList: function(__ctx)
+	getMethodsList: function(ctx)
 	{
 		var a = [
 		];
 		return Runtime.Collection.from(a);
 	},
-	getMethodInfoByName: function(__ctx,field_name)
+	getMethodInfoByName: function(ctx,field_name)
 	{
 		return null;
 	},

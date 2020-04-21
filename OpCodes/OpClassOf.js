@@ -20,7 +20,7 @@ var use = (typeof Runtime != 'undefined' && typeof Runtime.rtl != 'undefined') ?
 if (typeof Bayrell == 'undefined') Bayrell = {};
 if (typeof Bayrell.Lang == 'undefined') Bayrell.Lang = {};
 if (typeof Bayrell.Lang.OpCodes == 'undefined') Bayrell.Lang.OpCodes = {};
-Bayrell.Lang.OpCodes.OpClassOf = function(__ctx)
+Bayrell.Lang.OpCodes.OpClassOf = function(ctx)
 {
 	Bayrell.Lang.OpCodes.BaseOpCode.apply(this, arguments);
 };
@@ -28,39 +28,37 @@ Bayrell.Lang.OpCodes.OpClassOf.prototype = Object.create(Bayrell.Lang.OpCodes.Ba
 Bayrell.Lang.OpCodes.OpClassOf.prototype.constructor = Bayrell.Lang.OpCodes.OpClassOf;
 Object.assign(Bayrell.Lang.OpCodes.OpClassOf.prototype,
 {
-	_init: function(__ctx)
+	_init: function(ctx)
 	{
 		var defProp = use('Runtime.rtl').defProp;
 		var a = Object.getOwnPropertyNames(this);
-		this.__op = "op_classof";
-		if (a.indexOf("op") == -1) defProp(this, "op");
-		this.__entity_name = null;
-		if (a.indexOf("entity_name") == -1) defProp(this, "entity_name");
-		Bayrell.Lang.OpCodes.BaseOpCode.prototype._init.call(this,__ctx);
+		this.op = "op_classof";
+		this.entity_name = null;
+		Bayrell.Lang.OpCodes.BaseOpCode.prototype._init.call(this,ctx);
 	},
-	assignObject: function(__ctx,o)
+	assignObject: function(ctx,o)
 	{
 		if (o instanceof Bayrell.Lang.OpCodes.OpClassOf)
 		{
-			this.__op = o.__op;
-			this.__entity_name = o.__entity_name;
+			this.op = o.op;
+			this.entity_name = o.entity_name;
 		}
-		Bayrell.Lang.OpCodes.BaseOpCode.prototype.assignObject.call(this,__ctx,o);
+		Bayrell.Lang.OpCodes.BaseOpCode.prototype.assignObject.call(this,ctx,o);
 	},
-	assignValue: function(__ctx,k,v)
+	assignValue: function(ctx,k,v)
 	{
-		if (k == "op")this.__op = v;
-		else if (k == "entity_name")this.__entity_name = v;
-		else Bayrell.Lang.OpCodes.BaseOpCode.prototype.assignValue.call(this,__ctx,k,v);
+		if (k == "op")this.op = v;
+		else if (k == "entity_name")this.entity_name = v;
+		else Bayrell.Lang.OpCodes.BaseOpCode.prototype.assignValue.call(this,ctx,k,v);
 	},
-	takeValue: function(__ctx,k,d)
+	takeValue: function(ctx,k,d)
 	{
 		if (d == undefined) d = null;
-		if (k == "op")return this.__op;
-		else if (k == "entity_name")return this.__entity_name;
-		return Bayrell.Lang.OpCodes.BaseOpCode.prototype.takeValue.call(this,__ctx,k,d);
+		if (k == "op")return this.op;
+		else if (k == "entity_name")return this.entity_name;
+		return Bayrell.Lang.OpCodes.BaseOpCode.prototype.takeValue.call(this,ctx,k,d);
 	},
-	getClassName: function(__ctx)
+	getClassName: function(ctx)
 	{
 		return "Bayrell.Lang.OpCodes.OpClassOf";
 	},
@@ -81,12 +79,12 @@ Object.assign(Bayrell.Lang.OpCodes.OpClassOf,
 	{
 		return "Bayrell.Lang.OpCodes.BaseOpCode";
 	},
-	getClassInfo: function(__ctx)
+	getClassInfo: function(ctx)
 	{
 		var Collection = Runtime.Collection;
 		var Dict = Runtime.Dict;
 		var IntrospectionInfo = Runtime.Annotations.IntrospectionInfo;
-		return new IntrospectionInfo(__ctx, {
+		return new IntrospectionInfo(ctx, {
 			"kind": IntrospectionInfo.ITEM_CLASS,
 			"class_name": "Bayrell.Lang.OpCodes.OpClassOf",
 			"name": "Bayrell.Lang.OpCodes.OpClassOf",
@@ -94,7 +92,7 @@ Object.assign(Bayrell.Lang.OpCodes.OpClassOf,
 			]),
 		});
 	},
-	getFieldsList: function(__ctx, f)
+	getFieldsList: function(ctx, f)
 	{
 		var a = [];
 		if (f==undefined) f=0;
@@ -105,17 +103,34 @@ Object.assign(Bayrell.Lang.OpCodes.OpClassOf,
 		}
 		return Runtime.Collection.from(a);
 	},
-	getFieldInfoByName: function(__ctx,field_name)
+	getFieldInfoByName: function(ctx,field_name)
 	{
+		var Collection = Runtime.Collection;
+		var Dict = Runtime.Dict;
+		var IntrospectionInfo = Runtime.Annotations.IntrospectionInfo;
+		if (field_name == "op") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.OpCodes.OpClassOf",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "entity_name") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.OpCodes.OpClassOf",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
 		return null;
 	},
-	getMethodsList: function(__ctx)
+	getMethodsList: function(ctx)
 	{
 		var a = [
 		];
 		return Runtime.Collection.from(a);
 	},
-	getMethodInfoByName: function(__ctx,field_name)
+	getMethodInfoByName: function(ctx,field_name)
 	{
 		return null;
 	},

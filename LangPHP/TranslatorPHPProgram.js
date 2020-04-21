@@ -3,7 +3,7 @@ var use = (typeof Runtime != 'undefined' && typeof Runtime.rtl != 'undefined') ?
 /*!
  *  Bayrell Language
  *
- *  (c) Copyright 2016-2019 "Ildar Bikmamatov" <support@bayrell.org>
+ *  (c) Copyright 2016-2020 "Ildar Bikmamatov" <support@bayrell.org>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -20,25 +20,25 @@ var use = (typeof Runtime != 'undefined' && typeof Runtime.rtl != 'undefined') ?
 if (typeof Bayrell == 'undefined') Bayrell = {};
 if (typeof Bayrell.Lang == 'undefined') Bayrell.Lang = {};
 if (typeof Bayrell.Lang.LangPHP == 'undefined') Bayrell.Lang.LangPHP = {};
-Bayrell.Lang.LangPHP.TranslatorPHPProgram = function(__ctx)
+Bayrell.Lang.LangPHP.TranslatorPHPProgram = function(ctx)
 {
 };
 Object.assign(Bayrell.Lang.LangPHP.TranslatorPHPProgram.prototype,
 {
-	assignObject: function(__ctx,o)
+	assignObject: function(ctx,o)
 	{
 		if (o instanceof Bayrell.Lang.LangPHP.TranslatorPHPProgram)
 		{
 		}
 	},
-	assignValue: function(__ctx,k,v)
+	assignValue: function(ctx,k,v)
 	{
 	},
-	takeValue: function(__ctx,k,d)
+	takeValue: function(ctx,k,d)
 	{
 		if (d == undefined) d = null;
 	},
-	getClassName: function(__ctx)
+	getClassName: function(ctx)
 	{
 		return "Bayrell.Lang.LangPHP.TranslatorPHPProgram";
 	},
@@ -48,16 +48,150 @@ Object.assign(Bayrell.Lang.LangPHP.TranslatorPHPProgram,
 	/**
 	 * OpNamespace
 	 */
-	OpNamespace: function(__ctx, t, op_code)
+	OpNamespace: function(ctx, t, op_code)
 	{
-		var arr = Runtime.rs.split(__ctx, "\\.", op_code.name);
-		t = t.copy(__ctx, { "current_namespace_name": op_code.name });
-		return Runtime.Collection.from([t,t.s(__ctx, "namespace " + Runtime.rtl.toStr(Runtime.rs.join(__ctx, "\\", arr)) + Runtime.rtl.toStr(";"))]);
+		var arr = Runtime.rs.split(ctx, "\\.", op_code.name);
+		t = t.copy(ctx, { "current_namespace_name": op_code.name });
+		return Runtime.Collection.from([t,t.s(ctx, "namespace " + Runtime.rtl.toStr(Runtime.rs.join(ctx, "\\", arr)) + Runtime.rtl.toStr(";"))]);
+	},
+	/**
+	 * OpDeclareFunction
+	 */
+	OpDeclareFunction: function(ctx, t, op_code)
+	{
+		if (op_code.isFlag(ctx, "declare"))
+		{
+			return Runtime.Collection.from([t,""]);
+		}
+		var content = "";
+		/* Set current function */
+		t = t.copy(ctx, { "current_function": op_code });
+		var s1 = "";
+		var s2 = "";
+		if (op_code.isStatic(ctx))
+		{
+			s1 += Runtime.rtl.toStr("static ");
+			t = t.copy(ctx, { "is_static_function": true });
+		}
+		else
+		{
+			t = t.copy(ctx, { "is_static_function": false });
+		}
+		var res = t.operator.constructor.OpDeclareFunctionArgs(ctx, t, op_code);
+		var args = res[1];
+		s1 += Runtime.rtl.toStr("function " + Runtime.rtl.toStr(op_code.name) + Runtime.rtl.toStr("(") + Runtime.rtl.toStr(args) + Runtime.rtl.toStr(")"));
+		if (t.current_class.kind != Bayrell.Lang.OpCodes.OpDeclareClass.KIND_INTERFACE)
+		{
+			var res = t.operator.constructor.OpDeclareFunctionBody(ctx, t, op_code);
+			s2 += Runtime.rtl.toStr(res[1]);
+		}
+		else
+		{
+			s2 += Runtime.rtl.toStr(";");
+		}
+		s1 = t.s(ctx, s1);
+		/* Function comments */
+		var res = t.operator.constructor.AddComments(ctx, t, op_code.comments, s1 + Runtime.rtl.toStr(s2));
+		content += Runtime.rtl.toStr(res[1]);
+		return Runtime.Collection.from([t,content]);
+	},
+	/**
+	 * OpFunctionAnnotations
+	 */
+	OpFunctionAnnotations: function(ctx, t, f)
+	{
+		var content = "";
+		if (f.flags.isFlag(ctx, "declare"))
+		{
+			return Runtime.Collection.from([t,content]);
+		}
+		if (f.annotations.count(ctx) == 0)
+		{
+			return Runtime.Collection.from([t,content]);
+		}
+		content += Runtime.rtl.toStr(t.s(ctx, "if ($field_name == " + Runtime.rtl.toStr(t.expression.constructor.toString(ctx, f.name)) + Runtime.rtl.toStr(")")));
+		t = t.levelInc(ctx);
+		content += Runtime.rtl.toStr(t.s(ctx, "return new \\Runtime\\Annotations\\IntrospectionInfo($ctx, ["));
+		t = t.levelInc(ctx);
+		content += Runtime.rtl.toStr(t.s(ctx, "\"kind\"=>\\Runtime\\Annotations\\IntrospectionInfo::ITEM_METHOD,"));
+		content += Runtime.rtl.toStr(t.s(ctx, "\"class_name\"=>" + Runtime.rtl.toStr(t.expression.constructor.toString(ctx, t.current_class_full_name)) + Runtime.rtl.toStr(",")));
+		content += Runtime.rtl.toStr(t.s(ctx, "\"name\"=>" + Runtime.rtl.toStr(t.expression.constructor.toString(ctx, f.name)) + Runtime.rtl.toStr(",")));
+		content += Runtime.rtl.toStr(t.s(ctx, "\"annotations\"=>\\Runtime\\Collection::from(["));
+		t = t.levelInc(ctx);
+		for (var j = 0;j < f.annotations.count(ctx);j++)
+		{
+			var annotation = f.annotations.item(ctx, j);
+			var res = t.expression.constructor.OpTypeIdentifier(ctx, t, annotation.name);
+			t = res[0];
+			var name = res[1];
+			var res = t.expression.constructor.OpDict(ctx, t, annotation.params, true);
+			t = res[0];
+			var params = res[1];
+			content += Runtime.rtl.toStr(t.s(ctx, "new " + Runtime.rtl.toStr(name) + Runtime.rtl.toStr("($ctx, ") + Runtime.rtl.toStr(params) + Runtime.rtl.toStr("),")));
+		}
+		t = t.levelDec(ctx);
+		content += Runtime.rtl.toStr(t.s(ctx, "]),"));
+		t = t.levelDec(ctx);
+		content += Runtime.rtl.toStr(t.s(ctx, "]);"));
+		t = t.levelDec(ctx);
+		return Runtime.Collection.from([t,content]);
+	},
+	/**
+	 * OpClassBodyItemMethodsList
+	 */
+	OpClassBodyItemMethodsList: function(ctx, t, item)
+	{
+		var content = "";
+		if (item instanceof Bayrell.Lang.OpCodes.OpPreprocessorIfDef)
+		{
+			if (t.preprocessor_flags.has(ctx, item.condition.value))
+			{
+				for (var i = 0;i < item.items.count(ctx);i++)
+				{
+					var op_code = item.items.item(ctx, i);
+					var res = this.OpClassBodyItemMethodsList(ctx, t, op_code);
+					t = res[0];
+					content += Runtime.rtl.toStr(res[1]);
+				}
+			}
+		}
+		else if (item instanceof Bayrell.Lang.OpCodes.OpDeclareFunction)
+		{
+			content += Runtime.rtl.toStr(t.s(ctx, t.expression.constructor.toString(ctx, item.name) + Runtime.rtl.toStr(",")));
+		}
+		return Runtime.Collection.from([t,content]);
+	},
+	/**
+	 * OpClassBodyItemAnnotations
+	 */
+	OpClassBodyItemAnnotations: function(ctx, t, item)
+	{
+		var content = "";
+		if (item instanceof Bayrell.Lang.OpCodes.OpPreprocessorIfDef)
+		{
+			if (t.preprocessor_flags.has(ctx, item.condition.value))
+			{
+				for (var i = 0;i < item.items.count(ctx);i++)
+				{
+					var op_code = item.items.item(ctx, i);
+					var res = this.OpClassBodyItemAnnotations(ctx, t, op_code);
+					t = res[0];
+					content += Runtime.rtl.toStr(res[1]);
+				}
+			}
+		}
+		else if (item instanceof Bayrell.Lang.OpCodes.OpDeclareFunction)
+		{
+			var res = this.OpFunctionAnnotations(ctx, t, item);
+			t = res[0];
+			content += Runtime.rtl.toStr(res[1]);
+		}
+		return Runtime.Collection.from([t,content]);
 	},
 	/**
 	 * OpDeclareClass
 	 */
-	OpDeclareClassConstructor: function(__ctx, t, op_code)
+	OpDeclareClassConstructor: function(ctx, t, op_code)
 	{
 		if (op_code.fn_create == null)
 		{
@@ -67,75 +201,78 @@ Object.assign(Bayrell.Lang.LangPHP.TranslatorPHPProgram,
 		var content = "";
 		var save_t = t;
 		/* Set function name */
-		t = t.copy(__ctx, { "current_function": op_code.fn_create });
+		t = t.copy(ctx, { "current_function": op_code.fn_create });
 		/* Clear save op codes */
-		t = t.constructor.clearSaveOpCode(__ctx, t);
-		open += Runtime.rtl.toStr(t.s(__ctx, "function __construct("));
-		var res = t.operator.constructor.OpDeclareFunctionArgs(__ctx, t, op_code.fn_create);
+		t = t.constructor.clearSaveOpCode(ctx, t);
+		open += Runtime.rtl.toStr(t.s(ctx, "function __construct("));
+		var res = t.operator.constructor.OpDeclareFunctionArgs(ctx, t, op_code.fn_create);
 		t = res[0];
 		open += Runtime.rtl.toStr(res[1]);
 		open += Runtime.rtl.toStr(")");
-		open += Runtime.rtl.toStr(t.s(__ctx, "{"));
-		t = t.levelInc(__ctx);
+		open += Runtime.rtl.toStr(t.s(ctx, "{"));
+		t = t.levelInc(ctx);
 		/* Function body */
-		var res = t.operator.constructor.Operators(__ctx, t, (op_code.fn_create.expression) ? op_code.fn_create.expression : op_code.fn_create.value);
+		var res = t.operator.constructor.Operators(ctx, t, (op_code.fn_create.expression) ? op_code.fn_create.expression : op_code.fn_create.value);
 		t = res[0];
 		content += Runtime.rtl.toStr(res[1]);
 		/* Constructor end */
-		var save = t.constructor.outputSaveOpCode(__ctx, t);
+		var save = t.constructor.outputSaveOpCode(ctx, t);
 		if (save != "")
 		{
-			content = open + Runtime.rtl.toStr(t.s(__ctx, save + Runtime.rtl.toStr(content)));
+			content = open + Runtime.rtl.toStr(t.s(ctx, save + Runtime.rtl.toStr(content)));
 		}
 		else
 		{
 			content = open + Runtime.rtl.toStr(content);
 		}
-		t = t.levelDec(__ctx);
-		content += Runtime.rtl.toStr(t.s(__ctx, "}"));
+		t = t.levelDec(ctx);
+		content += Runtime.rtl.toStr(t.s(ctx, "}"));
 		return Runtime.Collection.from([save_t,content]);
 	},
 	/**
 	 * OpDeclareClass
 	 */
-	OpDeclareClassBody: function(__ctx, t, op_code)
+	OpDeclareClassBody: function(ctx, t, op_code)
 	{
 		var content = "";
 		var class_kind = op_code.kind;
-		content += Runtime.rtl.toStr(t.s(__ctx, "{"));
-		t = t.levelInc(__ctx);
+		var save_op_codes = t.save_op_codes;
+		var save_op_code_inc = t.save_op_code_inc;
+		t = t.constructor.clearSaveOpCode(ctx, t);
+		content += Runtime.rtl.toStr(t.s(ctx, "{"));
+		t = t.levelInc(ctx);
 		/* Static variables */
 		if (class_kind != Bayrell.Lang.OpCodes.OpDeclareClass.KIND_INTERFACE && op_code.vars != null)
 		{
-			for (var i = 0;i < op_code.vars.count(__ctx);i++)
+			for (var i = 0;i < op_code.vars.count(ctx);i++)
 			{
-				var variable = op_code.vars.item(__ctx, i);
+				var variable = op_code.vars.item(ctx, i);
 				if (variable.kind != Bayrell.Lang.OpCodes.OpAssign.KIND_DECLARE)
 				{
 					continue;
 				}
-				var is_static = variable.flags.isFlag(__ctx, "static");
-				var is_const = variable.flags.isFlag(__ctx, "const");
-				for (var j = 0;j < variable.values.count(__ctx);j++)
+				var is_static = variable.flags.isFlag(ctx, "static");
+				var is_const = variable.flags.isFlag(ctx, "const");
+				for (var j = 0;j < variable.values.count(ctx);j++)
 				{
-					var value = variable.values.item(__ctx, j);
-					var res = t.expression.constructor.Expression(__ctx, t, value.expression);
+					var value = variable.values.item(ctx, j);
+					var res = t.expression.constructor.Expression(ctx, t, value.expression);
 					var s = (value.expression != null) ? res[1] : "null";
 					if (is_static && is_const)
 					{
-						content += Runtime.rtl.toStr(t.s(__ctx, "const " + Runtime.rtl.toStr(value.var_name) + Runtime.rtl.toStr("=") + Runtime.rtl.toStr(s) + Runtime.rtl.toStr(";")));
+						content += Runtime.rtl.toStr(t.s(ctx, "const " + Runtime.rtl.toStr(value.var_name) + Runtime.rtl.toStr("=") + Runtime.rtl.toStr(s) + Runtime.rtl.toStr(";")));
 					}
 					else if (is_static)
 					{
-						content += Runtime.rtl.toStr(t.s(__ctx, "static $" + Runtime.rtl.toStr(value.var_name) + Runtime.rtl.toStr("=") + Runtime.rtl.toStr(s) + Runtime.rtl.toStr(";")));
+						content += Runtime.rtl.toStr(t.s(ctx, "static $" + Runtime.rtl.toStr(value.var_name) + Runtime.rtl.toStr("=") + Runtime.rtl.toStr(s) + Runtime.rtl.toStr(";")));
 					}
 					else if (class_kind == Bayrell.Lang.OpCodes.OpDeclareClass.KIND_STRUCT)
 					{
-						content += Runtime.rtl.toStr(t.s(__ctx, "public $__" + Runtime.rtl.toStr(value.var_name) + Runtime.rtl.toStr(";")));
+						content += Runtime.rtl.toStr(t.s(ctx, "public $__" + Runtime.rtl.toStr(value.var_name) + Runtime.rtl.toStr(";")));
 					}
 					else
 					{
-						content += Runtime.rtl.toStr(t.s(__ctx, "public $" + Runtime.rtl.toStr(value.var_name) + Runtime.rtl.toStr(";")));
+						content += Runtime.rtl.toStr(t.s(ctx, "public $" + Runtime.rtl.toStr(value.var_name) + Runtime.rtl.toStr(";")));
 					}
 				}
 			}
@@ -143,74 +280,72 @@ Object.assign(Bayrell.Lang.LangPHP.TranslatorPHPProgram,
 		/* Constructor */
 		if (class_kind != Bayrell.Lang.OpCodes.OpDeclareClass.KIND_INTERFACE)
 		{
-			var res = this.OpDeclareClassConstructor(__ctx, t, op_code);
+			var res = this.OpDeclareClassConstructor(ctx, t, op_code);
 			content += Runtime.rtl.toStr(res[1]);
 		}
 		/* Functions */
 		if (op_code.functions != null)
 		{
-			for (var i = 0;i < op_code.functions.count(__ctx);i++)
+			for (var i = 0;i < op_code.functions.count(ctx);i++)
 			{
-				var f = op_code.functions.item(__ctx, i);
-				if (f.flags.isFlag(__ctx, "declare"))
-				{
-					continue;
-				}
-				/* Set function name */
-				t = t.copy(__ctx, { "current_function": f });
-				var s1 = "";
-				var s2 = "";
-				if (f.isStatic(__ctx))
-				{
-					s1 += Runtime.rtl.toStr("static ");
-					t = t.copy(__ctx, { "is_static_function": true });
-				}
-				else
-				{
-					t = t.copy(__ctx, { "is_static_function": false });
-				}
-				var res = t.operator.constructor.OpDeclareFunctionArgs(__ctx, t, f);
-				var args = res[1];
-				s1 += Runtime.rtl.toStr("function " + Runtime.rtl.toStr(f.name) + Runtime.rtl.toStr("(") + Runtime.rtl.toStr(args) + Runtime.rtl.toStr(")"));
-				if (class_kind != Bayrell.Lang.OpCodes.OpDeclareClass.KIND_INTERFACE)
-				{
-					var res = t.operator.constructor.OpDeclareFunctionBody(__ctx, t, f);
-					s2 += Runtime.rtl.toStr(res[1]);
-				}
-				else
-				{
-					s2 += Runtime.rtl.toStr(";");
-				}
-				s1 = t.s(__ctx, s1);
-				/* Function comments */
-				var res = t.operator.constructor.AddComments(__ctx, t, f.comments, s1 + Runtime.rtl.toStr(s2));
+				var f = op_code.functions.item(ctx, i);
+				var res = this.OpDeclareFunction(ctx, t, f);
+				t = res[0];
 				content += Runtime.rtl.toStr(res[1]);
+			}
+		}
+		/* Class items */
+		for (var i = 0;i < op_code.items.count(ctx);i++)
+		{
+			var item = op_code.items.item(ctx, i);
+			if (item instanceof Bayrell.Lang.OpCodes.OpPreprocessorIfCode)
+			{
+				var res = t.operator.constructor.OpPreprocessorIfCode(ctx, t, item);
+				content += Runtime.rtl.toStr(res[1]);
+			}
+			else if (item instanceof Bayrell.Lang.OpCodes.OpPreprocessorIfDef)
+			{
+				var res = t.operator.constructor.OpPreprocessorIfDef(ctx, t, item, Bayrell.Lang.OpCodes.OpPreprocessorIfDef.KIND_CLASS_BODY);
+				content += Runtime.rtl.toStr(res[1]);
+			}
+			else if (item instanceof Bayrell.Lang.OpCodes.OpPreprocessorSwitch)
+			{
+				for (var j = 0;j < item.items.count(ctx);j++)
+				{
+					var res = t.operator.constructor.OpPreprocessorIfCode(ctx, t, item.items.item(ctx, j));
+					var s = res[1];
+					if (s == "")
+					{
+						continue;
+					}
+					content += Runtime.rtl.toStr(res[1]);
+				}
 			}
 		}
 		if (class_kind != Bayrell.Lang.OpCodes.OpDeclareClass.KIND_INTERFACE)
 		{
-			content += Runtime.rtl.toStr(t.s(__ctx, "/* ======================= Class Init Functions ======================= */"));
+			content += Runtime.rtl.toStr(t.s(ctx, "/* ======================= Class Init Functions ======================= */"));
 		}
 		/* Init variables */
 		if (class_kind != Bayrell.Lang.OpCodes.OpDeclareClass.KIND_INTERFACE && op_code.vars != null)
 		{
-			var vars = op_code.vars.filter(__ctx, (__ctx, variable) => 
+			var vars = op_code.vars.filter(ctx, (ctx, variable) => 
 			{
-				return !variable.flags.isFlag(__ctx, "static");
+				return !variable.flags.isFlag(ctx, "static");
 			});
-			if (t.current_class_full_name != "Runtime.CoreObject" && vars.count(__ctx) > 0)
+			if (t.current_class_full_name != "Runtime.CoreObject" && vars.count(ctx) > 0)
 			{
-				content += Runtime.rtl.toStr(t.s(__ctx, "function _init($__ctx)"));
-				content += Runtime.rtl.toStr(t.s(__ctx, "{"));
-				t = t.levelInc(__ctx);
+				content += Runtime.rtl.toStr(t.s(ctx, "function _init($ctx)"));
+				content += Runtime.rtl.toStr(t.s(ctx, "{"));
+				t = t.levelInc(ctx);
 				if (t.current_class_extends_name != "")
 				{
-					content += Runtime.rtl.toStr(t.s(__ctx, "parent::_init($__ctx);"));
+					content += Runtime.rtl.toStr(t.s(ctx, "parent::_init($ctx);"));
 				}
-				for (var i = 0;i < op_code.vars.count(__ctx);i++)
+				for (var i = 0;i < op_code.vars.count(ctx);i++)
 				{
-					var variable = op_code.vars.item(__ctx, i);
-					var is_static = variable.flags.isFlag(__ctx, "static");
+					var variable = op_code.vars.item(ctx, i);
+					var is_static = variable.flags.isFlag(ctx, "static");
 					if (is_static)
 					{
 						continue;
@@ -228,189 +363,190 @@ Object.assign(Bayrell.Lang.LangPHP.TranslatorPHPProgram,
 					{
 						prefix = "";
 					}
-					for (var j = 0;j < variable.values.count(__ctx);j++)
+					for (var j = 0;j < variable.values.count(ctx);j++)
 					{
-						var value = variable.values.item(__ctx, j);
-						var res = t.expression.constructor.Expression(__ctx, t, value.expression);
+						var value = variable.values.item(ctx, j);
+						var res = t.expression.constructor.Expression(ctx, t, value.expression);
 						var s = (value.expression != null) ? res[1] : "null";
-						content += Runtime.rtl.toStr(t.s(__ctx, "$this->" + Runtime.rtl.toStr(prefix) + Runtime.rtl.toStr(value.var_name) + Runtime.rtl.toStr(" = ") + Runtime.rtl.toStr(s) + Runtime.rtl.toStr(";")));
+						content += Runtime.rtl.toStr(t.s(ctx, "$this->" + Runtime.rtl.toStr(prefix) + Runtime.rtl.toStr(value.var_name) + Runtime.rtl.toStr(" = ") + Runtime.rtl.toStr(s) + Runtime.rtl.toStr(";")));
 					}
 				}
-				t = t.levelDec(__ctx);
-				content += Runtime.rtl.toStr(t.s(__ctx, "}"));
+				t = t.levelDec(ctx);
+				content += Runtime.rtl.toStr(t.s(ctx, "}"));
 			}
 			/* Struct */
 			if (class_kind == Bayrell.Lang.OpCodes.OpDeclareClass.KIND_STRUCT)
 			{
 				/* Assign Object */
-				content += Runtime.rtl.toStr(t.s(__ctx, "function assignObject($__ctx,$o)"));
-				content += Runtime.rtl.toStr(t.s(__ctx, "{"));
-				t = t.levelInc(__ctx);
-				content += Runtime.rtl.toStr(t.s(__ctx, "if ($o instanceof \\" + Runtime.rtl.toStr(Runtime.rs.replace(__ctx, "\\.", "\\", t.current_class_full_name)) + Runtime.rtl.toStr(")")));
-				content += Runtime.rtl.toStr(t.s(__ctx, "{"));
-				t = t.levelInc(__ctx);
-				for (var i = 0;i < op_code.vars.count(__ctx);i++)
+				content += Runtime.rtl.toStr(t.s(ctx, "function assignObject($ctx,$o)"));
+				content += Runtime.rtl.toStr(t.s(ctx, "{"));
+				t = t.levelInc(ctx);
+				content += Runtime.rtl.toStr(t.s(ctx, "if ($o instanceof \\" + Runtime.rtl.toStr(Runtime.rs.replace(ctx, "\\.", "\\", t.current_class_full_name)) + Runtime.rtl.toStr(")")));
+				content += Runtime.rtl.toStr(t.s(ctx, "{"));
+				t = t.levelInc(ctx);
+				for (var i = 0;i < op_code.vars.count(ctx);i++)
 				{
-					var variable = op_code.vars.item(__ctx, i);
+					var variable = op_code.vars.item(ctx, i);
 					if (variable.kind != Bayrell.Lang.OpCodes.OpAssign.KIND_DECLARE)
 					{
 						continue;
 					}
-					var is_const = variable.flags.isFlag(__ctx, "const");
-					var is_static = variable.flags.isFlag(__ctx, "static");
+					var is_const = variable.flags.isFlag(ctx, "const");
+					var is_static = variable.flags.isFlag(ctx, "static");
 					if (is_const || is_static)
 					{
 						continue;
 					}
-					for (var j = 0;j < variable.values.count(__ctx);j++)
+					for (var j = 0;j < variable.values.count(ctx);j++)
 					{
-						var value = variable.values.item(__ctx, j);
-						content += Runtime.rtl.toStr(t.s(__ctx, "$this->__" + Runtime.rtl.toStr(value.var_name) + Runtime.rtl.toStr(" = $o->__") + Runtime.rtl.toStr(value.var_name) + Runtime.rtl.toStr(";")));
+						var value = variable.values.item(ctx, j);
+						content += Runtime.rtl.toStr(t.s(ctx, "$this->__" + Runtime.rtl.toStr(value.var_name) + Runtime.rtl.toStr(" = $o->__") + Runtime.rtl.toStr(value.var_name) + Runtime.rtl.toStr(";")));
 					}
 				}
-				t = t.levelDec(__ctx);
-				content += Runtime.rtl.toStr(t.s(__ctx, "}"));
-				content += Runtime.rtl.toStr(t.s(__ctx, "parent::assignObject($__ctx,$o);"));
-				t = t.levelDec(__ctx);
-				content += Runtime.rtl.toStr(t.s(__ctx, "}"));
+				t = t.levelDec(ctx);
+				content += Runtime.rtl.toStr(t.s(ctx, "}"));
+				content += Runtime.rtl.toStr(t.s(ctx, "parent::assignObject($ctx,$o);"));
+				t = t.levelDec(ctx);
+				content += Runtime.rtl.toStr(t.s(ctx, "}"));
 				/* Assign Value */
-				content += Runtime.rtl.toStr(t.s(__ctx, "function assignValue($__ctx,$k,$v)"));
-				content += Runtime.rtl.toStr(t.s(__ctx, "{"));
-				t = t.levelInc(__ctx);
+				content += Runtime.rtl.toStr(t.s(ctx, "function assignValue($ctx,$k,$v)"));
+				content += Runtime.rtl.toStr(t.s(ctx, "{"));
+				t = t.levelInc(ctx);
 				var flag = false;
-				for (var i = 0;i < op_code.vars.count(__ctx);i++)
+				for (var i = 0;i < op_code.vars.count(ctx);i++)
 				{
-					var variable = op_code.vars.item(__ctx, i);
+					var variable = op_code.vars.item(ctx, i);
 					if (variable.kind != Bayrell.Lang.OpCodes.OpAssign.KIND_DECLARE)
 					{
 						continue;
 					}
-					var is_const = variable.flags.isFlag(__ctx, "const");
-					var is_static = variable.flags.isFlag(__ctx, "static");
+					var is_const = variable.flags.isFlag(ctx, "const");
+					var is_static = variable.flags.isFlag(ctx, "static");
 					if (is_const || is_static)
 					{
 						continue;
 					}
-					for (var j = 0;j < variable.values.count(__ctx);j++)
+					for (var j = 0;j < variable.values.count(ctx);j++)
 					{
-						var value = variable.values.item(__ctx, j);
+						var value = variable.values.item(ctx, j);
 						if (t.flag_struct_check_types)
 						{
-							content += Runtime.rtl.toStr(t.s(__ctx, ((flag) ? "else " : "") + Runtime.rtl.toStr("if ($k == ") + Runtime.rtl.toStr(t.expression.constructor.toString(__ctx, value.var_name)) + Runtime.rtl.toStr(")") + Runtime.rtl.toStr("$this->__") + Runtime.rtl.toStr(value.var_name) + Runtime.rtl.toStr(" = Runtime.rtl.to($v, null, ") + Runtime.rtl.toStr(this.toPattern(__ctx, t, variable.pattern)) + Runtime.rtl.toStr(");")));
+							content += Runtime.rtl.toStr(t.s(ctx, ((flag) ? "else " : "") + Runtime.rtl.toStr("if ($k == ") + Runtime.rtl.toStr(t.expression.constructor.toString(ctx, value.var_name)) + Runtime.rtl.toStr(")") + Runtime.rtl.toStr("$this->__") + Runtime.rtl.toStr(value.var_name) + Runtime.rtl.toStr(" = Runtime.rtl.to($v, null, ") + Runtime.rtl.toStr(this.toPattern(ctx, t, variable.pattern)) + Runtime.rtl.toStr(");")));
 						}
 						else
 						{
-							content += Runtime.rtl.toStr(t.s(__ctx, ((flag) ? "else " : "") + Runtime.rtl.toStr("if ($k == ") + Runtime.rtl.toStr(t.expression.constructor.toString(__ctx, value.var_name)) + Runtime.rtl.toStr(")") + Runtime.rtl.toStr("$this->__") + Runtime.rtl.toStr(value.var_name) + Runtime.rtl.toStr(" = $v;")));
+							content += Runtime.rtl.toStr(t.s(ctx, ((flag) ? "else " : "") + Runtime.rtl.toStr("if ($k == ") + Runtime.rtl.toStr(t.expression.constructor.toString(ctx, value.var_name)) + Runtime.rtl.toStr(")") + Runtime.rtl.toStr("$this->__") + Runtime.rtl.toStr(value.var_name) + Runtime.rtl.toStr(" = $v;")));
 						}
 						flag = true;
 					}
 				}
-				content += Runtime.rtl.toStr(t.s(__ctx, ((flag) ? "else " : "") + Runtime.rtl.toStr("parent::assignValue($__ctx,$k,$v);")));
-				t = t.levelDec(__ctx);
-				content += Runtime.rtl.toStr(t.s(__ctx, "}"));
+				content += Runtime.rtl.toStr(t.s(ctx, ((flag) ? "else " : "") + Runtime.rtl.toStr("parent::assignValue($ctx,$k,$v);")));
+				t = t.levelDec(ctx);
+				content += Runtime.rtl.toStr(t.s(ctx, "}"));
 				/* Take Value */
-				content += Runtime.rtl.toStr(t.s(__ctx, "function takeValue($__ctx,$k,$d=null)"));
-				content += Runtime.rtl.toStr(t.s(__ctx, "{"));
-				t = t.levelInc(__ctx);
+				content += Runtime.rtl.toStr(t.s(ctx, "function takeValue($ctx,$k,$d=null)"));
+				content += Runtime.rtl.toStr(t.s(ctx, "{"));
+				t = t.levelInc(ctx);
 				var flag = false;
-				for (var i = 0;i < op_code.vars.count(__ctx);i++)
+				for (var i = 0;i < op_code.vars.count(ctx);i++)
 				{
-					var variable = op_code.vars.item(__ctx, i);
+					var variable = op_code.vars.item(ctx, i);
 					if (variable.kind != Bayrell.Lang.OpCodes.OpAssign.KIND_DECLARE)
 					{
 						continue;
 					}
-					var is_const = variable.flags.isFlag(__ctx, "const");
-					var is_static = variable.flags.isFlag(__ctx, "static");
+					var is_const = variable.flags.isFlag(ctx, "const");
+					var is_static = variable.flags.isFlag(ctx, "static");
 					if (is_const || is_static)
 					{
 						continue;
 					}
-					for (var j = 0;j < variable.values.count(__ctx);j++)
+					for (var j = 0;j < variable.values.count(ctx);j++)
 					{
-						var value = variable.values.item(__ctx, j);
-						content += Runtime.rtl.toStr(t.s(__ctx, ((flag) ? "else " : "") + Runtime.rtl.toStr("if ($k == ") + Runtime.rtl.toStr(t.expression.constructor.toString(__ctx, value.var_name)) + Runtime.rtl.toStr(")return $this->__") + Runtime.rtl.toStr(value.var_name) + Runtime.rtl.toStr(";")));
+						var value = variable.values.item(ctx, j);
+						content += Runtime.rtl.toStr(t.s(ctx, ((flag) ? "else " : "") + Runtime.rtl.toStr("if ($k == ") + Runtime.rtl.toStr(t.expression.constructor.toString(ctx, value.var_name)) + Runtime.rtl.toStr(")return $this->__") + Runtime.rtl.toStr(value.var_name) + Runtime.rtl.toStr(";")));
 						flag = true;
 					}
 				}
-				content += Runtime.rtl.toStr(t.s(__ctx, "return parent::takeValue($__ctx,$k,$d);"));
-				t = t.levelDec(__ctx);
-				content += Runtime.rtl.toStr(t.s(__ctx, "}"));
+				content += Runtime.rtl.toStr(t.s(ctx, "return parent::takeValue($ctx,$k,$d);"));
+				t = t.levelDec(ctx);
+				content += Runtime.rtl.toStr(t.s(ctx, "}"));
 			}
 		}
 		if (class_kind != Bayrell.Lang.OpCodes.OpDeclareClass.KIND_INTERFACE)
 		{
 			/* Get class name function */
-			content += Runtime.rtl.toStr(t.s(__ctx, "function getClassName()"));
-			content += Runtime.rtl.toStr(t.s(__ctx, "{"));
-			t = t.levelInc(__ctx);
-			content += Runtime.rtl.toStr(t.s(__ctx, "return " + Runtime.rtl.toStr(t.expression.constructor.toString(__ctx, t.current_class_full_name)) + Runtime.rtl.toStr(";")));
-			t = t.levelDec(__ctx);
-			content += Runtime.rtl.toStr(t.s(__ctx, "}"));
+			content += Runtime.rtl.toStr(t.s(ctx, "function getClassName()"));
+			content += Runtime.rtl.toStr(t.s(ctx, "{"));
+			t = t.levelInc(ctx);
+			content += Runtime.rtl.toStr(t.s(ctx, "return " + Runtime.rtl.toStr(t.expression.constructor.toString(ctx, t.current_class_full_name)) + Runtime.rtl.toStr(";")));
+			t = t.levelDec(ctx);
+			content += Runtime.rtl.toStr(t.s(ctx, "}"));
 			/* Get current namespace function */
-			content += Runtime.rtl.toStr(t.s(__ctx, "static function getCurrentNamespace()"));
-			content += Runtime.rtl.toStr(t.s(__ctx, "{"));
-			t = t.levelInc(__ctx);
-			content += Runtime.rtl.toStr(t.s(__ctx, "return " + Runtime.rtl.toStr(t.expression.constructor.toString(__ctx, t.current_namespace_name)) + Runtime.rtl.toStr(";")));
-			t = t.levelDec(__ctx);
-			content += Runtime.rtl.toStr(t.s(__ctx, "}"));
+			content += Runtime.rtl.toStr(t.s(ctx, "static function getCurrentNamespace()"));
+			content += Runtime.rtl.toStr(t.s(ctx, "{"));
+			t = t.levelInc(ctx);
+			content += Runtime.rtl.toStr(t.s(ctx, "return " + Runtime.rtl.toStr(t.expression.constructor.toString(ctx, t.current_namespace_name)) + Runtime.rtl.toStr(";")));
+			t = t.levelDec(ctx);
+			content += Runtime.rtl.toStr(t.s(ctx, "}"));
 			/* Get current class name function */
-			content += Runtime.rtl.toStr(t.s(__ctx, "static function getCurrentClassName()"));
-			content += Runtime.rtl.toStr(t.s(__ctx, "{"));
-			t = t.levelInc(__ctx);
-			content += Runtime.rtl.toStr(t.s(__ctx, "return " + Runtime.rtl.toStr(t.expression.constructor.toString(__ctx, t.current_class_full_name)) + Runtime.rtl.toStr(";")));
-			t = t.levelDec(__ctx);
-			content += Runtime.rtl.toStr(t.s(__ctx, "}"));
+			content += Runtime.rtl.toStr(t.s(ctx, "static function getCurrentClassName()"));
+			content += Runtime.rtl.toStr(t.s(ctx, "{"));
+			t = t.levelInc(ctx);
+			content += Runtime.rtl.toStr(t.s(ctx, "return " + Runtime.rtl.toStr(t.expression.constructor.toString(ctx, t.current_class_full_name)) + Runtime.rtl.toStr(";")));
+			t = t.levelDec(ctx);
+			content += Runtime.rtl.toStr(t.s(ctx, "}"));
 			/* Get parent class name function */
-			content += Runtime.rtl.toStr(t.s(__ctx, "static function getParentClassName()"));
-			content += Runtime.rtl.toStr(t.s(__ctx, "{"));
-			t = t.levelInc(__ctx);
-			content += Runtime.rtl.toStr(t.s(__ctx, "return " + Runtime.rtl.toStr(t.expression.constructor.toString(__ctx, t.expression.constructor.findModuleName(__ctx, t, t.current_class_extends_name))) + Runtime.rtl.toStr(";")));
-			t = t.levelDec(__ctx);
-			content += Runtime.rtl.toStr(t.s(__ctx, "}"));
+			content += Runtime.rtl.toStr(t.s(ctx, "static function getParentClassName()"));
+			content += Runtime.rtl.toStr(t.s(ctx, "{"));
+			t = t.levelInc(ctx);
+			content += Runtime.rtl.toStr(t.s(ctx, "return " + Runtime.rtl.toStr(t.expression.constructor.toString(ctx, t.expression.constructor.findModuleName(ctx, t, t.current_class_extends_name))) + Runtime.rtl.toStr(";")));
+			t = t.levelDec(ctx);
+			content += Runtime.rtl.toStr(t.s(ctx, "}"));
 			/* Class info */
-			content += Runtime.rtl.toStr(t.s(__ctx, "static function getClassInfo($__ctx)"));
-			content += Runtime.rtl.toStr(t.s(__ctx, "{"));
-			t = t.levelInc(__ctx);
-			content += Runtime.rtl.toStr(t.s(__ctx, "return new \\Runtime\\Annotations\\IntrospectionInfo($__ctx, ["));
-			t = t.levelInc(__ctx);
-			content += Runtime.rtl.toStr(t.s(__ctx, "\"kind\"=>\\Runtime\\Annotations\\IntrospectionInfo::ITEM_CLASS,"));
-			content += Runtime.rtl.toStr(t.s(__ctx, "\"class_name\"=>" + Runtime.rtl.toStr(t.expression.constructor.toString(__ctx, t.current_class_full_name)) + Runtime.rtl.toStr(",")));
-			content += Runtime.rtl.toStr(t.s(__ctx, "\"name\"=>" + Runtime.rtl.toStr(t.expression.constructor.toString(__ctx, t.current_class_full_name)) + Runtime.rtl.toStr(",")));
-			content += Runtime.rtl.toStr(t.s(__ctx, "\"annotations\"=>\\Runtime\\Collection::from(["));
-			t = t.levelInc(__ctx);
-			for (var j = 0;j < op_code.annotations.count(__ctx);j++)
+			content += Runtime.rtl.toStr(t.s(ctx, "static function getClassInfo($ctx)"));
+			content += Runtime.rtl.toStr(t.s(ctx, "{"));
+			t = t.levelInc(ctx);
+			t = t.constructor.clearSaveOpCode(ctx, t);
+			content += Runtime.rtl.toStr(t.s(ctx, "return new \\Runtime\\Annotations\\IntrospectionInfo($ctx, ["));
+			t = t.levelInc(ctx);
+			content += Runtime.rtl.toStr(t.s(ctx, "\"kind\"=>\\Runtime\\Annotations\\IntrospectionInfo::ITEM_CLASS,"));
+			content += Runtime.rtl.toStr(t.s(ctx, "\"class_name\"=>" + Runtime.rtl.toStr(t.expression.constructor.toString(ctx, t.current_class_full_name)) + Runtime.rtl.toStr(",")));
+			content += Runtime.rtl.toStr(t.s(ctx, "\"name\"=>" + Runtime.rtl.toStr(t.expression.constructor.toString(ctx, t.current_class_full_name)) + Runtime.rtl.toStr(",")));
+			content += Runtime.rtl.toStr(t.s(ctx, "\"annotations\"=>\\Runtime\\Collection::from(["));
+			t = t.levelInc(ctx);
+			for (var j = 0;j < op_code.annotations.count(ctx);j++)
 			{
-				var annotation = op_code.annotations.item(__ctx, j);
-				var res = t.expression.constructor.OpTypeIdentifier(__ctx, t, annotation.name);
+				var annotation = op_code.annotations.item(ctx, j);
+				var res = t.expression.constructor.OpTypeIdentifier(ctx, t, annotation.name);
 				t = res[0];
 				var name = res[1];
-				var res = t.expression.constructor.OpDict(__ctx, t, annotation.params, true);
+				var res = t.expression.constructor.OpDict(ctx, t, annotation.params, true);
 				t = res[0];
 				var params = res[1];
-				content += Runtime.rtl.toStr(t.s(__ctx, "new " + Runtime.rtl.toStr(name) + Runtime.rtl.toStr("($__ctx, ") + Runtime.rtl.toStr(params) + Runtime.rtl.toStr("),")));
+				content += Runtime.rtl.toStr(t.s(ctx, "new " + Runtime.rtl.toStr(name) + Runtime.rtl.toStr("($ctx, ") + Runtime.rtl.toStr(params) + Runtime.rtl.toStr("),")));
 			}
-			t = t.levelDec(__ctx);
-			content += Runtime.rtl.toStr(t.s(__ctx, "]),"));
-			t = t.levelDec(__ctx);
-			content += Runtime.rtl.toStr(t.s(__ctx, "]);"));
-			t = t.levelDec(__ctx);
-			content += Runtime.rtl.toStr(t.s(__ctx, "}"));
+			t = t.levelDec(ctx);
+			content += Runtime.rtl.toStr(t.s(ctx, "]),"));
+			t = t.levelDec(ctx);
+			content += Runtime.rtl.toStr(t.s(ctx, "]);"));
+			t = t.levelDec(ctx);
+			content += Runtime.rtl.toStr(t.s(ctx, "}"));
 			/* Get fields list of the function */
-			content += Runtime.rtl.toStr(t.s(__ctx, "static function getFieldsList($__ctx,$f)"));
-			content += Runtime.rtl.toStr(t.s(__ctx, "{"));
-			t = t.levelInc(__ctx);
-			content += Runtime.rtl.toStr(t.s(__ctx, "$a = [];"));
+			content += Runtime.rtl.toStr(t.s(ctx, "static function getFieldsList($ctx,$f)"));
+			content += Runtime.rtl.toStr(t.s(ctx, "{"));
+			t = t.levelInc(ctx);
+			content += Runtime.rtl.toStr(t.s(ctx, "$a = [];"));
 			if (op_code.vars != null)
 			{
-				var vars = new Runtime.Map(__ctx);
-				for (var i = 0;i < op_code.vars.count(__ctx);i++)
+				var vars = new Runtime.Map(ctx);
+				for (var i = 0;i < op_code.vars.count(ctx);i++)
 				{
-					var variable = op_code.vars.item(__ctx, i);
-					var is_static = variable.flags.isFlag(__ctx, "static");
-					var is_serializable = variable.flags.isFlag(__ctx, "serializable");
-					var is_assignable = variable.flags.isFlag(__ctx, "assignable");
-					var has_annotation = variable.annotations != null && variable.annotations.count(__ctx) > 0;
+					var variable = op_code.vars.item(ctx, i);
+					var is_static = variable.flags.isFlag(ctx, "static");
+					var is_serializable = variable.flags.isFlag(ctx, "serializable");
+					var is_assignable = variable.flags.isFlag(ctx, "assignable");
+					var has_annotation = variable.annotations != null && variable.annotations.count(ctx) > 0;
 					if (is_static)
 					{
 						continue;
@@ -443,147 +579,152 @@ Object.assign(Bayrell.Lang.LangPHP.TranslatorPHPProgram,
 					}
 					if (flag != 0)
 					{
-						if (!vars.has(__ctx, flag))
+						if (!vars.has(ctx, flag))
 						{
-							vars.set(__ctx, flag, new Runtime.Vector(__ctx));
+							vars.set(ctx, flag, new Runtime.Vector(ctx));
 						}
-						var v = vars.item(__ctx, flag);
-						for (var j = 0;j < variable.values.count(__ctx);j++)
+						var v = vars.item(ctx, flag);
+						for (var j = 0;j < variable.values.count(ctx);j++)
 						{
-							var value = variable.values.item(__ctx, j);
-							v.push(__ctx, value.var_name);
+							var value = variable.values.item(ctx, j);
+							v.push(ctx, value.var_name);
 						}
 					}
 				}
-				vars.each(__ctx, (__ctx, v, flag) => 
+				vars.each(ctx, (ctx, v, flag) => 
 				{
-					content += Runtime.rtl.toStr(t.s(__ctx, "if (($f|" + Runtime.rtl.toStr(flag) + Runtime.rtl.toStr(")==") + Runtime.rtl.toStr(flag) + Runtime.rtl.toStr(")")));
-					content += Runtime.rtl.toStr(t.s(__ctx, "{"));
-					t = t.levelInc(__ctx);
-					v.each(__ctx, (__ctx, varname) => 
+					content += Runtime.rtl.toStr(t.s(ctx, "if (($f|" + Runtime.rtl.toStr(flag) + Runtime.rtl.toStr(")==") + Runtime.rtl.toStr(flag) + Runtime.rtl.toStr(")")));
+					content += Runtime.rtl.toStr(t.s(ctx, "{"));
+					t = t.levelInc(ctx);
+					v.each(ctx, (ctx, varname) => 
 					{
-						content += Runtime.rtl.toStr(t.s(__ctx, "$a[] = " + Runtime.rtl.toStr(t.expression.constructor.toString(__ctx, varname)) + Runtime.rtl.toStr(";")));
+						content += Runtime.rtl.toStr(t.s(ctx, "$a[] = " + Runtime.rtl.toStr(t.expression.constructor.toString(ctx, varname)) + Runtime.rtl.toStr(";")));
 					});
-					t = t.levelDec(__ctx);
-					content += Runtime.rtl.toStr(t.s(__ctx, "}"));
+					t = t.levelDec(ctx);
+					content += Runtime.rtl.toStr(t.s(ctx, "}"));
 				});
 			}
-			content += Runtime.rtl.toStr(t.s(__ctx, "return " + Runtime.rtl.toStr(t.expression.constructor.getModuleName(__ctx, t, "Runtime.Collection")) + Runtime.rtl.toStr("::from($a);")));
-			t = t.levelDec(__ctx);
-			content += Runtime.rtl.toStr(t.s(__ctx, "}"));
+			content += Runtime.rtl.toStr(t.s(ctx, "return " + Runtime.rtl.toStr(t.expression.constructor.getModuleName(ctx, t, "Runtime.Collection")) + Runtime.rtl.toStr("::from($a);")));
+			t = t.levelDec(ctx);
+			content += Runtime.rtl.toStr(t.s(ctx, "}"));
 			/* Get field info by name */
-			content += Runtime.rtl.toStr(t.s(__ctx, "static function getFieldInfoByName($__ctx,$field_name)"));
-			content += Runtime.rtl.toStr(t.s(__ctx, "{"));
-			t = t.levelInc(__ctx);
-			content += Runtime.rtl.toStr(t.s(__ctx, "return null;"));
-			t = t.levelDec(__ctx);
-			content += Runtime.rtl.toStr(t.s(__ctx, "}"));
-			/* Get methods list of the function */
-			content += Runtime.rtl.toStr(t.s(__ctx, "static function getMethodsList($__ctx)"));
-			content += Runtime.rtl.toStr(t.s(__ctx, "{"));
-			t = t.levelInc(__ctx);
-			content += Runtime.rtl.toStr(t.s(__ctx, "$a = ["));
-			t = t.levelInc(__ctx);
-			if (op_code.functions != null)
+			content += Runtime.rtl.toStr(t.s(ctx, "static function getFieldInfoByName($ctx,$field_name)"));
+			content += Runtime.rtl.toStr(t.s(ctx, "{"));
+			t = t.levelInc(ctx);
+			if (op_code.vars != null)
 			{
-				for (var i = 0;i < op_code.functions.count(__ctx);i++)
+				for (var i = 0;i < op_code.vars.count(ctx);i++)
 				{
-					var f = op_code.functions.item(__ctx, i);
-					if (f.flags.isFlag(__ctx, "declare"))
+					var variable = op_code.vars.item(ctx, i);
+					var v = variable.values.map(ctx, (ctx, value) => 
 					{
-						continue;
-					}
-					if (f.annotations.count(__ctx) == 0)
+						return value.var_name;
+					});
+					v = v.map(ctx, (ctx, var_name) => 
 					{
-						continue;
-					}
-					content += Runtime.rtl.toStr(t.s(__ctx, t.expression.constructor.toString(__ctx, f.name) + Runtime.rtl.toStr(",")));
-				}
-			}
-			t = t.levelDec(__ctx);
-			content += Runtime.rtl.toStr(t.s(__ctx, "];"));
-			content += Runtime.rtl.toStr(t.s(__ctx, "return " + Runtime.rtl.toStr(t.expression.constructor.getModuleName(__ctx, t, "Runtime.Collection")) + Runtime.rtl.toStr("::from($a);")));
-			t = t.levelDec(__ctx);
-			content += Runtime.rtl.toStr(t.s(__ctx, "}"));
-			/* Get method info by name */
-			content += Runtime.rtl.toStr(t.s(__ctx, "static function getMethodInfoByName($__ctx,$field_name)"));
-			content += Runtime.rtl.toStr(t.s(__ctx, "{"));
-			t = t.levelInc(__ctx);
-			if (op_code.functions != null)
-			{
-				for (var i = 0;i < op_code.functions.count(__ctx);i++)
-				{
-					var f = op_code.functions.item(__ctx, i);
-					if (f.flags.isFlag(__ctx, "declare"))
+						return "$field_name == " + Runtime.rtl.toStr(t.expression.constructor.toString(ctx, var_name));
+					});
+					t = t.constructor.clearSaveOpCode(ctx, t);
+					content += Runtime.rtl.toStr(t.s(ctx, "if (" + Runtime.rtl.toStr(Runtime.rs.join(ctx, " or ", v)) + Runtime.rtl.toStr(") ") + Runtime.rtl.toStr("return new \\Runtime\\Annotations\\IntrospectionInfo($ctx, [")));
+					t = t.levelInc(ctx);
+					content += Runtime.rtl.toStr(t.s(ctx, "\"kind\"=>\\Runtime\\Annotations\\IntrospectionInfo::ITEM_FIELD,"));
+					content += Runtime.rtl.toStr(t.s(ctx, "\"class_name\"=>" + Runtime.rtl.toStr(t.expression.constructor.toString(ctx, t.current_class_full_name)) + Runtime.rtl.toStr(",")));
+					content += Runtime.rtl.toStr(t.s(ctx, "\"name\"=> $field_name,"));
+					content += Runtime.rtl.toStr(t.s(ctx, "\"annotations\"=>\\Runtime\\Collection::from(["));
+					t = t.levelInc(ctx);
+					for (var j = 0;j < variable.annotations.count(ctx);j++)
 					{
-						continue;
-					}
-					if (f.annotations.count(__ctx) == 0)
-					{
-						continue;
-					}
-					content += Runtime.rtl.toStr(t.s(__ctx, "if ($field_name == " + Runtime.rtl.toStr(t.expression.constructor.toString(__ctx, f.name)) + Runtime.rtl.toStr(")")));
-					t = t.levelInc(__ctx);
-					content += Runtime.rtl.toStr(t.s(__ctx, "return new \\Runtime\\Annotations\\IntrospectionInfo($__ctx, ["));
-					t = t.levelInc(__ctx);
-					content += Runtime.rtl.toStr(t.s(__ctx, "\"kind\"=>\\Runtime\\Annotations\\IntrospectionInfo::ITEM_METHOD,"));
-					content += Runtime.rtl.toStr(t.s(__ctx, "\"class_name\"=>" + Runtime.rtl.toStr(t.expression.constructor.toString(__ctx, t.current_class_full_name)) + Runtime.rtl.toStr(",")));
-					content += Runtime.rtl.toStr(t.s(__ctx, "\"name\"=>" + Runtime.rtl.toStr(t.expression.constructor.toString(__ctx, f.name)) + Runtime.rtl.toStr(",")));
-					content += Runtime.rtl.toStr(t.s(__ctx, "\"annotations\"=>\\Runtime\\Collection::from(["));
-					t = t.levelInc(__ctx);
-					for (var j = 0;j < f.annotations.count(__ctx);j++)
-					{
-						var annotation = f.annotations.item(__ctx, j);
-						var res = t.expression.constructor.OpTypeIdentifier(__ctx, t, annotation.name);
+						var annotation = variable.annotations.item(ctx, j);
+						var res = t.expression.constructor.OpTypeIdentifier(ctx, t, annotation.name);
 						t = res[0];
 						var name = res[1];
-						var res = t.expression.constructor.OpDict(__ctx, t, annotation.params, true);
+						var res = t.expression.constructor.OpDict(ctx, t, annotation.params, true);
 						t = res[0];
 						var params = res[1];
-						content += Runtime.rtl.toStr(t.s(__ctx, "new " + Runtime.rtl.toStr(name) + Runtime.rtl.toStr("($__ctx, ") + Runtime.rtl.toStr(params) + Runtime.rtl.toStr("),")));
+						content += Runtime.rtl.toStr(t.s(ctx, "new " + Runtime.rtl.toStr(name) + Runtime.rtl.toStr("($ctx, ") + Runtime.rtl.toStr(params) + Runtime.rtl.toStr("),")));
 					}
-					t = t.levelDec(__ctx);
-					content += Runtime.rtl.toStr(t.s(__ctx, "]),"));
-					t = t.levelDec(__ctx);
-					content += Runtime.rtl.toStr(t.s(__ctx, "]);"));
-					t = t.levelDec(__ctx);
+					t = t.levelDec(ctx);
+					content += Runtime.rtl.toStr(t.s(ctx, "]),"));
+					t = t.levelDec(ctx);
+					content += Runtime.rtl.toStr(t.s(ctx, "]);"));
 				}
 			}
-			content += Runtime.rtl.toStr(t.s(__ctx, "return null;"));
-			t = t.levelDec(__ctx);
-			content += Runtime.rtl.toStr(t.s(__ctx, "}"));
-		}
-		/* Class items */
-		for (var i = 0;i < op_code.items.count(__ctx);i++)
-		{
-			var item = op_code.items.item(__ctx, i);
-			if (item instanceof Bayrell.Lang.OpCodes.OpPreprocessorIfCode)
+			content += Runtime.rtl.toStr(t.s(ctx, "return null;"));
+			t = t.levelDec(ctx);
+			content += Runtime.rtl.toStr(t.s(ctx, "}"));
+			/* Get methods list of the function */
+			content += Runtime.rtl.toStr(t.s(ctx, "static function getMethodsList($ctx)"));
+			content += Runtime.rtl.toStr(t.s(ctx, "{"));
+			t = t.levelInc(ctx);
+			content += Runtime.rtl.toStr(t.s(ctx, "$a = ["));
+			t = t.levelInc(ctx);
+			if (op_code.functions != null)
 			{
-				var res = t.operator.constructor.OpPreprocessorIfCode(__ctx, t, item);
-				content += Runtime.rtl.toStr(t.s(__ctx, res[1]));
-			}
-			else if (item instanceof Bayrell.Lang.OpCodes.OpPreprocessorSwitch)
-			{
-				for (var j = 0;i < item.items.count(__ctx);i++)
+				for (var i = 0;i < op_code.functions.count(ctx);i++)
 				{
-					var res = t.operator.constructor.OpPreprocessorIfCode(__ctx, t, item.items.item(__ctx, i));
-					var s = res[1];
-					if (s == "")
+					var f = op_code.functions.item(ctx, i);
+					if (f.flags.isFlag(ctx, "declare"))
 					{
 						continue;
 					}
-					content += Runtime.rtl.toStr(t.s(__ctx, res[1]));
+					if (f.annotations.count(ctx) == 0)
+					{
+						continue;
+					}
+					content += Runtime.rtl.toStr(t.s(ctx, t.expression.constructor.toString(ctx, f.name) + Runtime.rtl.toStr(",")));
 				}
 			}
+			if (op_code.items != null)
+			{
+				for (var i = 0;i < op_code.items.count(ctx);i++)
+				{
+					var item = op_code.items.item(ctx, i);
+					var res = this.OpClassBodyItemMethodsList(ctx, t, item);
+					t = res[0];
+					content += Runtime.rtl.toStr(res[1]);
+				}
+			}
+			t = t.levelDec(ctx);
+			content += Runtime.rtl.toStr(t.s(ctx, "];"));
+			content += Runtime.rtl.toStr(t.s(ctx, "return " + Runtime.rtl.toStr(t.expression.constructor.getModuleName(ctx, t, "Runtime.Collection")) + Runtime.rtl.toStr("::from($a);")));
+			t = t.levelDec(ctx);
+			content += Runtime.rtl.toStr(t.s(ctx, "}"));
+			/* Get method info by name */
+			content += Runtime.rtl.toStr(t.s(ctx, "static function getMethodInfoByName($ctx,$field_name)"));
+			content += Runtime.rtl.toStr(t.s(ctx, "{"));
+			t = t.levelInc(ctx);
+			if (op_code.functions != null)
+			{
+				for (var i = 0;i < op_code.functions.count(ctx);i++)
+				{
+					var f = op_code.functions.item(ctx, i);
+					var res = this.OpFunctionAnnotations(ctx, t, f);
+					t = res[0];
+					content += Runtime.rtl.toStr(res[1]);
+				}
+			}
+			if (op_code.items != null)
+			{
+				for (var i = 0;i < op_code.items.count(ctx);i++)
+				{
+					var item = op_code.items.item(ctx, i);
+					var res = this.OpClassBodyItemAnnotations(ctx, t, item);
+					t = res[0];
+					content += Runtime.rtl.toStr(res[1]);
+				}
+			}
+			content += Runtime.rtl.toStr(t.s(ctx, "return null;"));
+			t = t.levelDec(ctx);
+			content += Runtime.rtl.toStr(t.s(ctx, "}"));
 		}
-		t = t.levelDec(__ctx);
-		content += Runtime.rtl.toStr(t.s(__ctx, "}"));
+		t = t.levelDec(ctx);
+		content += Runtime.rtl.toStr(t.s(ctx, "}"));
 		return Runtime.Collection.from([t,content]);
 	},
 	/**
 	 * OpDeclareClassFooter
 	 */
-	OpDeclareClassFooter: function(__ctx, t, op_code)
+	OpDeclareClassFooter: function(ctx, t, op_code)
 	{
 		var content = "";
 		return Runtime.Collection.from([t,content]);
@@ -591,33 +732,34 @@ Object.assign(Bayrell.Lang.LangPHP.TranslatorPHPProgram,
 	/**
 	 * OpDeclareClass
 	 */
-	OpDeclareClass: function(__ctx, t, op_code)
+	OpDeclareClass: function(ctx, t, op_code)
 	{
 		if (op_code.is_declare)
 		{
 			return Runtime.Collection.from([t,""]);
 		}
 		var content = "";
-		t = t.copy(__ctx, { "current_class_name": op_code.name });
-		t = t.copy(__ctx, { "current_class_full_name": t.current_namespace_name + Runtime.rtl.toStr(".") + Runtime.rtl.toStr(t.current_class_name) });
+		t = t.copy(ctx, { "current_class": op_code });
+		t = t.copy(ctx, { "current_class_name": op_code.name });
+		t = t.copy(ctx, { "current_class_full_name": t.current_namespace_name + Runtime.rtl.toStr(".") + Runtime.rtl.toStr(t.current_class_name) });
 		if (op_code.class_extends != null)
 		{
-			var extends_name = Runtime.rs.join(__ctx, ".", op_code.class_extends.entity_name.names);
-			t = t.copy(__ctx, { "current_class_extends_name": extends_name });
+			var extends_name = Runtime.rs.join(ctx, ".", op_code.class_extends.entity_name.names);
+			t = t.copy(ctx, { "current_class_extends_name": extends_name });
 		}
 		else if (op_code.kind == Bayrell.Lang.OpCodes.OpDeclareClass.KIND_STRUCT)
 		{
-			t = t.copy(__ctx, { "current_class_extends_name": "Runtime.CoreStruct" });
+			t = t.copy(ctx, { "current_class_extends_name": "Runtime.CoreStruct" });
 		}
 		else if (op_code.kind == Bayrell.Lang.OpCodes.OpDeclareClass.KIND_STRUCT)
 		{
-			t = t.copy(__ctx, { "current_class_extends_name": "" });
+			t = t.copy(ctx, { "current_class_extends_name": "" });
 		}
 		if (op_code.kind != Bayrell.Lang.OpCodes.OpDeclareClass.KIND_INTERFACE)
 		{
 			if (op_code.class_extends != null)
 			{
-				content = "class " + Runtime.rtl.toStr(t.current_class_name) + Runtime.rtl.toStr(" extends ") + Runtime.rtl.toStr(t.expression.constructor.getModuleName(__ctx, t, t.current_class_extends_name));
+				content = "class " + Runtime.rtl.toStr(t.current_class_name) + Runtime.rtl.toStr(" extends ") + Runtime.rtl.toStr(t.expression.constructor.getModuleName(ctx, t, t.current_class_extends_name));
 			}
 			else
 			{
@@ -629,53 +771,53 @@ Object.assign(Bayrell.Lang.LangPHP.TranslatorPHPProgram,
 			content = "interface " + Runtime.rtl.toStr(t.current_class_name);
 		}
 		/* Add implements */
-		if (op_code.class_implements != null && op_code.class_implements.count(__ctx) > 0)
+		if (op_code.class_implements != null && op_code.class_implements.count(ctx) > 0)
 		{
-			var arr = op_code.class_implements.map(__ctx, (__ctx, item) => 
+			var arr = op_code.class_implements.map(ctx, (ctx, item) => 
 			{
-				return t.expression.constructor.getModuleNames(__ctx, t, item.entity_name.names);
+				return t.expression.constructor.getModuleNames(ctx, t, item.entity_name.names);
 			});
-			var s1 = Runtime.rs.join(__ctx, ", ", arr);
+			var s1 = Runtime.rs.join(ctx, ", ", arr);
 			content += Runtime.rtl.toStr(" implements " + Runtime.rtl.toStr(s1));
 		}
 		/* Class body */
-		var res = this.OpDeclareClassBody(__ctx, t, op_code);
+		var res = this.OpDeclareClassBody(ctx, t, op_code);
 		content += Runtime.rtl.toStr(res[1]);
 		/* Class comments */
-		var res = t.operator.constructor.AddComments(__ctx, t, op_code.comments, content);
+		var res = t.operator.constructor.AddComments(ctx, t, op_code.comments, content);
 		content = res[1];
 		/* Class footer */
-		var res = this.OpDeclareClassFooter(__ctx, t, op_code);
+		var res = this.OpDeclareClassFooter(ctx, t, op_code);
 		content += Runtime.rtl.toStr(res[1]);
-		return Runtime.Collection.from([t,t.s(__ctx, content)]);
+		return Runtime.Collection.from([t,t.s(ctx, content)]);
 	},
 	/**
 	 * Translate item
 	 */
-	translateItem: function(__ctx, t, op_code)
+	translateItem: function(ctx, t, op_code)
 	{
 		if (op_code instanceof Bayrell.Lang.OpCodes.OpNamespace)
 		{
-			return this.OpNamespace(__ctx, t, op_code);
+			return this.OpNamespace(ctx, t, op_code);
 		}
 		else if (op_code instanceof Bayrell.Lang.OpCodes.OpDeclareClass)
 		{
-			return this.OpDeclareClass(__ctx, t, op_code);
+			return this.OpDeclareClass(ctx, t, op_code);
 		}
 		else if (op_code instanceof Bayrell.Lang.OpCodes.OpComment)
 		{
-			return t.operator.constructor.OpComment(__ctx, t, op_code);
+			return t.operator.constructor.OpComment(ctx, t, op_code);
 		}
 		else if (op_code instanceof Bayrell.Lang.OpCodes.OpPreprocessorIfCode)
 		{
-			return t.operator.constructor.OpPreprocessorIfCode(__ctx, t, op_code);
+			return t.operator.constructor.OpPreprocessorIfCode(ctx, t, op_code);
 		}
 		else if (op_code instanceof Bayrell.Lang.OpCodes.OpPreprocessorSwitch)
 		{
 			var content = "";
-			for (var i = 0;i < op_code.items.count(__ctx);i++)
+			for (var i = 0;i < op_code.items.count(ctx);i++)
 			{
-				var res = t.operator.constructor.OpPreprocessorIfCode(__ctx, t, op_code.items.item(__ctx, i));
+				var res = t.operator.constructor.OpPreprocessorIfCode(ctx, t, op_code.items.item(ctx, i));
 				var s = res[1];
 				if (s == "")
 				{
@@ -690,7 +832,7 @@ Object.assign(Bayrell.Lang.LangPHP.TranslatorPHPProgram,
 	/**
 	 * Translate program
 	 */
-	translateProgramHeader: function(__ctx, t, op_code)
+	translateProgramHeader: function(ctx, t, op_code)
 	{
 		var content = "<?php";
 		return Runtime.Collection.from([t,content]);
@@ -698,21 +840,25 @@ Object.assign(Bayrell.Lang.LangPHP.TranslatorPHPProgram,
 	/**
 	 * Translate program
 	 */
-	translateProgram: function(__ctx, t, op_code)
+	translateProgram: function(ctx, t, op_code)
 	{
 		var content = "";
+		if (op_code == null)
+		{
+			return Runtime.Collection.from([t,content]);
+		}
 		if (op_code.uses != null)
 		{
-			t = t.copy(__ctx, { "modules": op_code.uses });
+			t = t.copy(ctx, { "modules": op_code.uses });
 		}
 		if (op_code.items != null)
 		{
-			var res = this.translateProgramHeader(__ctx, t, op_code);
+			var res = this.translateProgramHeader(ctx, t, op_code);
 			content += Runtime.rtl.toStr(res[1]);
-			for (var i = 0;i < op_code.items.count(__ctx);i++)
+			for (var i = 0;i < op_code.items.count(ctx);i++)
 			{
-				var item = op_code.items.item(__ctx, i);
-				var res = this.translateItem(__ctx, t, item);
+				var item = op_code.items.item(ctx, i);
+				var res = this.translateItem(ctx, t, item);
 				t = res[0];
 				var s = res[1];
 				if (s == "")
@@ -737,12 +883,12 @@ Object.assign(Bayrell.Lang.LangPHP.TranslatorPHPProgram,
 	{
 		return "";
 	},
-	getClassInfo: function(__ctx)
+	getClassInfo: function(ctx)
 	{
 		var Collection = Runtime.Collection;
 		var Dict = Runtime.Dict;
 		var IntrospectionInfo = Runtime.Annotations.IntrospectionInfo;
-		return new IntrospectionInfo(__ctx, {
+		return new IntrospectionInfo(ctx, {
 			"kind": IntrospectionInfo.ITEM_CLASS,
 			"class_name": "Bayrell.Lang.LangPHP.TranslatorPHPProgram",
 			"name": "Bayrell.Lang.LangPHP.TranslatorPHPProgram",
@@ -750,23 +896,26 @@ Object.assign(Bayrell.Lang.LangPHP.TranslatorPHPProgram,
 			]),
 		});
 	},
-	getFieldsList: function(__ctx, f)
+	getFieldsList: function(ctx, f)
 	{
 		var a = [];
 		if (f==undefined) f=0;
 		return Runtime.Collection.from(a);
 	},
-	getFieldInfoByName: function(__ctx,field_name)
+	getFieldInfoByName: function(ctx,field_name)
 	{
+		var Collection = Runtime.Collection;
+		var Dict = Runtime.Dict;
+		var IntrospectionInfo = Runtime.Annotations.IntrospectionInfo;
 		return null;
 	},
-	getMethodsList: function(__ctx)
+	getMethodsList: function(ctx)
 	{
 		var a = [
 		];
 		return Runtime.Collection.from(a);
 	},
-	getMethodInfoByName: function(__ctx,field_name)
+	getMethodInfoByName: function(ctx,field_name)
 	{
 		return null;
 	},

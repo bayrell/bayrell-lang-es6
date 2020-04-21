@@ -3,7 +3,7 @@ var use = (typeof Runtime != 'undefined' && typeof Runtime.rtl != 'undefined') ?
 /*!
  *  Bayrell Language
  *
- *  (c) Copyright 2016-2019 "Ildar Bikmamatov" <support@bayrell.org>
+ *  (c) Copyright 2016-2020 "Ildar Bikmamatov" <support@bayrell.org>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ var use = (typeof Runtime != 'undefined' && typeof Runtime.rtl != 'undefined') ?
 if (typeof Bayrell == 'undefined') Bayrell = {};
 if (typeof Bayrell.Lang == 'undefined') Bayrell.Lang = {};
 if (typeof Bayrell.Lang.LangES6 == 'undefined') Bayrell.Lang.LangES6 = {};
-Bayrell.Lang.LangES6.TranslatorES6 = function(__ctx)
+Bayrell.Lang.LangES6.TranslatorES6 = function(ctx)
 {
 	Bayrell.Lang.CoreTranslator.apply(this, arguments);
 };
@@ -28,54 +28,49 @@ Bayrell.Lang.LangES6.TranslatorES6.prototype = Object.create(Bayrell.Lang.CoreTr
 Bayrell.Lang.LangES6.TranslatorES6.prototype.constructor = Bayrell.Lang.LangES6.TranslatorES6;
 Object.assign(Bayrell.Lang.LangES6.TranslatorES6.prototype,
 {
-	_init: function(__ctx)
+	_init: function(ctx)
 	{
 		var defProp = use('Runtime.rtl').defProp;
 		var a = Object.getOwnPropertyNames(this);
-		this.__async_await = null;
-		if (a.indexOf("async_await") == -1) defProp(this, "async_await");
-		this.__expression = null;
-		if (a.indexOf("expression") == -1) defProp(this, "expression");
-		this.__html = null;
-		if (a.indexOf("html") == -1) defProp(this, "html");
-		this.__operator = null;
-		if (a.indexOf("operator") == -1) defProp(this, "operator");
-		this.__program = null;
-		if (a.indexOf("program") == -1) defProp(this, "program");
-		Bayrell.Lang.CoreTranslator.prototype._init.call(this,__ctx);
+		this.async_await = null;
+		this.expression = null;
+		this.html = null;
+		this.operator = null;
+		this.program = null;
+		Bayrell.Lang.CoreTranslator.prototype._init.call(this,ctx);
 	},
-	assignObject: function(__ctx,o)
+	assignObject: function(ctx,o)
 	{
 		if (o instanceof Bayrell.Lang.LangES6.TranslatorES6)
 		{
-			this.__async_await = o.__async_await;
-			this.__expression = o.__expression;
-			this.__html = o.__html;
-			this.__operator = o.__operator;
-			this.__program = o.__program;
+			this.async_await = o.async_await;
+			this.expression = o.expression;
+			this.html = o.html;
+			this.operator = o.operator;
+			this.program = o.program;
 		}
-		Bayrell.Lang.CoreTranslator.prototype.assignObject.call(this,__ctx,o);
+		Bayrell.Lang.CoreTranslator.prototype.assignObject.call(this,ctx,o);
 	},
-	assignValue: function(__ctx,k,v)
+	assignValue: function(ctx,k,v)
 	{
-		if (k == "async_await")this.__async_await = v;
-		else if (k == "expression")this.__expression = v;
-		else if (k == "html")this.__html = v;
-		else if (k == "operator")this.__operator = v;
-		else if (k == "program")this.__program = v;
-		else Bayrell.Lang.CoreTranslator.prototype.assignValue.call(this,__ctx,k,v);
+		if (k == "async_await")this.async_await = v;
+		else if (k == "expression")this.expression = v;
+		else if (k == "html")this.html = v;
+		else if (k == "operator")this.operator = v;
+		else if (k == "program")this.program = v;
+		else Bayrell.Lang.CoreTranslator.prototype.assignValue.call(this,ctx,k,v);
 	},
-	takeValue: function(__ctx,k,d)
+	takeValue: function(ctx,k,d)
 	{
 		if (d == undefined) d = null;
-		if (k == "async_await")return this.__async_await;
-		else if (k == "expression")return this.__expression;
-		else if (k == "html")return this.__html;
-		else if (k == "operator")return this.__operator;
-		else if (k == "program")return this.__program;
-		return Bayrell.Lang.CoreTranslator.prototype.takeValue.call(this,__ctx,k,d);
+		if (k == "async_await")return this.async_await;
+		else if (k == "expression")return this.expression;
+		else if (k == "html")return this.html;
+		else if (k == "operator")return this.operator;
+		else if (k == "program")return this.program;
+		return Bayrell.Lang.CoreTranslator.prototype.takeValue.call(this,ctx,k,d);
 	},
-	getClassName: function(__ctx)
+	getClassName: function(ctx)
 	{
 		return "Bayrell.Lang.LangES6.TranslatorES6";
 	},
@@ -86,17 +81,17 @@ Object.assign(Bayrell.Lang.LangES6.TranslatorES6,
 	/**
 	 * Reset translator
 	 */
-	reset: function(__ctx, t)
+	reset: function(ctx, t)
 	{
-		return t.copy(__ctx, Runtime.Dict.from({"value":"","current_namespace_name":"","modules":new Runtime.Dict(__ctx),"async_await":new Bayrell.Lang.LangES6.TranslatorES6AsyncAwait(__ctx),"expression":new Bayrell.Lang.LangES6.TranslatorES6Expression(__ctx),"html":new Bayrell.Lang.LangES6.TranslatorES6Html(__ctx),"operator":new Bayrell.Lang.LangES6.TranslatorES6Operator(__ctx),"program":new Bayrell.Lang.LangES6.TranslatorES6Program(__ctx),"save_vars":new Runtime.Collection(__ctx),"save_op_codes":new Runtime.Collection(__ctx),"save_op_code_inc":0,"preprocessor_flags":Runtime.Dict.from({"ES6":true,"JAVASCRIPT":true})}));
+		return t.copy(ctx, Runtime.Dict.from({"value":"","current_namespace_name":"","modules":new Runtime.Dict(ctx),"async_await":new Bayrell.Lang.LangES6.TranslatorES6AsyncAwait(ctx),"expression":new Bayrell.Lang.LangES6.TranslatorES6Expression(ctx),"html":new Bayrell.Lang.LangES6.TranslatorES6Html(ctx),"operator":new Bayrell.Lang.LangES6.TranslatorES6Operator(ctx),"program":new Bayrell.Lang.LangES6.TranslatorES6Program(ctx),"save_vars":new Runtime.Collection(ctx),"save_op_codes":new Runtime.Collection(ctx),"save_op_code_inc":0,"preprocessor_flags":Runtime.Dict.from({"FRONTEND":true,"ES6":true,"JAVASCRIPT":true})}));
 	},
 	/**
 	 * Translate BaseOpCode
 	 */
-	translate: function(__ctx, t, op_code)
+	translate: function(ctx, t, op_code)
 	{
-		t = this.reset(__ctx, t);
-		return t.program.constructor.translateProgram(__ctx, t, op_code);
+		t = this.reset(ctx, t);
+		return t.program.constructor.translateProgram(ctx, t, op_code);
 	},
 	/* ======================= Class Init Functions ======================= */
 	getCurrentNamespace: function()
@@ -111,12 +106,12 @@ Object.assign(Bayrell.Lang.LangES6.TranslatorES6,
 	{
 		return "Bayrell.Lang.CoreTranslator";
 	},
-	getClassInfo: function(__ctx)
+	getClassInfo: function(ctx)
 	{
 		var Collection = Runtime.Collection;
 		var Dict = Runtime.Dict;
 		var IntrospectionInfo = Runtime.Annotations.IntrospectionInfo;
-		return new IntrospectionInfo(__ctx, {
+		return new IntrospectionInfo(ctx, {
 			"kind": IntrospectionInfo.ITEM_CLASS,
 			"class_name": "Bayrell.Lang.LangES6.TranslatorES6",
 			"name": "Bayrell.Lang.LangES6.TranslatorES6",
@@ -124,7 +119,7 @@ Object.assign(Bayrell.Lang.LangES6.TranslatorES6,
 			]),
 		});
 	},
-	getFieldsList: function(__ctx, f)
+	getFieldsList: function(ctx, f)
 	{
 		var a = [];
 		if (f==undefined) f=0;
@@ -138,17 +133,55 @@ Object.assign(Bayrell.Lang.LangES6.TranslatorES6,
 		}
 		return Runtime.Collection.from(a);
 	},
-	getFieldInfoByName: function(__ctx,field_name)
+	getFieldInfoByName: function(ctx,field_name)
 	{
+		var Collection = Runtime.Collection;
+		var Dict = Runtime.Dict;
+		var IntrospectionInfo = Runtime.Annotations.IntrospectionInfo;
+		if (field_name == "async_await") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.LangES6.TranslatorES6",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "expression") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.LangES6.TranslatorES6",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "html") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.LangES6.TranslatorES6",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "operator") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.LangES6.TranslatorES6",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "program") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.LangES6.TranslatorES6",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
 		return null;
 	},
-	getMethodsList: function(__ctx)
+	getMethodsList: function(ctx)
 	{
 		var a = [
 		];
 		return Runtime.Collection.from(a);
 	},
-	getMethodInfoByName: function(__ctx,field_name)
+	getMethodInfoByName: function(ctx,field_name)
 	{
 		return null;
 	},

@@ -20,7 +20,7 @@ var use = (typeof Runtime != 'undefined' && typeof Runtime.rtl != 'undefined') ?
 if (typeof Bayrell == 'undefined') Bayrell = {};
 if (typeof Bayrell.Lang == 'undefined') Bayrell.Lang = {};
 if (typeof Bayrell.Lang.OpCodes == 'undefined') Bayrell.Lang.OpCodes = {};
-Bayrell.Lang.OpCodes.OpDeclareClass = function(__ctx)
+Bayrell.Lang.OpCodes.OpDeclareClass = function(ctx)
 {
 	Bayrell.Lang.OpCodes.BaseOpCode.apply(this, arguments);
 };
@@ -28,114 +28,97 @@ Bayrell.Lang.OpCodes.OpDeclareClass.prototype = Object.create(Bayrell.Lang.OpCod
 Bayrell.Lang.OpCodes.OpDeclareClass.prototype.constructor = Bayrell.Lang.OpCodes.OpDeclareClass;
 Object.assign(Bayrell.Lang.OpCodes.OpDeclareClass.prototype,
 {
-	_init: function(__ctx)
+	_init: function(ctx)
 	{
 		var defProp = use('Runtime.rtl').defProp;
 		var a = Object.getOwnPropertyNames(this);
-		this.__op = "op_class";
-		if (a.indexOf("op") == -1) defProp(this, "op");
-		this.__kind = "";
-		if (a.indexOf("kind") == -1) defProp(this, "kind");
-		this.__name = "";
-		if (a.indexOf("name") == -1) defProp(this, "name");
-		this.__extend_name = "";
-		if (a.indexOf("extend_name") == -1) defProp(this, "extend_name");
-		this.__annotations = null;
-		if (a.indexOf("annotations") == -1) defProp(this, "annotations");
-		this.__comments = null;
-		if (a.indexOf("comments") == -1) defProp(this, "comments");
-		this.__template = null;
-		if (a.indexOf("template") == -1) defProp(this, "template");
-		this.__flags = null;
-		if (a.indexOf("flags") == -1) defProp(this, "flags");
-		this.__fn_create = null;
-		if (a.indexOf("fn_create") == -1) defProp(this, "fn_create");
-		this.__fn_destroy = null;
-		if (a.indexOf("fn_destroy") == -1) defProp(this, "fn_destroy");
-		this.__class_extends = null;
-		if (a.indexOf("class_extends") == -1) defProp(this, "class_extends");
-		this.__class_implements = null;
-		if (a.indexOf("class_implements") == -1) defProp(this, "class_implements");
-		this.__vars = null;
-		if (a.indexOf("vars") == -1) defProp(this, "vars");
-		this.__functions = null;
-		if (a.indexOf("functions") == -1) defProp(this, "functions");
-		this.__items = null;
-		if (a.indexOf("items") == -1) defProp(this, "items");
-		this.__is_static = false;
-		if (a.indexOf("is_static") == -1) defProp(this, "is_static");
-		this.__is_declare = false;
-		if (a.indexOf("is_declare") == -1) defProp(this, "is_declare");
-		Bayrell.Lang.OpCodes.BaseOpCode.prototype._init.call(this,__ctx);
+		this.op = "op_class";
+		this.kind = "";
+		this.name = "";
+		this.extend_name = "";
+		this.annotations = null;
+		this.comments = null;
+		this.template = null;
+		this.flags = null;
+		this.fn_create = null;
+		this.fn_destroy = null;
+		this.class_extends = null;
+		this.class_implements = null;
+		this.vars = null;
+		this.functions = null;
+		this.items = null;
+		this.is_static = false;
+		this.is_declare = false;
+		Bayrell.Lang.OpCodes.BaseOpCode.prototype._init.call(this,ctx);
 	},
-	assignObject: function(__ctx,o)
+	assignObject: function(ctx,o)
 	{
 		if (o instanceof Bayrell.Lang.OpCodes.OpDeclareClass)
 		{
-			this.__op = o.__op;
-			this.__kind = o.__kind;
-			this.__name = o.__name;
-			this.__extend_name = o.__extend_name;
-			this.__annotations = o.__annotations;
-			this.__comments = o.__comments;
-			this.__template = o.__template;
-			this.__flags = o.__flags;
-			this.__fn_create = o.__fn_create;
-			this.__fn_destroy = o.__fn_destroy;
-			this.__class_extends = o.__class_extends;
-			this.__class_implements = o.__class_implements;
-			this.__vars = o.__vars;
-			this.__functions = o.__functions;
-			this.__items = o.__items;
-			this.__is_static = o.__is_static;
-			this.__is_declare = o.__is_declare;
+			this.op = o.op;
+			this.kind = o.kind;
+			this.name = o.name;
+			this.extend_name = o.extend_name;
+			this.annotations = o.annotations;
+			this.comments = o.comments;
+			this.template = o.template;
+			this.flags = o.flags;
+			this.fn_create = o.fn_create;
+			this.fn_destroy = o.fn_destroy;
+			this.class_extends = o.class_extends;
+			this.class_implements = o.class_implements;
+			this.vars = o.vars;
+			this.functions = o.functions;
+			this.items = o.items;
+			this.is_static = o.is_static;
+			this.is_declare = o.is_declare;
 		}
-		Bayrell.Lang.OpCodes.BaseOpCode.prototype.assignObject.call(this,__ctx,o);
+		Bayrell.Lang.OpCodes.BaseOpCode.prototype.assignObject.call(this,ctx,o);
 	},
-	assignValue: function(__ctx,k,v)
+	assignValue: function(ctx,k,v)
 	{
-		if (k == "op")this.__op = v;
-		else if (k == "kind")this.__kind = v;
-		else if (k == "name")this.__name = v;
-		else if (k == "extend_name")this.__extend_name = v;
-		else if (k == "annotations")this.__annotations = v;
-		else if (k == "comments")this.__comments = v;
-		else if (k == "template")this.__template = v;
-		else if (k == "flags")this.__flags = v;
-		else if (k == "fn_create")this.__fn_create = v;
-		else if (k == "fn_destroy")this.__fn_destroy = v;
-		else if (k == "class_extends")this.__class_extends = v;
-		else if (k == "class_implements")this.__class_implements = v;
-		else if (k == "vars")this.__vars = v;
-		else if (k == "functions")this.__functions = v;
-		else if (k == "items")this.__items = v;
-		else if (k == "is_static")this.__is_static = v;
-		else if (k == "is_declare")this.__is_declare = v;
-		else Bayrell.Lang.OpCodes.BaseOpCode.prototype.assignValue.call(this,__ctx,k,v);
+		if (k == "op")this.op = v;
+		else if (k == "kind")this.kind = v;
+		else if (k == "name")this.name = v;
+		else if (k == "extend_name")this.extend_name = v;
+		else if (k == "annotations")this.annotations = v;
+		else if (k == "comments")this.comments = v;
+		else if (k == "template")this.template = v;
+		else if (k == "flags")this.flags = v;
+		else if (k == "fn_create")this.fn_create = v;
+		else if (k == "fn_destroy")this.fn_destroy = v;
+		else if (k == "class_extends")this.class_extends = v;
+		else if (k == "class_implements")this.class_implements = v;
+		else if (k == "vars")this.vars = v;
+		else if (k == "functions")this.functions = v;
+		else if (k == "items")this.items = v;
+		else if (k == "is_static")this.is_static = v;
+		else if (k == "is_declare")this.is_declare = v;
+		else Bayrell.Lang.OpCodes.BaseOpCode.prototype.assignValue.call(this,ctx,k,v);
 	},
-	takeValue: function(__ctx,k,d)
+	takeValue: function(ctx,k,d)
 	{
 		if (d == undefined) d = null;
-		if (k == "op")return this.__op;
-		else if (k == "kind")return this.__kind;
-		else if (k == "name")return this.__name;
-		else if (k == "extend_name")return this.__extend_name;
-		else if (k == "annotations")return this.__annotations;
-		else if (k == "comments")return this.__comments;
-		else if (k == "template")return this.__template;
-		else if (k == "flags")return this.__flags;
-		else if (k == "fn_create")return this.__fn_create;
-		else if (k == "fn_destroy")return this.__fn_destroy;
-		else if (k == "class_extends")return this.__class_extends;
-		else if (k == "class_implements")return this.__class_implements;
-		else if (k == "vars")return this.__vars;
-		else if (k == "functions")return this.__functions;
-		else if (k == "items")return this.__items;
-		else if (k == "is_static")return this.__is_static;
-		else if (k == "is_declare")return this.__is_declare;
-		return Bayrell.Lang.OpCodes.BaseOpCode.prototype.takeValue.call(this,__ctx,k,d);
+		if (k == "op")return this.op;
+		else if (k == "kind")return this.kind;
+		else if (k == "name")return this.name;
+		else if (k == "extend_name")return this.extend_name;
+		else if (k == "annotations")return this.annotations;
+		else if (k == "comments")return this.comments;
+		else if (k == "template")return this.template;
+		else if (k == "flags")return this.flags;
+		else if (k == "fn_create")return this.fn_create;
+		else if (k == "fn_destroy")return this.fn_destroy;
+		else if (k == "class_extends")return this.class_extends;
+		else if (k == "class_implements")return this.class_implements;
+		else if (k == "vars")return this.vars;
+		else if (k == "functions")return this.functions;
+		else if (k == "items")return this.items;
+		else if (k == "is_static")return this.is_static;
+		else if (k == "is_declare")return this.is_declare;
+		return Bayrell.Lang.OpCodes.BaseOpCode.prototype.takeValue.call(this,ctx,k,d);
 	},
-	getClassName: function(__ctx)
+	getClassName: function(ctx)
 	{
 		return "Bayrell.Lang.OpCodes.OpDeclareClass";
 	},
@@ -159,12 +142,12 @@ Object.assign(Bayrell.Lang.OpCodes.OpDeclareClass,
 	{
 		return "Bayrell.Lang.OpCodes.BaseOpCode";
 	},
-	getClassInfo: function(__ctx)
+	getClassInfo: function(ctx)
 	{
 		var Collection = Runtime.Collection;
 		var Dict = Runtime.Dict;
 		var IntrospectionInfo = Runtime.Annotations.IntrospectionInfo;
-		return new IntrospectionInfo(__ctx, {
+		return new IntrospectionInfo(ctx, {
 			"kind": IntrospectionInfo.ITEM_CLASS,
 			"class_name": "Bayrell.Lang.OpCodes.OpDeclareClass",
 			"name": "Bayrell.Lang.OpCodes.OpDeclareClass",
@@ -172,7 +155,7 @@ Object.assign(Bayrell.Lang.OpCodes.OpDeclareClass,
 			]),
 		});
 	},
-	getFieldsList: function(__ctx, f)
+	getFieldsList: function(ctx, f)
 	{
 		var a = [];
 		if (f==undefined) f=0;
@@ -198,17 +181,160 @@ Object.assign(Bayrell.Lang.OpCodes.OpDeclareClass,
 		}
 		return Runtime.Collection.from(a);
 	},
-	getFieldInfoByName: function(__ctx,field_name)
+	getFieldInfoByName: function(ctx,field_name)
 	{
+		var Collection = Runtime.Collection;
+		var Dict = Runtime.Dict;
+		var IntrospectionInfo = Runtime.Annotations.IntrospectionInfo;
+		if (field_name == "KIND_CLASS") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.OpCodes.OpDeclareClass",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "KIND_STRUCT") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.OpCodes.OpDeclareClass",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "KIND_INTERFACE") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.OpCodes.OpDeclareClass",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "op") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.OpCodes.OpDeclareClass",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "kind") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.OpCodes.OpDeclareClass",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "name") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.OpCodes.OpDeclareClass",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "extend_name") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.OpCodes.OpDeclareClass",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "annotations") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.OpCodes.OpDeclareClass",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "comments") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.OpCodes.OpDeclareClass",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "template") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.OpCodes.OpDeclareClass",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "flags") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.OpCodes.OpDeclareClass",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "fn_create") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.OpCodes.OpDeclareClass",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "fn_destroy") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.OpCodes.OpDeclareClass",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "class_extends") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.OpCodes.OpDeclareClass",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "class_implements") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.OpCodes.OpDeclareClass",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "vars") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.OpCodes.OpDeclareClass",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "functions") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.OpCodes.OpDeclareClass",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "items") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.OpCodes.OpDeclareClass",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "is_static") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.OpCodes.OpDeclareClass",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "is_declare") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.OpCodes.OpDeclareClass",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
 		return null;
 	},
-	getMethodsList: function(__ctx)
+	getMethodsList: function(ctx)
 	{
 		var a = [
 		];
 		return Runtime.Collection.from(a);
 	},
-	getMethodInfoByName: function(__ctx,field_name)
+	getMethodInfoByName: function(ctx,field_name)
 	{
 		return null;
 	},

@@ -3,7 +3,7 @@ var use = (typeof Runtime != 'undefined' && typeof Runtime.rtl != 'undefined') ?
 /*!
  *  Bayrell Language
  *
- *  (c) Copyright 2016-2019 "Ildar Bikmamatov" <support@bayrell.org>
+ *  (c) Copyright 2016-2020 "Ildar Bikmamatov" <support@bayrell.org>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ var use = (typeof Runtime != 'undefined' && typeof Runtime.rtl != 'undefined') ?
 if (typeof Bayrell == 'undefined') Bayrell = {};
 if (typeof Bayrell.Lang == 'undefined') Bayrell.Lang = {};
 if (typeof Bayrell.Lang.LangPHP == 'undefined') Bayrell.Lang.LangPHP = {};
-Bayrell.Lang.LangPHP.TranslatorPHP = function(__ctx)
+Bayrell.Lang.LangPHP.TranslatorPHP = function(ctx)
 {
 	Bayrell.Lang.CoreTranslator.apply(this, arguments);
 };
@@ -28,49 +28,45 @@ Bayrell.Lang.LangPHP.TranslatorPHP.prototype = Object.create(Bayrell.Lang.CoreTr
 Bayrell.Lang.LangPHP.TranslatorPHP.prototype.constructor = Bayrell.Lang.LangPHP.TranslatorPHP;
 Object.assign(Bayrell.Lang.LangPHP.TranslatorPHP.prototype,
 {
-	_init: function(__ctx)
+	_init: function(ctx)
 	{
 		var defProp = use('Runtime.rtl').defProp;
 		var a = Object.getOwnPropertyNames(this);
-		this.__expression = null;
-		if (a.indexOf("expression") == -1) defProp(this, "expression");
-		this.__html = null;
-		if (a.indexOf("html") == -1) defProp(this, "html");
-		this.__operator = null;
-		if (a.indexOf("operator") == -1) defProp(this, "operator");
-		this.__program = null;
-		if (a.indexOf("program") == -1) defProp(this, "program");
-		Bayrell.Lang.CoreTranslator.prototype._init.call(this,__ctx);
+		this.expression = null;
+		this.html = null;
+		this.operator = null;
+		this.program = null;
+		Bayrell.Lang.CoreTranslator.prototype._init.call(this,ctx);
 	},
-	assignObject: function(__ctx,o)
+	assignObject: function(ctx,o)
 	{
 		if (o instanceof Bayrell.Lang.LangPHP.TranslatorPHP)
 		{
-			this.__expression = o.__expression;
-			this.__html = o.__html;
-			this.__operator = o.__operator;
-			this.__program = o.__program;
+			this.expression = o.expression;
+			this.html = o.html;
+			this.operator = o.operator;
+			this.program = o.program;
 		}
-		Bayrell.Lang.CoreTranslator.prototype.assignObject.call(this,__ctx,o);
+		Bayrell.Lang.CoreTranslator.prototype.assignObject.call(this,ctx,o);
 	},
-	assignValue: function(__ctx,k,v)
+	assignValue: function(ctx,k,v)
 	{
-		if (k == "expression")this.__expression = v;
-		else if (k == "html")this.__html = v;
-		else if (k == "operator")this.__operator = v;
-		else if (k == "program")this.__program = v;
-		else Bayrell.Lang.CoreTranslator.prototype.assignValue.call(this,__ctx,k,v);
+		if (k == "expression")this.expression = v;
+		else if (k == "html")this.html = v;
+		else if (k == "operator")this.operator = v;
+		else if (k == "program")this.program = v;
+		else Bayrell.Lang.CoreTranslator.prototype.assignValue.call(this,ctx,k,v);
 	},
-	takeValue: function(__ctx,k,d)
+	takeValue: function(ctx,k,d)
 	{
 		if (d == undefined) d = null;
-		if (k == "expression")return this.__expression;
-		else if (k == "html")return this.__html;
-		else if (k == "operator")return this.__operator;
-		else if (k == "program")return this.__program;
-		return Bayrell.Lang.CoreTranslator.prototype.takeValue.call(this,__ctx,k,d);
+		if (k == "expression")return this.expression;
+		else if (k == "html")return this.html;
+		else if (k == "operator")return this.operator;
+		else if (k == "program")return this.program;
+		return Bayrell.Lang.CoreTranslator.prototype.takeValue.call(this,ctx,k,d);
 	},
-	getClassName: function(__ctx)
+	getClassName: function(ctx)
 	{
 		return "Bayrell.Lang.LangPHP.TranslatorPHP";
 	},
@@ -81,40 +77,40 @@ Object.assign(Bayrell.Lang.LangPHP.TranslatorPHP,
 	/**
 	 * Reset translator
 	 */
-	reset: function(__ctx, t)
+	reset: function(ctx, t)
 	{
-		return t.copy(__ctx, Runtime.Dict.from({"value":"","current_namespace_name":"","modules":new Runtime.Dict(__ctx),"expression":new Bayrell.Lang.LangPHP.TranslatorPHPExpression(__ctx),"html":new Bayrell.Lang.LangPHP.TranslatorPHPHtml(__ctx),"operator":new Bayrell.Lang.LangPHP.TranslatorPHPOperator(__ctx),"program":new Bayrell.Lang.LangPHP.TranslatorPHPProgram(__ctx),"save_vars":new Runtime.Collection(__ctx),"save_op_codes":new Runtime.Collection(__ctx),"save_op_code_inc":0,"preprocessor_flags":Runtime.Dict.from({"PHP":true})}));
+		return t.copy(ctx, Runtime.Dict.from({"value":"","current_namespace_name":"","modules":new Runtime.Dict(ctx),"expression":new Bayrell.Lang.LangPHP.TranslatorPHPExpression(ctx),"html":new Bayrell.Lang.LangPHP.TranslatorPHPHtml(ctx),"operator":new Bayrell.Lang.LangPHP.TranslatorPHPOperator(ctx),"program":new Bayrell.Lang.LangPHP.TranslatorPHPProgram(ctx),"save_vars":new Runtime.Collection(ctx),"save_op_codes":new Runtime.Collection(ctx),"save_op_code_inc":0,"preprocessor_flags":Runtime.Dict.from({"BACKEND":true,"PHP":true})}));
 	},
 	/**
 	 * Translate BaseOpCode
 	 */
-	translate: function(__ctx, t, op_code)
+	translate: function(ctx, t, op_code)
 	{
-		t = this.reset(__ctx, t);
-		return t.program.constructor.translateProgram(__ctx, t, op_code);
+		t = this.reset(ctx, t);
+		return t.program.constructor.translateProgram(ctx, t, op_code);
 	},
 	/**
 	 * Inc save op code
 	 */
-	nextSaveOpCode: function(__ctx, t)
+	nextSaveOpCode: function(ctx, t)
 	{
 		return "$__v" + Runtime.rtl.toStr(t.save_op_code_inc);
 	},
 	/**
 	 * Output save op code content
 	 */
-	outputSaveOpCode: function(__ctx, t, save_op_code_value)
+	outputSaveOpCode: function(ctx, t, save_op_code_value)
 	{
 		if (save_op_code_value == undefined) save_op_code_value = 0;
 		var content = "";
-		for (var i = 0;i < t.save_op_codes.count(__ctx);i++)
+		for (var i = 0;i < t.save_op_codes.count(ctx);i++)
 		{
 			if (i < save_op_code_value)
 			{
 				continue;
 			}
-			var save = t.save_op_codes.item(__ctx, i);
-			var s = (save.content == "") ? t.s(__ctx, save.var_name + Runtime.rtl.toStr(" = ") + Runtime.rtl.toStr(save.var_content) + Runtime.rtl.toStr(";")) : save.content;
+			var save = t.save_op_codes.item(ctx, i);
+			var s = (save.content == "") ? t.s(ctx, save.var_name + Runtime.rtl.toStr(" = ") + Runtime.rtl.toStr(save.var_content) + Runtime.rtl.toStr(";")) : save.content;
 			content += Runtime.rtl.toStr(s);
 		}
 		return content;
@@ -132,12 +128,12 @@ Object.assign(Bayrell.Lang.LangPHP.TranslatorPHP,
 	{
 		return "Bayrell.Lang.CoreTranslator";
 	},
-	getClassInfo: function(__ctx)
+	getClassInfo: function(ctx)
 	{
 		var Collection = Runtime.Collection;
 		var Dict = Runtime.Dict;
 		var IntrospectionInfo = Runtime.Annotations.IntrospectionInfo;
-		return new IntrospectionInfo(__ctx, {
+		return new IntrospectionInfo(ctx, {
 			"kind": IntrospectionInfo.ITEM_CLASS,
 			"class_name": "Bayrell.Lang.LangPHP.TranslatorPHP",
 			"name": "Bayrell.Lang.LangPHP.TranslatorPHP",
@@ -145,7 +141,7 @@ Object.assign(Bayrell.Lang.LangPHP.TranslatorPHP,
 			]),
 		});
 	},
-	getFieldsList: function(__ctx, f)
+	getFieldsList: function(ctx, f)
 	{
 		var a = [];
 		if (f==undefined) f=0;
@@ -158,17 +154,48 @@ Object.assign(Bayrell.Lang.LangPHP.TranslatorPHP,
 		}
 		return Runtime.Collection.from(a);
 	},
-	getFieldInfoByName: function(__ctx,field_name)
+	getFieldInfoByName: function(ctx,field_name)
 	{
+		var Collection = Runtime.Collection;
+		var Dict = Runtime.Dict;
+		var IntrospectionInfo = Runtime.Annotations.IntrospectionInfo;
+		if (field_name == "expression") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.LangPHP.TranslatorPHP",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "html") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.LangPHP.TranslatorPHP",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "operator") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.LangPHP.TranslatorPHP",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "program") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.LangPHP.TranslatorPHP",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
 		return null;
 	},
-	getMethodsList: function(__ctx)
+	getMethodsList: function(ctx)
 	{
 		var a = [
 		];
 		return Runtime.Collection.from(a);
 	},
-	getMethodInfoByName: function(__ctx,field_name)
+	getMethodInfoByName: function(ctx,field_name)
 	{
 		return null;
 	},

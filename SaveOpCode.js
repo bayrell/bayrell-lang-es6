@@ -3,7 +3,7 @@ var use = (typeof Runtime != 'undefined' && typeof Runtime.rtl != 'undefined') ?
 /*!
  *  Bayrell Language
  *
- *  (c) Copyright 2016-2019 "Ildar Bikmamatov" <support@bayrell.org>
+ *  (c) Copyright 2016-2020 "Ildar Bikmamatov" <support@bayrell.org>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ var use = (typeof Runtime != 'undefined' && typeof Runtime.rtl != 'undefined') ?
  */
 if (typeof Bayrell == 'undefined') Bayrell = {};
 if (typeof Bayrell.Lang == 'undefined') Bayrell.Lang = {};
-Bayrell.Lang.SaveOpCode = function(__ctx)
+Bayrell.Lang.SaveOpCode = function(ctx)
 {
 	Runtime.CoreStruct.apply(this, arguments);
 };
@@ -27,49 +27,45 @@ Bayrell.Lang.SaveOpCode.prototype = Object.create(Runtime.CoreStruct.prototype);
 Bayrell.Lang.SaveOpCode.prototype.constructor = Bayrell.Lang.SaveOpCode;
 Object.assign(Bayrell.Lang.SaveOpCode.prototype,
 {
-	_init: function(__ctx)
+	_init: function(ctx)
 	{
 		var defProp = use('Runtime.rtl').defProp;
 		var a = Object.getOwnPropertyNames(this);
-		this.__var_name = "";
-		if (a.indexOf("var_name") == -1) defProp(this, "var_name");
-		this.__var_content = "";
-		if (a.indexOf("var_content") == -1) defProp(this, "var_content");
-		this.__content = "";
-		if (a.indexOf("content") == -1) defProp(this, "content");
-		this.__op_code = null;
-		if (a.indexOf("op_code") == -1) defProp(this, "op_code");
-		Runtime.CoreStruct.prototype._init.call(this,__ctx);
+		this.var_name = "";
+		this.var_content = "";
+		this.content = "";
+		this.op_code = null;
+		Runtime.CoreStruct.prototype._init.call(this,ctx);
 	},
-	assignObject: function(__ctx,o)
+	assignObject: function(ctx,o)
 	{
 		if (o instanceof Bayrell.Lang.SaveOpCode)
 		{
-			this.__var_name = o.__var_name;
-			this.__var_content = o.__var_content;
-			this.__content = o.__content;
-			this.__op_code = o.__op_code;
+			this.var_name = o.var_name;
+			this.var_content = o.var_content;
+			this.content = o.content;
+			this.op_code = o.op_code;
 		}
-		Runtime.CoreStruct.prototype.assignObject.call(this,__ctx,o);
+		Runtime.CoreStruct.prototype.assignObject.call(this,ctx,o);
 	},
-	assignValue: function(__ctx,k,v)
+	assignValue: function(ctx,k,v)
 	{
-		if (k == "var_name")this.__var_name = v;
-		else if (k == "var_content")this.__var_content = v;
-		else if (k == "content")this.__content = v;
-		else if (k == "op_code")this.__op_code = v;
-		else Runtime.CoreStruct.prototype.assignValue.call(this,__ctx,k,v);
+		if (k == "var_name")this.var_name = v;
+		else if (k == "var_content")this.var_content = v;
+		else if (k == "content")this.content = v;
+		else if (k == "op_code")this.op_code = v;
+		else Runtime.CoreStruct.prototype.assignValue.call(this,ctx,k,v);
 	},
-	takeValue: function(__ctx,k,d)
+	takeValue: function(ctx,k,d)
 	{
 		if (d == undefined) d = null;
-		if (k == "var_name")return this.__var_name;
-		else if (k == "var_content")return this.__var_content;
-		else if (k == "content")return this.__content;
-		else if (k == "op_code")return this.__op_code;
-		return Runtime.CoreStruct.prototype.takeValue.call(this,__ctx,k,d);
+		if (k == "var_name")return this.var_name;
+		else if (k == "var_content")return this.var_content;
+		else if (k == "content")return this.content;
+		else if (k == "op_code")return this.op_code;
+		return Runtime.CoreStruct.prototype.takeValue.call(this,ctx,k,d);
 	},
-	getClassName: function(__ctx)
+	getClassName: function(ctx)
 	{
 		return "Bayrell.Lang.SaveOpCode";
 	},
@@ -90,12 +86,12 @@ Object.assign(Bayrell.Lang.SaveOpCode,
 	{
 		return "Runtime.CoreStruct";
 	},
-	getClassInfo: function(__ctx)
+	getClassInfo: function(ctx)
 	{
 		var Collection = Runtime.Collection;
 		var Dict = Runtime.Dict;
 		var IntrospectionInfo = Runtime.Annotations.IntrospectionInfo;
-		return new IntrospectionInfo(__ctx, {
+		return new IntrospectionInfo(ctx, {
 			"kind": IntrospectionInfo.ITEM_CLASS,
 			"class_name": "Bayrell.Lang.SaveOpCode",
 			"name": "Bayrell.Lang.SaveOpCode",
@@ -103,7 +99,7 @@ Object.assign(Bayrell.Lang.SaveOpCode,
 			]),
 		});
 	},
-	getFieldsList: function(__ctx, f)
+	getFieldsList: function(ctx, f)
 	{
 		var a = [];
 		if (f==undefined) f=0;
@@ -116,17 +112,48 @@ Object.assign(Bayrell.Lang.SaveOpCode,
 		}
 		return Runtime.Collection.from(a);
 	},
-	getFieldInfoByName: function(__ctx,field_name)
+	getFieldInfoByName: function(ctx,field_name)
 	{
+		var Collection = Runtime.Collection;
+		var Dict = Runtime.Dict;
+		var IntrospectionInfo = Runtime.Annotations.IntrospectionInfo;
+		if (field_name == "var_name") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.SaveOpCode",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "var_content") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.SaveOpCode",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "content") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.SaveOpCode",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "op_code") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.SaveOpCode",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
 		return null;
 	},
-	getMethodsList: function(__ctx)
+	getMethodsList: function(ctx)
 	{
 		var a = [
 		];
 		return Runtime.Collection.from(a);
 	},
-	getMethodInfoByName: function(__ctx,field_name)
+	getMethodInfoByName: function(ctx,field_name)
 	{
 		return null;
 	},

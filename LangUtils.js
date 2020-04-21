@@ -3,7 +3,7 @@ var use = (typeof Runtime != 'undefined' && typeof Runtime.rtl != 'undefined') ?
 /*!
  *  Bayrell Language
  *
- *  (c) Copyright 2016-2019 "Ildar Bikmamatov" <support@bayrell.org>
+ *  (c) Copyright 2016-2020 "Ildar Bikmamatov" <support@bayrell.org>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -19,25 +19,25 @@ var use = (typeof Runtime != 'undefined' && typeof Runtime.rtl != 'undefined') ?
  */
 if (typeof Bayrell == 'undefined') Bayrell = {};
 if (typeof Bayrell.Lang == 'undefined') Bayrell.Lang = {};
-Bayrell.Lang.LangUtils = function(__ctx)
+Bayrell.Lang.LangUtils = function(ctx)
 {
 };
 Object.assign(Bayrell.Lang.LangUtils.prototype,
 {
-	assignObject: function(__ctx,o)
+	assignObject: function(ctx,o)
 	{
 		if (o instanceof Bayrell.Lang.LangUtils)
 		{
 		}
 	},
-	assignValue: function(__ctx,k,v)
+	assignValue: function(ctx,k,v)
 	{
 	},
-	takeValue: function(__ctx,k,d)
+	takeValue: function(ctx,k,d)
 	{
 		if (d == undefined) d = null;
 	},
-	getClassName: function(__ctx)
+	getClassName: function(ctx)
 	{
 		return "Bayrell.Lang.LangUtils";
 	},
@@ -47,17 +47,17 @@ Object.assign(Bayrell.Lang.LangUtils,
 	/**
 	 * Parse file and convert to BaseOpCode
 	 */
-	parse: function(__ctx, parser, text)
+	parse: function(ctx, parser, text)
 	{
-		var res = parser.constructor.parse(__ctx, parser, text);
+		var res = parser.constructor.parse(ctx, parser, text);
 		return res[1];
 	},
 	/**
 	 * Translate BaseOpCode to string
 	 */
-	translate: function(__ctx, translator, op_code)
+	translate: function(ctx, translator, op_code)
 	{
-		var res = translator.constructor.translate(__ctx, translator, op_code);
+		var res = translator.constructor.translate(ctx, translator, op_code);
 		return res[1];
 	},
 	/* ======================= Class Init Functions ======================= */
@@ -73,12 +73,12 @@ Object.assign(Bayrell.Lang.LangUtils,
 	{
 		return "";
 	},
-	getClassInfo: function(__ctx)
+	getClassInfo: function(ctx)
 	{
 		var Collection = Runtime.Collection;
 		var Dict = Runtime.Dict;
 		var IntrospectionInfo = Runtime.Annotations.IntrospectionInfo;
-		return new IntrospectionInfo(__ctx, {
+		return new IntrospectionInfo(ctx, {
 			"kind": IntrospectionInfo.ITEM_CLASS,
 			"class_name": "Bayrell.Lang.LangUtils",
 			"name": "Bayrell.Lang.LangUtils",
@@ -86,23 +86,26 @@ Object.assign(Bayrell.Lang.LangUtils,
 			]),
 		});
 	},
-	getFieldsList: function(__ctx, f)
+	getFieldsList: function(ctx, f)
 	{
 		var a = [];
 		if (f==undefined) f=0;
 		return Runtime.Collection.from(a);
 	},
-	getFieldInfoByName: function(__ctx,field_name)
+	getFieldInfoByName: function(ctx,field_name)
 	{
+		var Collection = Runtime.Collection;
+		var Dict = Runtime.Dict;
+		var IntrospectionInfo = Runtime.Annotations.IntrospectionInfo;
 		return null;
 	},
-	getMethodsList: function(__ctx)
+	getMethodsList: function(ctx)
 	{
 		var a = [
 		];
 		return Runtime.Collection.from(a);
 	},
-	getMethodInfoByName: function(__ctx,field_name)
+	getMethodInfoByName: function(ctx,field_name)
 	{
 		return null;
 	},

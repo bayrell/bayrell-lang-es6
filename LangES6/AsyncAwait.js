@@ -3,7 +3,7 @@ var use = (typeof Runtime != 'undefined' && typeof Runtime.rtl != 'undefined') ?
 /*!
  *  Bayrell Language
  *
- *  (c) Copyright 2016-2019 "Ildar Bikmamatov" <support@bayrell.org>
+ *  (c) Copyright 2016-2020 "Ildar Bikmamatov" <support@bayrell.org>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ var use = (typeof Runtime != 'undefined' && typeof Runtime.rtl != 'undefined') ?
 if (typeof Bayrell == 'undefined') Bayrell = {};
 if (typeof Bayrell.Lang == 'undefined') Bayrell.Lang = {};
 if (typeof Bayrell.Lang.LangES6 == 'undefined') Bayrell.Lang.LangES6 = {};
-Bayrell.Lang.LangES6.AsyncAwait = function(__ctx)
+Bayrell.Lang.LangES6.AsyncAwait = function(ctx)
 {
 	Runtime.CoreStruct.apply(this, arguments);
 };
@@ -28,39 +28,37 @@ Bayrell.Lang.LangES6.AsyncAwait.prototype = Object.create(Runtime.CoreStruct.pro
 Bayrell.Lang.LangES6.AsyncAwait.prototype.constructor = Bayrell.Lang.LangES6.AsyncAwait;
 Object.assign(Bayrell.Lang.LangES6.AsyncAwait.prototype,
 {
-	_init: function(__ctx)
+	_init: function(ctx)
 	{
 		var defProp = use('Runtime.rtl').defProp;
 		var a = Object.getOwnPropertyNames(this);
-		this.__start_pos = "";
-		if (a.indexOf("start_pos") == -1) defProp(this, "start_pos");
-		this.__end_pos = "";
-		if (a.indexOf("end_pos") == -1) defProp(this, "end_pos");
-		Runtime.CoreStruct.prototype._init.call(this,__ctx);
+		this.start_pos = "";
+		this.end_pos = "";
+		Runtime.CoreStruct.prototype._init.call(this,ctx);
 	},
-	assignObject: function(__ctx,o)
+	assignObject: function(ctx,o)
 	{
 		if (o instanceof Bayrell.Lang.LangES6.AsyncAwait)
 		{
-			this.__start_pos = o.__start_pos;
-			this.__end_pos = o.__end_pos;
+			this.start_pos = o.start_pos;
+			this.end_pos = o.end_pos;
 		}
-		Runtime.CoreStruct.prototype.assignObject.call(this,__ctx,o);
+		Runtime.CoreStruct.prototype.assignObject.call(this,ctx,o);
 	},
-	assignValue: function(__ctx,k,v)
+	assignValue: function(ctx,k,v)
 	{
-		if (k == "start_pos")this.__start_pos = v;
-		else if (k == "end_pos")this.__end_pos = v;
-		else Runtime.CoreStruct.prototype.assignValue.call(this,__ctx,k,v);
+		if (k == "start_pos")this.start_pos = v;
+		else if (k == "end_pos")this.end_pos = v;
+		else Runtime.CoreStruct.prototype.assignValue.call(this,ctx,k,v);
 	},
-	takeValue: function(__ctx,k,d)
+	takeValue: function(ctx,k,d)
 	{
 		if (d == undefined) d = null;
-		if (k == "start_pos")return this.__start_pos;
-		else if (k == "end_pos")return this.__end_pos;
-		return Runtime.CoreStruct.prototype.takeValue.call(this,__ctx,k,d);
+		if (k == "start_pos")return this.start_pos;
+		else if (k == "end_pos")return this.end_pos;
+		return Runtime.CoreStruct.prototype.takeValue.call(this,ctx,k,d);
 	},
-	getClassName: function(__ctx)
+	getClassName: function(ctx)
 	{
 		return "Bayrell.Lang.LangES6.AsyncAwait";
 	},
@@ -81,12 +79,12 @@ Object.assign(Bayrell.Lang.LangES6.AsyncAwait,
 	{
 		return "Runtime.CoreStruct";
 	},
-	getClassInfo: function(__ctx)
+	getClassInfo: function(ctx)
 	{
 		var Collection = Runtime.Collection;
 		var Dict = Runtime.Dict;
 		var IntrospectionInfo = Runtime.Annotations.IntrospectionInfo;
-		return new IntrospectionInfo(__ctx, {
+		return new IntrospectionInfo(ctx, {
 			"kind": IntrospectionInfo.ITEM_CLASS,
 			"class_name": "Bayrell.Lang.LangES6.AsyncAwait",
 			"name": "Bayrell.Lang.LangES6.AsyncAwait",
@@ -94,7 +92,7 @@ Object.assign(Bayrell.Lang.LangES6.AsyncAwait,
 			]),
 		});
 	},
-	getFieldsList: function(__ctx, f)
+	getFieldsList: function(ctx, f)
 	{
 		var a = [];
 		if (f==undefined) f=0;
@@ -105,17 +103,34 @@ Object.assign(Bayrell.Lang.LangES6.AsyncAwait,
 		}
 		return Runtime.Collection.from(a);
 	},
-	getFieldInfoByName: function(__ctx,field_name)
+	getFieldInfoByName: function(ctx,field_name)
 	{
+		var Collection = Runtime.Collection;
+		var Dict = Runtime.Dict;
+		var IntrospectionInfo = Runtime.Annotations.IntrospectionInfo;
+		if (field_name == "start_pos") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.LangES6.AsyncAwait",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "end_pos") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.LangES6.AsyncAwait",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
 		return null;
 	},
-	getMethodsList: function(__ctx)
+	getMethodsList: function(ctx)
 	{
 		var a = [
 		];
 		return Runtime.Collection.from(a);
 	},
-	getMethodInfoByName: function(__ctx,field_name)
+	getMethodInfoByName: function(ctx,field_name)
 	{
 		return null;
 	},

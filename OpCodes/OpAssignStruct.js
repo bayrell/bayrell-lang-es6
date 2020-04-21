@@ -20,7 +20,7 @@ var use = (typeof Runtime != 'undefined' && typeof Runtime.rtl != 'undefined') ?
 if (typeof Bayrell == 'undefined') Bayrell = {};
 if (typeof Bayrell.Lang == 'undefined') Bayrell.Lang = {};
 if (typeof Bayrell.Lang.OpCodes == 'undefined') Bayrell.Lang.OpCodes = {};
-Bayrell.Lang.OpCodes.OpAssignStruct = function(__ctx)
+Bayrell.Lang.OpCodes.OpAssignStruct = function(ctx)
 {
 	Bayrell.Lang.OpCodes.BaseOpCode.apply(this, arguments);
 };
@@ -28,54 +28,49 @@ Bayrell.Lang.OpCodes.OpAssignStruct.prototype = Object.create(Bayrell.Lang.OpCod
 Bayrell.Lang.OpCodes.OpAssignStruct.prototype.constructor = Bayrell.Lang.OpCodes.OpAssignStruct;
 Object.assign(Bayrell.Lang.OpCodes.OpAssignStruct.prototype,
 {
-	_init: function(__ctx)
+	_init: function(ctx)
 	{
 		var defProp = use('Runtime.rtl').defProp;
 		var a = Object.getOwnPropertyNames(this);
-		this.__var_name = "";
-		if (a.indexOf("var_name") == -1) defProp(this, "var_name");
-		this.__annotations = null;
-		if (a.indexOf("annotations") == -1) defProp(this, "annotations");
-		this.__comments = null;
-		if (a.indexOf("comments") == -1) defProp(this, "comments");
-		this.__names = null;
-		if (a.indexOf("names") == -1) defProp(this, "names");
-		this.__expression = null;
-		if (a.indexOf("expression") == -1) defProp(this, "expression");
-		Bayrell.Lang.OpCodes.BaseOpCode.prototype._init.call(this,__ctx);
+		this.var_name = "";
+		this.annotations = null;
+		this.comments = null;
+		this.names = null;
+		this.expression = null;
+		Bayrell.Lang.OpCodes.BaseOpCode.prototype._init.call(this,ctx);
 	},
-	assignObject: function(__ctx,o)
+	assignObject: function(ctx,o)
 	{
 		if (o instanceof Bayrell.Lang.OpCodes.OpAssignStruct)
 		{
-			this.__var_name = o.__var_name;
-			this.__annotations = o.__annotations;
-			this.__comments = o.__comments;
-			this.__names = o.__names;
-			this.__expression = o.__expression;
+			this.var_name = o.var_name;
+			this.annotations = o.annotations;
+			this.comments = o.comments;
+			this.names = o.names;
+			this.expression = o.expression;
 		}
-		Bayrell.Lang.OpCodes.BaseOpCode.prototype.assignObject.call(this,__ctx,o);
+		Bayrell.Lang.OpCodes.BaseOpCode.prototype.assignObject.call(this,ctx,o);
 	},
-	assignValue: function(__ctx,k,v)
+	assignValue: function(ctx,k,v)
 	{
-		if (k == "var_name")this.__var_name = v;
-		else if (k == "annotations")this.__annotations = v;
-		else if (k == "comments")this.__comments = v;
-		else if (k == "names")this.__names = v;
-		else if (k == "expression")this.__expression = v;
-		else Bayrell.Lang.OpCodes.BaseOpCode.prototype.assignValue.call(this,__ctx,k,v);
+		if (k == "var_name")this.var_name = v;
+		else if (k == "annotations")this.annotations = v;
+		else if (k == "comments")this.comments = v;
+		else if (k == "names")this.names = v;
+		else if (k == "expression")this.expression = v;
+		else Bayrell.Lang.OpCodes.BaseOpCode.prototype.assignValue.call(this,ctx,k,v);
 	},
-	takeValue: function(__ctx,k,d)
+	takeValue: function(ctx,k,d)
 	{
 		if (d == undefined) d = null;
-		if (k == "var_name")return this.__var_name;
-		else if (k == "annotations")return this.__annotations;
-		else if (k == "comments")return this.__comments;
-		else if (k == "names")return this.__names;
-		else if (k == "expression")return this.__expression;
-		return Bayrell.Lang.OpCodes.BaseOpCode.prototype.takeValue.call(this,__ctx,k,d);
+		if (k == "var_name")return this.var_name;
+		else if (k == "annotations")return this.annotations;
+		else if (k == "comments")return this.comments;
+		else if (k == "names")return this.names;
+		else if (k == "expression")return this.expression;
+		return Bayrell.Lang.OpCodes.BaseOpCode.prototype.takeValue.call(this,ctx,k,d);
 	},
-	getClassName: function(__ctx)
+	getClassName: function(ctx)
 	{
 		return "Bayrell.Lang.OpCodes.OpAssignStruct";
 	},
@@ -96,12 +91,12 @@ Object.assign(Bayrell.Lang.OpCodes.OpAssignStruct,
 	{
 		return "Bayrell.Lang.OpCodes.BaseOpCode";
 	},
-	getClassInfo: function(__ctx)
+	getClassInfo: function(ctx)
 	{
 		var Collection = Runtime.Collection;
 		var Dict = Runtime.Dict;
 		var IntrospectionInfo = Runtime.Annotations.IntrospectionInfo;
-		return new IntrospectionInfo(__ctx, {
+		return new IntrospectionInfo(ctx, {
 			"kind": IntrospectionInfo.ITEM_CLASS,
 			"class_name": "Bayrell.Lang.OpCodes.OpAssignStruct",
 			"name": "Bayrell.Lang.OpCodes.OpAssignStruct",
@@ -109,7 +104,7 @@ Object.assign(Bayrell.Lang.OpCodes.OpAssignStruct,
 			]),
 		});
 	},
-	getFieldsList: function(__ctx, f)
+	getFieldsList: function(ctx, f)
 	{
 		var a = [];
 		if (f==undefined) f=0;
@@ -123,17 +118,55 @@ Object.assign(Bayrell.Lang.OpCodes.OpAssignStruct,
 		}
 		return Runtime.Collection.from(a);
 	},
-	getFieldInfoByName: function(__ctx,field_name)
+	getFieldInfoByName: function(ctx,field_name)
 	{
+		var Collection = Runtime.Collection;
+		var Dict = Runtime.Dict;
+		var IntrospectionInfo = Runtime.Annotations.IntrospectionInfo;
+		if (field_name == "var_name") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.OpCodes.OpAssignStruct",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "annotations") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.OpCodes.OpAssignStruct",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "comments") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.OpCodes.OpAssignStruct",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "names") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.OpCodes.OpAssignStruct",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
+		if (field_name == "expression") return new IntrospectionInfo(ctx, {
+			"kind": IntrospectionInfo.ITEM_FIELD,
+			"class_name": "Bayrell.Lang.OpCodes.OpAssignStruct",
+			"name": field_name,
+			"annotations": Collection.from([
+			]),
+		});
 		return null;
 	},
-	getMethodsList: function(__ctx)
+	getMethodsList: function(ctx)
 	{
 		var a = [
 		];
 		return Runtime.Collection.from(a);
 	},
-	getMethodInfoByName: function(__ctx,field_name)
+	getMethodInfoByName: function(ctx,field_name)
 	{
 		return null;
 	},
